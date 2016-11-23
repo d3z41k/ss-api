@@ -2,9 +2,12 @@
 
 const config = require('config');
 
-
 async function finStatements(nowMonths) {
   return new Promise(async(resolve, reject) => {
+
+    //-------------------------------------------------------------------------
+    // Usres libs
+    //-------------------------------------------------------------------------
 
     require('../libs/auth')(start);
     const getCols = require('../libs/get-cols');
@@ -101,7 +104,10 @@ async function finStatements(nowMonths) {
 
       for (let division in divisions) {
 
-        let cols = await getCols(auth, division, divisions[division].length);
+        let cols = await getCols(auth, division, divisions[division].length, months);
+
+        console.log(cols);
+
 
         for (let m = 0; m < months.length; m++) {
           params[0][0] = [];
@@ -148,9 +154,9 @@ async function finStatements(nowMonths) {
       let logSpreadsheetId = '1BWIgoCKT98IoYo8QJYas3BICqcFsOpePOcH19XMCD90';
 
       if (mode) {
-        range = 'sheet1!C5';
+        range = 'sheet1!C15';
       } else {
-        range = 'sheet1!B5';
+        range = 'sheet1!B15';
       }
 
       let now = new Date();

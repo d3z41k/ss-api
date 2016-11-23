@@ -21,13 +21,19 @@ const router = new Router({
 router
   .get('/mts-sales', async function() {
 
-    const mts = require('./ss-scripts/mts-sales');
-    this.body = await mts();
+    const mtsSales = require('./ss-scripts/mts-sales');
+    this.body = await mtsSales();
+
+  })
+  .get('/mts-dev', async function() {
+
+    const mtsDev = require('./ss-scripts/mts-dev');
+    this.body = await mtsDev();
 
   })
   .get('/profi1', async function() {
 
-    const profi1 = require('./ss-scripts/profi1_db');
+    const profi1 = require('./ss-scripts/profi1');
     this.body = await profi1();
 
   })
@@ -35,13 +41,13 @@ router
 
     let months = [this.params.pre_month, this.params.curr_month];
 
-    const profi1 = require('./ss-scripts/profi1_db');
+    const profi1 = require('./ss-scripts/profi1');
     this.body = await profi1(months);
 
   })
   .get('/profi2', async function() {
 
-    const profi2 = require('./ss-scripts/profi2_db');
+    const profi2 = require('./ss-scripts/profi2');
     this.body = await profi2();
 
   })
@@ -49,12 +55,11 @@ router
 
     let months = [this.params.pre_month, this.params.curr_month];
 
-    const profi2 = require('./ss-scripts/profi2_db');
+    const profi2 = require('./ss-scripts/profi2');
     this.body = await profi2(months);
   })
   .get('/fin-statements', async function() {
 
-    //remake like function overloading
     let months = [7, 8, 9, 10, 11, 12];
 
     const finStatements = require('./ss-scripts/fin-statements');
@@ -71,4 +76,4 @@ router
 
 app.use(router.routes());
 
-app.listen(3000, () => {console.log('Server start on port 3000...')});
+app.listen(3030, () => {console.log('Dev server start on port 3030...')});

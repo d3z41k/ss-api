@@ -384,9 +384,9 @@ async function profi1(mon) {
       let logSpreadsheetId = '1BWIgoCKT98IoYo8QJYas3BICqcFsOpePOcH19XMCD90';
 
       if (mode) {
-        range = 'sheet1!C3';
+        range = 'sheet1!C11';
       } else {
-        range = 'sheet1!B3';
+        range = 'sheet1!B11';
       }
 
       let now = new Date();

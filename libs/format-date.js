@@ -10,7 +10,11 @@ function formatDate(date) {
 
   let hh = date.getHours();
   //Correct time GMT +3 -> GMT +2
-  hh -= 1;
+  if (hh == '00') {
+    hh = '23'
+  } else {
+    hh -= 1;
+  }
   if (hh < 10) hh = '0' + hh;
 
   let MM = date.getMinutes();

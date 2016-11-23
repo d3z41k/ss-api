@@ -25,7 +25,7 @@ async function mts() {
       authorize(JSON.parse(content), start);
       //authorize(JSON.parse(content), updateData);
     });
-
+    
     /**
      * Create an OAuth2 client with the given credentials, and then execute the
      * given callback function.
@@ -33,7 +33,6 @@ async function mts() {
      * @param {Object} credentials The authorization client credentials.
      * @param {function} callback The callback to call with the authorized client.
      */
-
 
     function authorize(credentials, callback) {
 

@@ -1,22 +1,23 @@
 const Crud = require('../controllers/crud');
 const abc = require('./abc')();
 
-async function getCols(auth, products, quantity) {
+async function getCols(auth, products, quantity, months) {
   return new Promise(async(resolve, reject) => {
 
-    let spreadsheetId = '1VBtNQDkIsDome8gjwH4fY-Lx4KCbZynpIqSO2xZOXww';
+    let spreadsheetId = '1bg1eC-VLZ7PYr2fw4dIscYcxKBJjl3_Blwm5p6SVEKI';
     let list = encodeURIComponent(products);
     let range = list + '!A1:1';
 
     let crud = new Crud(auth);
     let row = await crud.readData(spreadsheetId, range);
 
-    let halfYear = [7, 8, 9, 10, 11, 12];
     let iRows = [];
     let monthCols = [];
 
+    console.log('row: ' + row[0]);
+
     row[0].forEach((value, i) => {
-      halfYear.forEach((month) => {
+      months.forEach((month) => {
         if (value == month) {
           iRows.push(i);
         }
@@ -24,6 +25,8 @@ async function getCols(auth, products, quantity) {
     });
 
     quantity = quantity * 3;
+
+    console.log(iRows);
 
     iRows.forEach((iRow) => {
 
