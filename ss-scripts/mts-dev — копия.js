@@ -5,7 +5,9 @@ const config = require('config');
 async function getAllHours(normaHour, normaType, params) {
   return new Promise(async(resolve, reject) => {
 
-    //console.log(params);
+    if (!normaHour || !normaType || !params) {
+      reject('Empty arguments!');
+    }
 
     let allHours = [];
     let ratio = 0;
@@ -33,7 +35,9 @@ async function getAllHours(normaHour, normaType, params) {
 async function getMargin(contractSum, params) {
   return new Promise(async(resolve, reject) => {
 
-    //console.log(params);
+    if (!contractSum || !params) {
+      reject('Empty arguments!');
+    }
 
     let margin = [];
     let sub = 0;
@@ -43,7 +47,7 @@ async function getMargin(contractSum, params) {
     for (let i = 2; i < params.length; i++) {
       params[i].forEach((value) => {
         sub += Number(value);
-      })
+      });
     }
 
     for (var j = 0; j < contractSum.length; j++) {
@@ -58,6 +62,60 @@ async function getMargin(contractSum, params) {
   });
 
 }
+
+async function getRatio(salary, lawt, params) {
+  return new Promise(async(resolve, reject) => {
+
+    if (!salary || !lawt || !params) {
+      reject('Empty arguments!');
+    }
+
+    let sum = [];
+    let dividers = [];
+    let ratio = [];
+    let factHours = [];
+
+    for (let j = 0; j < params[0].length; j++) {
+      for (let i = 0; i < salary.length; i++) {
+        if (salary[i][3] == params[0][j]) {
+          sum.push(Number(salary[i][24].replace(/\s/g, '')));
+        }
+      }
+    }
+
+    for (let n = 0; n < lawt.length; n++) {
+      let divider = 0;
+      for (let m = 0; m < lawt[n].length; m++) {
+        if (lawt[n][m][9] == params[1]) {
+          divider += Number(lawt[n][m][5].replace(/,/g, '.'));
+        }
+      }
+      dividers.push(divider);
+    }
+
+    for (let k = 0; k < sum.length; k++) {
+      ratio.push(dividers[k] ? [Math.round(sum[k] / dividers[k] * 10) / 10] : [0]);
+    }
+
+    for (let x = 0; x < lawt.length; x++) {
+      let factHour = 0;
+      for (let y = 0; y < lawt[x].length; y++) {
+        if (lawt[x][y][9] == params[1] && lawt[x][y][2] == params[2]) {
+          factHour += Number(lawt[x][y][5].replace(/,/g, '.'));
+        }
+      }
+      factHours.push([factHour]);
+    }
+
+    // console.log(ratio);
+    // console.log(factHours);
+
+    resolve([ratio, factHours]);
+  });
+
+}
+
+
 
 async function mtsDevSite() {
   return new Promise(async(resolve, reject) => {
@@ -133,7 +191,7 @@ async function mtsDevSite() {
 
       let clientInfo = await crud.readData(spreadsheetId, range);
 
-      let contractSum = clientInfo.map((row, i) => {
+      let contractSum = clientInfo.map((row) => {
         return [row[0], Number(row[row.length - 1].replace(/\s/g, ''))
         ? Number(row[row.length - 1].replace(/\s/g, '')) : 0]
       });
@@ -149,35 +207,35 @@ async function mtsDevSite() {
       }
 
       paramsMargin[0].push(devRegistry[0][0]);
-      devRegistry[0][13] && Number(devRegistry[0][13])
-        ? paramsMargin[1].push(devRegistry[0][13])
+      devRegistry[0][13] && Number(devRegistry[0][13].replace(/\s/g, ''))
+        ? paramsMargin[1].push(devRegistry[0][13].replace(/\s/g, ''))
         : paramsMargin[1].push(0);
 
-      for (let i = 0; i < devRegistry.length; i++) {
-        devRegistry[i][22] && Number(devRegistry[i][22].replace(/\s/g, ''))
-          ? paramsMargin[2].push(devRegistry[i][22].replace(/\s/g, ''))
-          : paramsMargin[2].push(0);
-
-        devRegistry[i][34] && Number(devRegistry[i][34].replace(/\s/g, ''))
-          ? paramsMargin[6].push(devRegistry[i][34].replace(/\s/g, ''))
-          : paramsMargin[6].push(0);
-
-        devRegistry[i][46] && Number(devRegistry[i][46].replace(/\s/g, ''))
-          ? paramsMargin[10].push(devRegistry[i][46].replace(/\s/g, ''))
-          : paramsMargin[10].push(0);
-
-        devRegistry[i][58] && Number(devRegistry[i][58].replace(/\s/g, ''))
-          ? paramsMargin[14].push(devRegistry[i][58].replace(/\s/g, ''))
-          : paramsMargin[14].push(0);
-
-        devRegistry[i][70] && Number(devRegistry[i][70].replace(/\s/g, ''))
-          ? paramsMargin[18].push(devRegistry[i][70].replace(/\s/g, ''))
-          : paramsMargin[18].push(0);
-
-        devRegistry[i][82] && Number(devRegistry[i][82].replace(/\s/g, ''))
-          ? paramsMargin[22].push(devRegistry[i][82].replace(/\s/g, ''))
-          : paramsMargin[22].push(0);
-      }
+      //  for (let i = 0; i < devRegistry.length; i++) {
+      //   devRegistry[i][22] && Number(devRegistry[i][22].replace(/\s/g, ''))
+      //     ? paramsMargin[2].push(devRegistry[i][22].replace(/\s/g, ''))
+      //     : paramsMargin[2].push(0);
+      //
+      //   devRegistry[i][34] && Number(devRegistry[i][34].replace(/\s/g, ''))
+      //     ? paramsMargin[6].push(devRegistry[i][34].replace(/\s/g, ''))
+      //     : paramsMargin[6].push(0);
+      //
+      //   devRegistry[i][46] && Number(devRegistry[i][46].replace(/\s/g, ''))
+      //     ? paramsMargin[10].push(devRegistry[i][46].replace(/\s/g, ''))
+      //     : paramsMargin[10].push(0);
+      //
+      //   devRegistry[i][58] && Number(devRegistry[i][58].replace(/\s/g, ''))
+      //     ? paramsMargin[14].push(devRegistry[i][58].replace(/\s/g, ''))
+      //     : paramsMargin[14].push(0);
+      //
+      //   devRegistry[i][70] && Number(devRegistry[i][70].replace(/\s/g, ''))
+      //     ? paramsMargin[18].push(devRegistry[i][70].replace(/\s/g, ''))
+      //     : paramsMargin[18].push(0);
+      //
+      //   devRegistry[i][82] && Number(devRegistry[i][82].replace(/\s/g, ''))
+      //     ? paramsMargin[22].push(devRegistry[i][82].replace(/\s/g, ''))
+      //     : paramsMargin[22].push(0);
+      // }
 
       // Hidden hell harcode
       {
@@ -241,6 +299,55 @@ async function mtsDevSite() {
           ? paramsMargin[25].push(devRegistry[0][85].replace(/\s/g, ''))
           : paramsMargin[25].push(0);
       }
+
+      //------------------------------------------------------------------------
+      // Remake HELL HARDCODE build
+      //------------------------------------------------------------------------
+
+      const quantity = 4;
+      let jArray = [];
+
+      for (let i = 0; i < devRegistry.length; i++) {
+        let step = 10;
+        for (let j = 2; j < 23; j += quantity) {
+          devRegistry[i][step + 12] && Number(devRegistry[i][step + 12].replace(/\s/g, ''))
+            ? paramsMargin[j].push(devRegistry[i][step + 12].replace(/\s/g, ''))
+            : paramsMargin[j].push(0);
+          jArray.push(j);
+          step += 12;
+        }
+      }
+
+      let factor = 20;
+      let count = 0;
+
+      for (let n = 3; n < 26; n++) {
+        if (!jArray.includes(n)) {
+          devRegistry[0][n + factor] && Number(devRegistry[0][n + factor].replace(/\s/g, ''))
+            ? paramsMargin[n].push(devRegistry[0][n + factor].replace(/\s/g, ''))
+            : paramsMargin[n].push(0);
+          count++;
+          if (count >= 3) {
+            factor += 8;
+            count = 0;
+          }
+        }
+      }
+
+      // let factor = 20;
+      // let count = 0;
+      //
+      // for (let n = 3; n < 26; n++) {
+      //   if (!jArray.includes(n)) {
+      //     console.log('n = ' + n);
+      //     console.log(n + factor);
+      //     count++;
+      //     if (count >= 3) {
+      //       factor += 8;
+      //       count = 0;
+      //     }
+      //   }
+      // }
 
 
       let margin = await getMargin(contractSum, paramsMargin);
@@ -310,8 +417,59 @@ async function mtsDevSite() {
       receiptParams[3] = [devRegistry[0][0]];
       receiptParams[4] = [devRegistry[0][1]];
 
-      console.log(receiptParams);
+      let value = await mtsDevQuery(pool, 'dds_olga', receiptParams);
 
+      list = encodeURIComponent('Разработка (реестр)');
+      range = list + '!S6:T6';
+
+      await crud.updateData(value, spreadsheetId, range)
+        .then(async result => {console.log(result)})
+        .catch(async err => {console.log(err)});
+
+      //--------------------------------------------------------------------------
+      // Get "Ratio" and "Hours"
+      //--------------------------------------------------------------------------
+
+      let ratioParams = [[], [], []];
+      // l.a.w.t - The list accounting work time
+      let lawt = [];
+      let lawtSpreadsheetId = '1qaxIR8lnaqyZe8HPeHrb_r7WJvp82_WpsNP5iYb4jnc';
+
+      for (let i = 0; i < devRegistry.length; i++) {
+
+        if (devRegistry[i][7]) {
+          ratioParams[0].push(devRegistry[i][7]);
+          list = encodeURIComponent(devRegistry[i][7]);
+          range = list + '!B10:L1000';
+          lawt.push(await crud.readData(lawtSpreadsheetId, range));
+        }
+      }
+
+      ratioParams[1] = '7';
+      ratioParams[2] = devRegistry[0][0];
+
+      let salarySpreadsheetId = '1fBUkFJhF6ukKd6cI33uLdOVNCZLZ-3-OcgKSMDZgzK0';
+      list = encodeURIComponent('ФОТ (факт)');
+      range = list + '!A6:ER77';
+
+      let salary = await crud.readData(salarySpreadsheetId, range);
+
+      let ratioAndHours = await getRatio(salary, lawt, ratioParams);
+
+      console.log(ratioAndHours);
+
+      spreadsheetId = '1v7_FqyFbhKZmvINgmTNwk2vpPHPP0p8JMA2l67K_cvM';
+      list = encodeURIComponent('Разработка (реестр)');
+
+      let rangeRatio = list + '!W6:W12';
+      let rangeHours = list + '!X6:X12';
+
+      await Promise.all([
+        crud.updateData(ratioAndHours[0], spreadsheetId, rangeRatio),
+        crud.updateData(ratioAndHours[1], spreadsheetId, rangeHours),
+      ]).then(async (results) => {
+        console.log(results);
+      }).catch(async (err) => {console.log(err)});
 
     }
 

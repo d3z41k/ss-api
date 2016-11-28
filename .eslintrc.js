@@ -1,28 +1,26 @@
 module.exports = {
     "env": {
-        "browser": true,
+        //"browser": true,
         "commonjs": true,
         "es6": true,
         "node": true
     },
     "extends": "eslint:recommended",
+    "plugins": [
+        "babel"
+    ],
+    "parser": "babel-eslint",
     "parserOptions": {
         "sourceType": "module"
     },
     "rules": {
-      "async-await/space-after-async": 2,
-      "async-await/space-after-await": 2,
 
-        "indent": [
-            "error",
-            "tab"
-        ],
         "linebreak-style": [
-            "error",
+            "warn",
             "unix"
         ],
         "quotes": [
-            "error",
+            "warn",
             "single"
         ],
         "semi": [
