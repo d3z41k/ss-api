@@ -171,7 +171,7 @@ async function mtsDevSite() {
       // Get data from 'dev-registry'
       //------------------------------------------------------------------------
 
-      range = list + '!C6:' + xLable.length;
+      range = list + '!C6:CL' + xLable.length;
       let devRegistry = await crud.readData(config.ssId.mts_dev, range);
 
       //------------------------------------------------------------------------
@@ -220,35 +220,153 @@ async function mtsDevSite() {
       // Get and Update allHours
       //------------------------------------------------------------------------
 
-      let allHours = await getAllHours(normaHour, normaType, paramsHours);
-
-      list = encodeURIComponent('Разработка (реестр)');
-
-      // IDEA: don't remove emty value
-
-      for (let x = 0; x < xArray.length; x++) {
-        range = list + '!K'+ xArray[x] +':K' + (xArray[x] + crew - 1);
-        await crud.updateData(allHours[x], config.ssId.mts_dev, range)
-          .then(async result => {console.log(result);})
-          .catch(console.log);
-      }
+      // let allHours = await getAllHours(normaHour, normaType, paramsHours);
+      //
+      // list = encodeURIComponent('Разработка (реестр)');
+      //
+      // // don't remove emty value!
+      //
+      // for (let x = 0; x < xArray.length; x++) {
+      //   range = list + '!K'+ xArray[x] +':K' + (xArray[x] + crew - 1);
+      //   await crud.updateData(allHours[x], config.ssId.mts_dev, range)
+      //     .then(async result => {console.log(result);})
+      //     .catch(console.log);
+      // }
 
       //------------------------------------------------------------------------
       // Get and normalize "Contract Sum"
       //------------------------------------------------------------------------
 
-      // list = encodeURIComponent('Клиенты (разработка)');
-      // range = list + '!A6:N1000';
-      //
-      // let clientInfo = await crud.readData(spreadsheetId, range);
-      //
-      // let contractSum = clientInfo.map((row, i) => {
-      //   return [row[0], Number(row[row.length - 1].replace(/\s/g, ''))
-      //   ? Number(row[row.length - 1].replace(/\s/g, '')) : 0]
-      // });
+      list = encodeURIComponent('Клиенты (разработка)');
+      range = list + '!A6:U300';
+
+      let clientInfo = await crud.readData(config.ssId.mts_dev, range);
+
+      let contractSum = clientInfo.map((row) => {
+        return [row[0], Number(row[row.length - 1].replace(/\s/g, ''))
+        ? Number(row[row.length - 1].replace(/\s/g, '')) : 0]
+      });
 
       //------------------------------------------------------------------------
-      // Build params for Margin - HELL HARDCODE - Remake!!!
+      // Get "Action months"
+      //------------------------------------------------------------------------
+
+      let actionMonth = [];
+
+      for (let x = 0; x < xArray.length; x++) {
+        actionMonth.push([]);
+        for (let i = 0; i < clientInfo.length; i++) {
+          if (devRegistry[xArray[x] - 6][0]  == clientInfo[i][0]) {
+            actionMonth[x].push(clientInfo[i][9] ? Number(clientInfo[i][9].slice(3,5)) : 6);
+            actionMonth[x].push(clientInfo[i][20] ? Number(clientInfo[i][20].slice(3,5)) : 12);
+          }
+        }
+
+      }
+
+      //console.log(actionMonth);
+
+      //------------------------------------------------------------------------
+      // The receipt of money from customers (prepaid & finalLy)
+      //------------------------------------------------------------------------
+
+      // let srcRows = [];
+      // list = encodeURIComponent('ДДС_Ольга');
+      // range = list + '!A6:AK';
+      //
+      // srcRows = await crud.readData(config.ssId.dds, range);
+      // srcRowslength = normLength(srcRows);
+
+      //---------------------------------------------------------------
+      // Normalizing of length "srcRows"
+      //---------------------------------------------------------------
+
+      // function normLength(srcRows){
+      //   for (let i = 0; i < srcRows.length; i++) {
+      //     if (srcRows[i][0] == '' &&
+      //       srcRows[i + 1][0] == '' &&
+      //       srcRows[i + 2][0] == '') {
+      //       return srcRows.length = i;
+      //     }
+      //   }
+      // }
+      //
+      // await dbRefresh(pool, 'dds_olga', srcRows.olga)
+      //   .then(async (results) => {console.log(results)})
+      //   .catch(async (err) => {console.log(err)});
+
+      //---------------------------------------------------------------
+      // Build receiptParams
+      //---------------------------------------------------------------
+
+      let receiptParams = [[], [[],[]], [], [], []];
+
+      receiptParams[0] = ['Разработка сайта'];
+      receiptParams[1][0] = ['Поступление денег от клиентов (предоплата)'];
+      receiptParams[1][1] = ['Поступление от клиентов (оконч. оплата)'];
+
+      receiptParams[2] = ['7'];
+
+      receiptParams[3] = [devRegistry[0][0]];
+      receiptParams[4] = [devRegistry[0][1]];
+
+      let value = await mtsDevQuery(pool, 'dds_olga', receiptParams);
+
+      list = encodeURIComponent('Разработка (реестр)');
+      range = list + '!S6:T6';
+
+      await crud.updateData(value, config.ssId.mts_dev, range)
+        .then(async result => {console.log(result);})
+        .catch(console.log);
+
+
+    //--------------------------------------------------------------------------
+    // Get "Ratio" and "Hours"
+    //--------------------------------------------------------------------------
+
+    // let ratioParams = [[], [], []];
+    // // l.a.w.t - The list accounting work time
+    // let lawt = [];
+    // let lawtSpreadsheetId = '1qaxIR8lnaqyZe8HPeHrb_r7WJvp82_WpsNP5iYb4jnc';
+    //
+    // for (let i = 0; i < devRegistry.length; i++) {
+    //
+    //   if (devRegistry[i][7]) {
+    //     ratioParams[0].push(devRegistry[i][7]);
+    //     list = encodeURIComponent(devRegistry[i][7]);
+    //     range = list + '!B10:L1000';
+    //     lawt.push(await crud.readData(lawtSpreadsheetId, range));
+    //   }
+    // }
+    //
+    // ratioParams[1] = '7';
+    // ratioParams[2] = devRegistry[0][0];
+    //
+    // let salarySpreadsheetId = '1fBUkFJhF6ukKd6cI33uLdOVNCZLZ-3-OcgKSMDZgzK0';
+    // list = encodeURIComponent('ФОТ (факт)');
+    // range = list + '!A6:ER77';
+    //
+    // let salary = await crud.readData(salarySpreadsheetId, range);
+    //
+    // let ratioAndHours = await getRatio(salary, lawt, ratioParams);
+    //
+    // console.log(ratioAndHours);
+    //
+    // spreadsheetId = '1v7_FqyFbhKZmvINgmTNwk2vpPHPP0p8JMA2l67K_cvM';
+    // list = encodeURIComponent('Разработка (реестр)');
+    //
+    // let rangeRatio = list + '!W6:W12';
+    // let rangeHours = list + '!X6:X12';
+    //
+    // await Promise.all([
+    //   crud.updateData(ratioAndHours[0], spreadsheetId, rangeRatio),
+    //   crud.updateData(ratioAndHours[1], spreadsheetId, rangeHours),
+    // ]).then(async (results) => {
+    //   console.log(results);
+    // }).catch(async (err) => {console.log(err)});
+
+      //------------------------------------------------------------------------
+      // Build params for Margin
       //------------------------------------------------------------------------
 
       // let paramsMargin = [];
@@ -312,59 +430,7 @@ async function mtsDevSite() {
       //   .then(async result => {console.log(result)})
       //   .catch(async err => {console.log(err)});
 
-      //--------------------------------------------------------------------------
-      // The receipt of money from customers (prepaid & finalLy)
-      //--------------------------------------------------------------------------
 
-      // let srcRows = [];
-      // list = encodeURIComponent('ДДС_Ольга');
-      // range = list + '!A6:AK';
-      //
-      // srcRows = await crud.readData(spreadsheetId, range);
-      // srcRowslength = normLength(srcRows);
-
-      //---------------------------------------------------------------
-      // Normalizing of length "srcRows"
-      //---------------------------------------------------------------
-
-      // function normLength(srcRows){
-      //   for (let i = 0; i < srcRows.length; i++) {
-      //     if (srcRows[i][0] == '' &&
-      //       srcRows[i + 1][0] == '' &&
-      //       srcRows[i + 2][0] == '') {
-      //       return srcRows.length = i;
-      //     }
-      //   }
-      // }
-      //
-      // await dbRefresh(pool, 'dds_olga', srcRows.olga)
-      //   .then(async (results) => {console.log(results)})
-      //   .catch(async (err) => {console.log(err)});
-
-      //---------------------------------------------------------------
-      // Build receiptParams
-      //---------------------------------------------------------------
-
-    //   let receiptParams = [[], [[],[]], [], [], []];
-    //
-    //   receiptParams[0] = ['Разработка сайта'];
-    //   receiptParams[1][0] = ['Поступление денег от клиентов (предоплата)'];
-    //   receiptParams[1][1] = ['Поступление от клиентов (оконч. оплата)'];
-    //
-    //   receiptParams[2] = ['7'];
-    //
-    //   receiptParams[3] = [devRegistry[0][0]];
-    //   receiptParams[4] = [devRegistry[0][1]];
-    //
-    //   let value = await mtsDevQuery(pool, 'dds_olga', receiptParams);
-    //
-    //   list = encodeURIComponent('Разработка (реестр)');
-    //   range = list + '!S6:T6';
-    //
-    //   await crud.updateData(value, spreadsheetId, range)
-    //     .then(async result => {console.log(result)})
-    //     .catch(async err => {console.log(err)});
-    //
 
 
      }
