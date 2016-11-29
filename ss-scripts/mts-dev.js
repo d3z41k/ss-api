@@ -261,7 +261,7 @@ async function mtsDevSite() {
             actionMonth[x].push(clientInfo[i][20] ? Number(clientInfo[i][20].slice(3,5)) : 12);
           }
         }
-
+        actionMonth[x].length = 2;
       }
 
       //console.log(actionMonth);
@@ -305,19 +305,56 @@ async function mtsDevSite() {
       receiptParams[1][0] = ['Поступление денег от клиентов (предоплата)'];
       receiptParams[1][1] = ['Поступление от клиентов (оконч. оплата)'];
 
-      receiptParams[2] = ['7'];
+      //---------------------------------------------------------------
+      // Get Actual months
+      //---------------------------------------------------------------
 
-      receiptParams[3] = [devRegistry[0][0]];
-      receiptParams[4] = [devRegistry[0][1]];
+      const colMonths = {
+        '7': ['S', 'T', 'W', 'X'],
+        '8': ['AF', 'AG', 'AI', 'AJ'],
+        '9': ['AR', 'AS', 'AU', 'AV'],
+        '10': ['BD', 'BE', 'BG', 'BH'],
+        '11': ['BP', 'BQ', 'BS', 'BT'],
+        '12': ['CB', 'CC', 'CE', 'CF']
+      };
 
-      let value = await mtsDevQuery(pool, 'dds_olga', receiptParams);
+      const yearMonths = [0 ,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+      let actionMonths = [];
 
-      list = encodeURIComponent('Разработка (реестр)');
-      range = list + '!S6:T6';
+      actionMonth.forEach((months) => {
+          actionMonths.push(yearMonths.slice(months[0], months[1] + 2));
+      });
 
-      await crud.updateData(value, config.ssId.mts_dev, range)
-        .then(async result => {console.log(result);})
-        .catch(console.log);
+      let cutActionMonths = [];
+
+      actionMonths.forEach((months) => {
+        let line = months.filter((month) => {
+          return month >= 7;
+        });
+        cutActionMonths.push(line);
+      });
+
+      //console.log(cutActionMonths);
+
+      // To finish! Problrm undefind values
+
+      // for (var x = 0; x < xArray.length; x++) {
+      //   receiptParams[3] = [devRegistry[xArray[x] - 6][0]];
+      //   receiptParams[4] = [devRegistry[xArray[x] - 6][1]];
+      //   for (var m = 0; m < actionMonths[x].length; m++) {
+      //     receiptParams[2] = [actionMonths[x][m]];
+      //     console.log(colMonths[actionMonths[x][m]]);
+      //   }
+      // }
+
+      //
+      //
+      // list = encodeURIComponent('Разработка (реестр)');
+      // range = list + '!S6:T6';
+      //
+      // await crud.updateData(value, config.ssId.mts_dev, range)
+      //   .then(async result => {console.log(result);})
+      //   .catch(console.log);
 
 
     //--------------------------------------------------------------------------
