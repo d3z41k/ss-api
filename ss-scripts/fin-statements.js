@@ -83,7 +83,7 @@ async function finStatements(nowMonths) {
       //await pool.end();
 
       //-------------------------------------------------------------
-      // Read data from Profi to RAM & combine params arrays
+      // 
       //-------------------------------------------------------------
 
       spreadsheetId = '1bg1eC-VLZ7PYr2fw4dIscYcxKBJjl3_Blwm5p6SVEKI';

@@ -141,6 +141,7 @@ async function mtsDevSite() {
 
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
+    const sleep = require('../libs/sleep');
     const dbRefresh = require('../models/db_refresh');
     const pool = require('../models/db_pool');
     const mtsDevQuery = require('../models/db_mts-dev-query');
@@ -296,27 +297,8 @@ async function mtsDevSite() {
       //   .catch(async (err) => {console.log(err)});
 
       //---------------------------------------------------------------
-      // Build receiptParams
+      // Get Actual months for a projects
       //---------------------------------------------------------------
-
-      let receiptParams = [[], [[],[]], [], [], []];
-
-      receiptParams[0] = ['Разработка сайта'];
-      receiptParams[1][0] = ['Поступление денег от клиентов (предоплата)'];
-      receiptParams[1][1] = ['Поступление от клиентов (оконч. оплата)'];
-
-      //---------------------------------------------------------------
-      // Get Actual months
-      //---------------------------------------------------------------
-
-      const colMonths = {
-        '7': ['S', 'T', 'W', 'X'],
-        '8': ['AF', 'AG', 'AI', 'AJ'],
-        '9': ['AR', 'AS', 'AU', 'AV'],
-        '10': ['BD', 'BE', 'BG', 'BH'],
-        '11': ['BP', 'BQ', 'BS', 'BT'],
-        '12': ['CB', 'CC', 'CE', 'CF']
-      };
 
       const yearMonths = [0 ,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
       let actionMonths = [];
@@ -334,73 +316,96 @@ async function mtsDevSite() {
         cutActionMonths.push(line);
       });
 
-      //console.log(cutActionMonths);
+      //---------------------------------------------------------------
+      // Build receiptParams
+      //---------------------------------------------------------------
 
-      // To finish! Problrm undefind values
-
+      // list = encodeURIComponent('Разработка (реестр)');
+      // let receiptParams = [[], [[],[]], [], [], []];
+      // let cols = [[], []];
+      // let value = [];
+      // // Get months cols for develope registry
+      // const colMonths = config.dev_colMonths;
+      //
+      // receiptParams[0] = 'Разработка сайта';
+      // receiptParams[1][0] = 'Поступление денег от клиентов (предоплата)';
+      // receiptParams[1][1] = 'Поступление от клиентов (оконч. оплата)';
+      //
       // for (var x = 0; x < xArray.length; x++) {
-      //   receiptParams[3] = [devRegistry[xArray[x] - 6][0]];
-      //   receiptParams[4] = [devRegistry[xArray[x] - 6][1]];
-      //   for (var m = 0; m < actionMonths[x].length; m++) {
-      //     receiptParams[2] = [actionMonths[x][m]];
-      //     console.log(colMonths[actionMonths[x][m]]);
+      //
+      //   receiptParams[2] = [];
+      //   receiptParams[3] = [];
+      //   receiptParams[4] = [];
+      //   cols = [[], []];
+      //
+      //   receiptParams[3].push(devRegistry[xArray[x] - 6][0]);
+      //   receiptParams[4].push(devRegistry[xArray[x] - 6][1]);
+      //
+      //   for (var m = 0; m < cutActionMonths[x].length; m++) {
+      //     receiptParams[2].push(cutActionMonths[x][m]);
+      //     cols[0] = cols[0].concat(colMonths[cutActionMonths[x][m]].slice(0,2));
+      //     cols[1] = cols[1].concat(colMonths[cutActionMonths[x][m]].slice(2));
       //   }
+      //
+      //   let values = await mtsDevQuery(pool, 'dds_olga', receiptParams);
+      //
+      //   for (let c = 0; c < cols[0].length; c += 2) {
+      //
+      //     range = list + '!' + cols[0][c] + xArray[x] + ':' + cols[0][c + 1] + xArray[x];
+      //     value = [[values[c], values[c + 1]]];
+      //
+      //     await crud.updateData(value, config.ssId.mts_dev, range)
+      //       .then(async result => {console.log(result);})
+      //       .catch(console.log);
+      //
+      //     // The sleep for avoid of limit quota ("Write requests per 100 seconds per user")
+      //     await sleep(800);
+      //
+      //   }
+      //
       // }
 
-      //
-      //
-      // list = encodeURIComponent('Разработка (реестр)');
-      // range = list + '!S6:T6';
-      //
-      // await crud.updateData(value, config.ssId.mts_dev, range)
-      //   .then(async result => {console.log(result);})
-      //   .catch(console.log);
+      //--------------------------------------------------------------------------
+      // Get "Ratio" and "Hours"
+      //--------------------------------------------------------------------------
 
+      let ratioParams = [[], [], []];
+      // l.a.w.t - The list accounting work time
+      let lawt = [];
 
-    //--------------------------------------------------------------------------
-    // Get "Ratio" and "Hours"
-    //--------------------------------------------------------------------------
+      for (let i = 0; i < devRegistry.length; i++) {
 
-    // let ratioParams = [[], [], []];
-    // // l.a.w.t - The list accounting work time
-    // let lawt = [];
-    // let lawtSpreadsheetId = '1qaxIR8lnaqyZe8HPeHrb_r7WJvp82_WpsNP5iYb4jnc';
-    //
-    // for (let i = 0; i < devRegistry.length; i++) {
-    //
-    //   if (devRegistry[i][7]) {
-    //     ratioParams[0].push(devRegistry[i][7]);
-    //     list = encodeURIComponent(devRegistry[i][7]);
-    //     range = list + '!B10:L1000';
-    //     lawt.push(await crud.readData(lawtSpreadsheetId, range));
-    //   }
-    // }
-    //
-    // ratioParams[1] = '7';
-    // ratioParams[2] = devRegistry[0][0];
-    //
-    // let salarySpreadsheetId = '1fBUkFJhF6ukKd6cI33uLdOVNCZLZ-3-OcgKSMDZgzK0';
-    // list = encodeURIComponent('ФОТ (факт)');
-    // range = list + '!A6:ER77';
-    //
-    // let salary = await crud.readData(salarySpreadsheetId, range);
-    //
-    // let ratioAndHours = await getRatio(salary, lawt, ratioParams);
-    //
-    // console.log(ratioAndHours);
-    //
-    // spreadsheetId = '1v7_FqyFbhKZmvINgmTNwk2vpPHPP0p8JMA2l67K_cvM';
-    // list = encodeURIComponent('Разработка (реестр)');
-    //
-    // let rangeRatio = list + '!W6:W12';
-    // let rangeHours = list + '!X6:X12';
-    //
-    // await Promise.all([
-    //   crud.updateData(ratioAndHours[0], spreadsheetId, rangeRatio),
-    //   crud.updateData(ratioAndHours[1], spreadsheetId, rangeHours),
-    // ]).then(async (results) => {
-    //   console.log(results);
-    // }).catch(async (err) => {console.log(err)});
+        if (devRegistry[i][7]) {
+          ratioParams[0].push(devRegistry[i][7]);
+          list = encodeURIComponent(devRegistry[i][7]);
+          range = list + '!B10:L1000';
+          lawt.push(await crud.readData(config.ssId.lawt, range));
+        }
+      }
+
+      ratioParams[1] = '7';
+      ratioParams[2] = devRegistry[0][0];
+
+      list = encodeURIComponent('ФОТ (факт)');
+      range = list + '!A6:ER77';
+
+      let salary = await crud.readData(config.ssId.salary, range);
+
+      let ratioAndHours = await getRatio(salary, lawt, ratioParams);
+
+      console.log(ratioAndHours);
+
+      list = encodeURIComponent('Разработка (реестр)');
+
+      let rangeRatio = list + '!W6:W12';
+      let rangeHours = list + '!X6:X12';
+
+      await Promise.all([
+        crud.updateData(ratioAndHours[0], config.ssId.mts_dev, rangeRatio),
+        crud.updateData(ratioAndHours[1], config.ssId.mts_dev, rangeHours),
+      ]).then(async (results) => {
+        console.log(results);
+      }).catch(console.log);
 
       //------------------------------------------------------------------------
       // Build params for Margin
@@ -466,9 +471,6 @@ async function mtsDevSite() {
       // await crud.updateData(margins, spreadsheetId, range)
       //   .then(async result => {console.log(result)})
       //   .catch(async err => {console.log(err)});
-
-
-
 
      }
 
