@@ -15,30 +15,6 @@ async function profi1(mon) {
     const dbRefresh = require('../models/db_refresh');
     const pool = require('../models/db_pool');
 
-    async function readData(auth, spreadsheetId, range) {
-      return new Promise(async (resolve, reject) => {
-
-        let sheets = google.sheets('v4');
-
-        sheets.spreadsheets.values.get({
-          auth: auth,
-          spreadsheetId: spreadsheetId,
-          range: range
-        }, (err, response) => {
-          if (err) {
-            console.log('The API returned an error: ' + err);
-            reject(err);
-          }
-
-          resolve(response.values);
-
-          //console.log(response.values);
-
-        });
-
-      });
-    }
-
     async function handlerParams1(rows, params) {
       return new Promise(async (resolve, reject) => {
 
@@ -78,32 +54,6 @@ async function profi1(mon) {
     }
 
 
-    async function updateData(auth, data, spreadsheetId, range) {
-      return new Promise(async (resolve, reject) => {
-
-        let sheets = google.sheets('v4');
-
-        sheets.spreadsheets.values.update({
-          auth: auth,
-          spreadsheetId: spreadsheetId,
-          range: range,
-          valueInputOption: 'USER_ENTERED',
-          resource: {
-            values: data
-          }
-        }, (err) => {
-          if (err) {
-            console.log('The API returned an error: ' + err);
-            reject(err);
-          }
-
-          resolve('update - OK!');
-
-        });
-
-      });
-    }
-
     //-------------------------------------------------------------
     // Fetch months
     //-------------------------------------------------------------
@@ -133,11 +83,10 @@ async function profi1(mon) {
       // Read data from DDS to RAM
       //-------------------------------------------------------------
 
-      let spreadsheetId = '1AxHOwz7zVZ6j6ulTKx7_XqVmKLDSwNf5Y2PqRrurQak';
       let list = encodeURIComponent('ДДС_Лера');
       let range = list + '!A6:AC';
 
-      let srcRows = await crud.readData(spreadsheetId, range);
+      let srcRows = await crud.readData(config.ssId.dds, range);
 
       //-------------------------------------------------------------
       // Normalizing of length "srcRows"
@@ -147,11 +96,8 @@ async function profi1(mon) {
         if (srcRows[i][0] == ''
           && srcRows[i + 1][0] == ''
           && srcRows[i + 2][0] == '') {
-
           srcRows.length = i;
-
         }
-
       }
 
       await dbRefresh(pool, 'dds_lera', srcRows),
@@ -160,7 +106,7 @@ async function profi1(mon) {
       // Read data from Profi to RAM & combine params arrays (2 steps)
       //-------------------------------------------------------------
 
-      spreadsheetId = '1LOrBLk15hVRf6U6NZgUmmf7MSWXnqkV9qPzfqbjPIkc';
+      let = spreadsheetId = '1LOrBLk15hVRf6U6NZgUmmf7MSWXnqkV9qPzfqbjPIkc';
 
       const profiQuery = require('../models/db_profi-query');
 

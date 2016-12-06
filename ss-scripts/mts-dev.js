@@ -89,43 +89,61 @@ async function getRatio(salary, lawt, params) {
     let dividers = [];
     let ratio = [];
     let factHours = [];
+    let ratioMonth = {
+      '7': 24,
+      '8': 45,
+      '9': 66,
+      '10': 87,
+      '11': 108,
+      '12': 129
+    };
 
-    for (let j = 0; j < params[0].length; j++) {
-      for (let i = 0; i < salary.length; i++) {
-        if (salary[i][3] == params[0][j]) {
-          sum.push(Number(salary[i][24].replace(/\s/g, '')));
+    for (let p = 0; p < params[0].length; p++) {
+      sum.push([]);
+      for (let m = 0; m < params[1][p].length; m++) {
+        sum[p].push([]);
+        for (let i = 0; i < params[0][p].length; i++) {
+          for (let s = 0; s < salary.length; s++) {
+            if (salary[s][3] == params[0][p][i]) {
+              sum[p][m].push(Number(salary[s][ratioMonth[params[1][p][m]]].replace(/\s/g, '')) ?
+                Number(salary[s][ratioMonth[params[1][p][m]]].replace(/\s/g, '')) : 0);
+            }
+          }
         }
       }
     }
 
-    for (let n = 0; n < lawt.length; n++) {
-      let divider = 0;
-      for (let m = 0; m < lawt[n].length; m++) {
-        if (lawt[n][m][9] == params[1]) {
-          divider += Number(lawt[n][m][5].replace(/,/g, '.'));
-        }
-      }
-      dividers.push(divider);
-    }
+    console.log(sum);
 
-    for (let k = 0; k < sum.length; k++) {
-      ratio.push(dividers[k] ? [Math.round(sum[k] / dividers[k] * 10) / 10] : [0]);
-    }
-
-    for (let x = 0; x < lawt.length; x++) {
-      let factHour = 0;
-      for (let y = 0; y < lawt[x].length; y++) {
-        if (lawt[x][y][9] == params[1] && lawt[x][y][2] == params[2]) {
-          factHour += Number(lawt[x][y][5].replace(/,/g, '.'));
-        }
-      }
-      factHours.push([factHour]);
-    }
+    // for (let n = 0; n < lawt.length; n++) {
+    //   let divider = 0;
+    //   for (let m = 0; m < lawt[n].length; m++) {
+    //     if (lawt[n][m][9] == params[1]) {
+    //       divider += Number(lawt[n][m][5].replace(/,/g, '.'));
+    //     }
+    //   }
+    //   dividers.push(divider);
+    // }
+    //
+    // for (let k = 0; k < sum.length; k++) {
+    //   ratio.push(dividers[k] ? [Math.round(sum[k] / dividers[k] * 10) / 10] : [0]);
+    // }
+    //
+    // for (let x = 0; x < lawt.length; x++) {
+    //   let factHour = 0;
+    //   for (let y = 0; y < lawt[x].length; y++) {
+    //     if (lawt[x][y][9] == params[1] && lawt[x][y][2] == params[2]) {
+    //       factHour += Number(lawt[x][y][5].replace(/,/g, '.'));
+    //     }
+    //   }
+    //   factHours.push([factHour]);
+    // }
 
     // console.log(ratio);
     // console.log(factHours);
 
-    resolve([ratio, factHours]);
+    //resolve([ratio, factHours]);
+    resolve('ok_stub');
   });
 
 }
@@ -371,20 +389,41 @@ async function mtsDevSite() {
 
       let ratioParams = [[], [], []];
       // l.a.w.t - The list accounting work time
-      let lawt = [];
+      let lawt = {
+        name: [],
+        table: []
+      };
 
-      for (let i = 0; i < devRegistry.length; i++) {
+      for (var x = 0; x < xArray.length; x++) {
 
-        if (devRegistry[i][7]) {
-          ratioParams[0].push(devRegistry[i][7]);
-          list = encodeURIComponent(devRegistry[i][7]);
-          range = list + '!B10:L1000';
-          lawt.push(await crud.readData(config.ssId.lawt, range));
+        ratioParams[0].push([]);
+        ratioParams[1].push([]);
+        ratioParams[2].push([]);
+
+        for (let i = (xArray[x] - 6); i < (xArray[x] - 6) + crew; i++) {
+           if (devRegistry[i][7]) {
+             ratioParams[0][x].push(devRegistry[i][7]);
+
+             // Get object lawt name[0] -> table[0] etc.
+             if (!lawt.name.includes(devRegistry[i][7])) {
+               lawt.name.push(devRegistry[i][7]);
+               list = encodeURIComponent(devRegistry[i][7]);
+               range = list + '!B10:L1000';
+               lawt.table.push(await crud.readData(config.ssId.lawt, range));
+             }
+
+          }
         }
+
+        for (var m = 0; m < cutActionMonths[x].length; m++) {
+            ratioParams[1][x].push(cutActionMonths[x][m]);
+        }
+
+        ratioParams[2][x].push(devRegistry[xArray[x] - 6][0]);
+
       }
 
-      ratioParams[1] = '7';
-      ratioParams[2] = devRegistry[0][0];
+      //console.log(ratioParams);
 
       list = encodeURIComponent('ФОТ (факт)');
       range = list + '!A6:ER77';
@@ -393,19 +432,19 @@ async function mtsDevSite() {
 
       let ratioAndHours = await getRatio(salary, lawt, ratioParams);
 
-      console.log(ratioAndHours);
-
-      list = encodeURIComponent('Разработка (реестр)');
-
-      let rangeRatio = list + '!W6:W12';
-      let rangeHours = list + '!X6:X12';
-
-      await Promise.all([
-        crud.updateData(ratioAndHours[0], config.ssId.mts_dev, rangeRatio),
-        crud.updateData(ratioAndHours[1], config.ssId.mts_dev, rangeHours),
-      ]).then(async (results) => {
-        console.log(results);
-      }).catch(console.log);
+      // console.log(ratioAndHours);
+      //
+      // list = encodeURIComponent('Разработка (реестр)');
+      //
+      // let rangeRatio = list + '!W6:W12';
+      // let rangeHours = list + '!X6:X12';
+      //
+      // await Promise.all([
+      //   crud.updateData(ratioAndHours[0], config.ssId.mts_dev, rangeRatio),
+      //   crud.updateData(ratioAndHours[1], config.ssId.mts_dev, rangeHours),
+      // ]).then(async (results) => {
+      //   console.log(results);
+      // }).catch(console.log);
 
       //------------------------------------------------------------------------
       // Build params for Margin
