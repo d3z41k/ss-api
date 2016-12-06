@@ -86,17 +86,14 @@ async function getRatio(salary, lawt, params) {
     }
 
     let sum = [];
+    let divider = 0;
     let dividers = [];
     let ratio = [];
     let factHours = [];
-    let ratioMonth = {
-      '7': 24,
-      '8': 45,
-      '9': 66,
-      '10': 87,
-      '11': 108,
-      '12': 129
-    };
+
+    let ratioMonth = config.ratioMonth;
+
+    // Build the salary sum for each month
 
     for (let p = 0; p < params[0].length; p++) {
       sum.push([]);
@@ -113,22 +110,40 @@ async function getRatio(salary, lawt, params) {
       }
     }
 
-    console.log(sum);
+    // console.log(sum);
 
-    // for (let n = 0; n < lawt.length; n++) {
-    //   let divider = 0;
-    //   for (let m = 0; m < lawt[n].length; m++) {
-    //     if (lawt[n][m][9] == params[1]) {
-    //       divider += Number(lawt[n][m][5].replace(/,/g, '.'));
-    //     }
-    //   }
-    //   dividers.push(divider);
-    // }
-    //
-    // for (let k = 0; k < sum.length; k++) {
-    //   ratio.push(dividers[k] ? [Math.round(sum[k] / dividers[k] * 10) / 10] : [0]);
-    // }
-    //
+    // Build divider
+    let months = [7, 8, 9, 10, 11, 12];
+
+    for (let n = 0; n < lawt.name.length; n++) {
+
+      dividers.push([]);
+
+      for (let m = 0; m < months.length; m++) {
+        divider = 0;
+        dividers[n].push([]);
+        for (let t = 0; t < lawt.table[n].length; t++) {
+          if (Number((lawt.table[n][t][0].substr(3,2)) == months[m]) && (lawt.table[n][t][5])) {
+             divider += Number(lawt.table[n][t][5].replace(/,/g, '.'));
+          }
+        }
+        dividers[n][m].push(Math.round(divider * 100) / 100);
+      }
+    }
+
+    console.log(dividers);
+
+    //console.log(lawt.name[1]);
+    //console.log(lawt.table[1].length);
+
+    for (let p = 0; p < params[0].length; p++) {
+      for (let s = 0; s < sum.length; s++) {
+        ratio.push(dividers[s] ? [Math.round(sum[s] / dividers[s] * 10) / 10] : [0]);
+      }
+    }
+
+
+
     // for (let x = 0; x < lawt.length; x++) {
     //   let factHour = 0;
     //   for (let y = 0; y < lawt[x].length; y++) {
