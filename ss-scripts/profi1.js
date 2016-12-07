@@ -87,79 +87,81 @@ async function profi1(mon) {
       let range = list + '!A6:AC';
 
       let srcRows = await crud.readData(config.ssId.dds, range);
+      srcRows.length = normLength(srcRows);
 
       //-------------------------------------------------------------
       // Normalizing of length "srcRows"
       //-------------------------------------------------------------
 
-      for (let i = 0; i < srcRows.length; i++) {
-        if (srcRows[i][0] == ''
-          && srcRows[i + 1][0] == ''
-          && srcRows[i + 2][0] == '') {
-          srcRows.length = i;
+      function normLength(srcRows){
+        for (let i = 0; i < srcRows.length; i++) {
+          if (srcRows[i][0] == '' &&
+            srcRows[i + 1][0] == '' &&
+            srcRows[i + 2][0] == '') {
+            return srcRows.length = i;
+          }
         }
       }
 
-      await dbRefresh(pool, 'dds_lera', srcRows),
+      //console.log(srcRows[0][5]);
+
+       await dbRefresh(pool, 'dds_lera', srcRows)
+      .then(async (result) => {console.log(result);})
+      .catch(console.log);
 
       //-------------------------------------------------------------
       // Read data from Profi to RAM & combine params arrays (2 steps)
-      //-------------------------------------------------------------
+      //-------------------------------------------------------------;
 
-      let = spreadsheetId = '1LOrBLk15hVRf6U6NZgUmmf7MSWXnqkV9qPzfqbjPIkc';
-
-      const profiQuery = require('../models/db_profi-query');
-
-      for (let month in months) {
-
-        for (let m = 0; m < directions.length; m++){
-
-          list = encodeURIComponent(directions[m]);
-
-          for (let i = 0; i < months[month].length; i++) {
-
-            range = list + '!' + months[month][i] + '2:' + months[month][i] + '4';
-
-            let dstRows = await crud.readData(spreadsheetId, range);
-
-            let params = [[], [], [], [], [], []];
-            params = await handlerParams1(dstRows, params);
-
-            range = list + '!C7:G';
-            dstRows = await crud.readData(spreadsheetId, range);
-
-            params = await handlerParams2(dstRows, params);
-
-            let sumValues = await profiQuery(pool, params);
-
-            //console.log(filalData);
-
-            range = list + '!' + months[month][i] + '7:' + months[month][i];
-            await crud.updateData(sumValues, spreadsheetId, range).then((result) => {console.log(result)});
-
-          }
-
-        }
-
-      }
+      // const profiQuery = require('../models/db_profi-query');
+      //
+      // for (let month in months) {
+      //
+      //   for (let m = 0; m < directions.length; m++){
+      //
+      //     list = encodeURIComponent(directions[m]);
+      //
+      //     for (let i = 0; i < months[month].length; i++) {
+      //
+      //       range = list + '!' + months[month][i] + '2:' + months[month][i] + '4';
+      //
+      //       let dstRows = await crud.readData(config.ssId.dev_prof1, range);
+      //
+      //       let params = [[], [], [], [], [], []];
+      //       params = await handlerParams1(dstRows, params);
+      //
+      //       range = list + '!C7:G';
+      //       dstRows = await crud.readData(config.ssId.dev_prof1, range);
+      //
+      //       params = await handlerParams2(dstRows, params);
+      //
+      //       let sumValues = await profiQuery(pool, params);
+      //
+      //       //console.log(filalData);
+      //
+      //       range = list + '!' + months[month][i] + '7:' + months[month][i];
+      //       await crud.updateData(sumValues, config.ssId.dev_prof1, range)
+      //         .then((result) => {console.log(result)});
+      //
+      //     }
+      //
+      //   }
+      // }
 
       //-------------------------------------------------------------
       // Update date-time in "Monitoring"
       //-------------------------------------------------------------
-      let logSpreadsheetId = '1BWIgoCKT98IoYo8QJYas3BICqcFsOpePOcH19XMCD90';
 
-      if (mode) {
-        range = 'sheet1!C11';
-      } else {
-        range = 'sheet1!B11';
-      }
-
-      let now = new Date();
-      now = [[formatDate(now)]];
-
-      await crud.updateData(now, logSpreadsheetId, range);
-
-      //resolve('complite!');
+      // if (mode) {
+      //   range = 'sheet1!C11';
+      // } else {
+      //   range = 'sheet1!B11';
+      // }
+      //
+      // let now = new Date();
+      // now = [[formatDate(now)]];
+      //
+      // await crud.updateData(now, config.ssId.monit, range);
 
     }
 

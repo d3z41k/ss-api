@@ -4,7 +4,6 @@ class Crud {
 
   constructor(auth) {
     this.auth = auth;
-
   }
 
   async readData(spreadsheetId, range) {

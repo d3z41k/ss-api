@@ -116,40 +116,92 @@ async function getRatio(salary, lawt, params) {
     let months = [7, 8, 9, 10, 11, 12];
 
     for (let n = 0; n < lawt.name.length; n++) {
-
       dividers.push([]);
+      dividers[n].push(lawt.name[n]);
+      dividers[n].push([]);
+      //console.log(dividers[n]);
 
       for (let m = 0; m < months.length; m++) {
         divider = 0;
-        dividers[n].push([]);
         for (let t = 0; t < lawt.table[n].length; t++) {
           if (Number((lawt.table[n][t][0].substr(3,2)) == months[m]) && (lawt.table[n][t][5])) {
              divider += Number(lawt.table[n][t][5].replace(/,/g, '.'));
           }
         }
-        dividers[n][m].push(Math.round(divider * 100) / 100);
+        dividers[n][1].push(Math.round(divider * 100) / 100);
       }
     }
 
-    console.log(dividers);
+    //console.log(dividers);
+
+    // console.log(dividers[2]);
+    // console.log(lawt.name[2]);
 
     //console.log(lawt.name[1]);
     //console.log(lawt.table[1].length);
 
-    for (let p = 0; p < params[0].length; p++) {
-      for (let s = 0; s < sum.length; s++) {
-        ratio.push(dividers[s] ? [Math.round(sum[s] / dividers[s] * 10) / 10] : [0]);
+    // console.log(params[0].length);
+    // console.log(sum.length);
+
+
+
+    const crew = 7;
+
+    let sal = 0;
+    let div = 0;
+
+    // for (let p = 0; p < params[0].length ; p++) {
+    //   ratio.push([]);
+    //   for (let m = 0; m < params[1][p].length; m++) {
+    //     ratio[p].push([]);
+    //     for (let c = 0; c < crew; c++) {
+    //       for (let d = 0; d < dividers.length; d++) {
+    //         if (dividers[d][0] == params[0][p][c]) {
+    //           div = dividers[d][1][params[1][p][m] - 7];
+    //           sal = sum[p][params[1][p][m] - params[1][p][0]][c] ? sum[p][params[1][p][m] - params[1][p][0]][c] : 0;
+    //           ratio[p][m].push(div ? Math.round(sal / div * 10) / 10 : 0);
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
+
+    //console.log(ratio);
+    for (let p = 0; p < params[0].length ; p++) {
+      factHours.push([]);
+      for (let m = 0; m < params[1][p].length; m++) {
+        factHours[p].push([]);
+        for (let c = 0; c < crew; c++) {
+          let factHour = 0;
+          for (let n = 0; n < lawt.name.length; n++) {
+////
+            if (lawt.name[n] == params[0][p][c]) {
+////
+              for (let t = 0; t < lawt.table[n].length; t++) {
+                console.log(lawt.name[n]);
+                if (Number(lawt.table[n][t][0].substr(3,2)) == params[1][p][c]
+                  && lawt.table[n][t][2] == params[2][p]) {
+                    console.log(lawt.table[n][t][2]);
+                    factHour += Number(lawt.table[n][t][5].replace(/,/g, '.'));
+                    console.log(factHour);
+                }
+              }
+              factHours[p][m].push(factHour);
+            }
+          }
+        }
       }
     }
 
+    //console.log(factHours);
 
-
-    // for (let x = 0; x < lawt.length; x++) {
+    // for (let x = 0; x < lawt.table.length; x++) {
     //   let factHour = 0;
-    //   for (let y = 0; y < lawt[x].length; y++) {
-    //     if (lawt[x][y][9] == params[1] && lawt[x][y][2] == params[2]) {
-    //       factHour += Number(lawt[x][y][5].replace(/,/g, '.'));
-    //     }
+    //   for (let y = 0; y < lawt.table[x].length; y++) {
+    //     // if (lawt[x][y][9] == params[1] && lawt[x][y][2] == params[2]) {
+    //     //   factHour += Number(lawt[x][y][5].replace(/,/g, '.'));
+    //     // }
+    //     console.log(Number(lawt.table[x][y][0].substr(3,2)));
     //   }
     //   factHours.push([factHour]);
     // }
@@ -325,7 +377,7 @@ async function mtsDevSite() {
       //   }
       // }
       //
-      // await dbRefresh(pool, 'dds_olga', srcRows.olga)
+      // await dbRefresh(pool, 'dds_olga', srcRows)
       //   .then(async (results) => {console.log(results)})
       //   .catch(async (err) => {console.log(err)});
 
