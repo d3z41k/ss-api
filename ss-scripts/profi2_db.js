@@ -317,12 +317,14 @@ async function profi2(mon) {
 
         srcRows[i].length = 29;
 
-        if (srcRows[i][5][0] == '(' && srcRows[i][5][srcRows[i][5].length - 1] == ')') {
-          srcRows[i][5] = srcRows[i][5].slice(1).slice(0, -1);
-          srcRows[i][5] = '-' + srcRows[i][5]
-        }
+        if (srcRows[i][5]) {
+          if (srcRows[i][5][0] == '(' && srcRows[i][5][srcRows[i][5].length - 1] == ')') {
+            srcRows[i][5] = srcRows[i][5].slice(1).slice(0, -1);
+            srcRows[i][5] = '-' + srcRows[i][5]
+          }
 
-        srcRows[i][5] = Number(srcRows[i][5].replace( /\s/g, '' ));
+          srcRows[i][5] = Number(srcRows[i][5].replace( /\s/g, '' ));
+        }
 
         //------------------------------------------------------------------------------
 

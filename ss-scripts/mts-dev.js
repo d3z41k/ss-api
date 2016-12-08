@@ -112,14 +112,14 @@ async function getRatio(salary, lawt, params) {
 
     // console.log(sum);
 
-    // Build divider
+    // = Build divider =
+
     let months = [7, 8, 9, 10, 11, 12];
 
     for (let n = 0; n < lawt.name.length; n++) {
       dividers.push([]);
       dividers[n].push(lawt.name[n]);
       dividers[n].push([]);
-      //console.log(dividers[n]);
 
       for (let m = 0; m < months.length; m++) {
         divider = 0;
@@ -134,39 +134,30 @@ async function getRatio(salary, lawt, params) {
 
     //console.log(dividers);
 
-    // console.log(dividers[2]);
-    // console.log(lawt.name[2]);
-
-    //console.log(lawt.name[1]);
-    //console.log(lawt.table[1].length);
-
-    // console.log(params[0].length);
-    // console.log(sum.length);
-
-
+    // = Build ratio =
 
     const crew = 7;
-
     let sal = 0;
     let div = 0;
 
-    // for (let p = 0; p < params[0].length ; p++) {
-    //   ratio.push([]);
-    //   for (let m = 0; m < params[1][p].length; m++) {
-    //     ratio[p].push([]);
-    //     for (let c = 0; c < crew; c++) {
-    //       for (let d = 0; d < dividers.length; d++) {
-    //         if (dividers[d][0] == params[0][p][c]) {
-    //           div = dividers[d][1][params[1][p][m] - 7];
-    //           sal = sum[p][params[1][p][m] - params[1][p][0]][c] ? sum[p][params[1][p][m] - params[1][p][0]][c] : 0;
-    //           ratio[p][m].push(div ? Math.round(sal / div * 10) / 10 : 0);
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
+    for (let p = 0; p < params[0].length ; p++) {
+      ratio.push([]);
+      for (let m = 0; m < params[1][p].length; m++) {
+        ratio[p].push([]);
+        for (let c = 0; c < crew; c++) {
+          for (let d = 0; d < dividers.length; d++) {
+            if (dividers[d][0] == params[0][p][c]) {
+              div = dividers[d][1][params[1][p][m] - 7];
+              sal = sum[p][params[1][p][m] - params[1][p][0]][c] ? sum[p][params[1][p][m] - params[1][p][0]][c] : 0;
+              ratio[p][m].push(div ? Math.round(sal / div * 10) / 10 : 0);
+            }
+          }
+        }
+      }
+    }
 
-    //console.log(ratio);
+    // = Build factHours =
+
     for (let p = 0; p < params[0].length ; p++) {
       factHours.push([]);
       for (let m = 0; m < params[1][p].length; m++) {
@@ -174,43 +165,26 @@ async function getRatio(salary, lawt, params) {
         for (let c = 0; c < crew; c++) {
           let factHour = 0;
           for (let n = 0; n < lawt.name.length; n++) {
-////
+
             if (lawt.name[n] == params[0][p][c]) {
-////
               for (let t = 0; t < lawt.table[n].length; t++) {
-                console.log(lawt.name[n]);
-                if (Number(lawt.table[n][t][0].substr(3,2)) == params[1][p][c]
+
+                if (Number(lawt.table[n][t][0].substr(3,2)) == params[1][p][m]
                   && lawt.table[n][t][2] == params[2][p]) {
-                    console.log(lawt.table[n][t][2]);
                     factHour += Number(lawt.table[n][t][5].replace(/,/g, '.'));
-                    console.log(factHour);
                 }
+
               }
-              factHours[p][m].push(factHour);
+              factHours[p][m].push(Math.round(factHour * 10) / 10);
             }
+
           }
         }
       }
     }
 
-    //console.log(factHours);
+    resolve([ratio, factHours]);
 
-    // for (let x = 0; x < lawt.table.length; x++) {
-    //   let factHour = 0;
-    //   for (let y = 0; y < lawt.table[x].length; y++) {
-    //     // if (lawt[x][y][9] == params[1] && lawt[x][y][2] == params[2]) {
-    //     //   factHour += Number(lawt[x][y][5].replace(/,/g, '.'));
-    //     // }
-    //     console.log(Number(lawt.table[x][y][0].substr(3,2)));
-    //   }
-    //   factHours.push([factHour]);
-    // }
-
-    // console.log(ratio);
-    // console.log(factHours);
-
-    //resolve([ratio, factHours]);
-    resolve('ok_stub');
   });
 
 }
@@ -409,14 +383,16 @@ async function mtsDevSite() {
       // let receiptParams = [[], [[],[]], [], [], []];
       // let cols = [[], []];
       // let value = [];
-      // // Get months cols for develope registry
+      //
+      // // = Get months cols for develope registry =
+      //
       // const colMonths = config.dev_colMonths;
       //
       // receiptParams[0] = 'Разработка сайта';
       // receiptParams[1][0] = 'Поступление денег от клиентов (предоплата)';
       // receiptParams[1][1] = 'Поступление от клиентов (оконч. оплата)';
       //
-      // for (var x = 0; x < xArray.length; x++) {
+      // for (let x = 0; x < xArray.length; x++) {
       //
       //   receiptParams[2] = [];
       //   receiptParams[3] = [];
@@ -426,7 +402,7 @@ async function mtsDevSite() {
       //   receiptParams[3].push(devRegistry[xArray[x] - 6][0]);
       //   receiptParams[4].push(devRegistry[xArray[x] - 6][1]);
       //
-      //   for (var m = 0; m < cutActionMonths[x].length; m++) {
+      //   for (let m = 0; m < cutActionMonths[x].length; m++) {
       //     receiptParams[2].push(cutActionMonths[x][m]);
       //     cols[0] = cols[0].concat(colMonths[cutActionMonths[x][m]].slice(0,2));
       //     cols[1] = cols[1].concat(colMonths[cutActionMonths[x][m]].slice(2));
@@ -440,10 +416,10 @@ async function mtsDevSite() {
       //     value = [[values[c], values[c + 1]]];
       //
       //     await crud.updateData(value, config.ssId.mts_dev, range)
-      //       .then(async result => {console.log(result);})
+      //       //.then(async result => {console.log(result);})
       //       .catch(console.log);
       //
-      //     // The sleep for avoid of limit quota ("Write requests per 100 seconds per user")
+      //     // = The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
       //     await sleep(800);
       //
       //   }
@@ -451,7 +427,7 @@ async function mtsDevSite() {
       // }
 
       //--------------------------------------------------------------------------
-      // Get "Ratio" and "Hours"
+      // Build ratioParams for "Ratio" and "factHours"
       //--------------------------------------------------------------------------
 
       let ratioParams = [[], [], []];
@@ -461,7 +437,7 @@ async function mtsDevSite() {
         table: []
       };
 
-      for (var x = 0; x < xArray.length; x++) {
+      for (let x = 0; x < xArray.length; x++) {
 
         ratioParams[0].push([]);
         ratioParams[1].push([]);
@@ -471,7 +447,8 @@ async function mtsDevSite() {
            if (devRegistry[i][7]) {
              ratioParams[0][x].push(devRegistry[i][7]);
 
-             // Get object lawt name[0] -> table[0] etc.
+             // = Get object lawt name[0] -> table[0] etc. =
+
              if (!lawt.name.includes(devRegistry[i][7])) {
                lawt.name.push(devRegistry[i][7]);
                list = encodeURIComponent(devRegistry[i][7]);
@@ -490,28 +467,63 @@ async function mtsDevSite() {
 
       }
 
-      //console.log(ratioParams);
-
       list = encodeURIComponent('ФОТ (факт)');
       range = list + '!A6:ER77';
 
       let salary = await crud.readData(config.ssId.salary, range);
 
-      let ratioAndHours = await getRatio(salary, lawt, ratioParams);
+      //--------------------------------------------------------------------------
+      // Get and Insert "Ratio" and "factHours"
+      //--------------------------------------------------------------------------
 
-      // console.log(ratioAndHours);
-      //
-      // list = encodeURIComponent('Разработка (реестр)');
-      //
-      // let rangeRatio = list + '!W6:W12';
-      // let rangeHours = list + '!X6:X12';
-      //
-      // await Promise.all([
-      //   crud.updateData(ratioAndHours[0], config.ssId.mts_dev, rangeRatio),
-      //   crud.updateData(ratioAndHours[1], config.ssId.mts_dev, rangeHours),
-      // ]).then(async (results) => {
-      //   console.log(results);
-      // }).catch(console.log);
+      let [ratio, factHours] = await getRatio(salary, lawt, ratioParams);
+
+
+      list = encodeURIComponent('Разработка (реестр)');
+
+      let cols = [[], []];
+      const colMonths = config.dev_colMonths;
+
+      for (let x = 0; x < xArray.length; x++) {
+        cols = [[], []];
+
+        for (let m = 0; m < cutActionMonths[x].length; m++) {
+           cols[1] = cols[1].concat(colMonths[cutActionMonths[x][m]].slice(2));
+        }
+
+        for (let c = 0; c < cols[1].length; c += 2) {
+          range = list + '!' + cols[1][c] + xArray[x] + ':' + cols[1][c + 1] + (xArray[x] + 6);
+          let value = [];
+          if (!c) {
+            value = [];
+            for (let i = 0; i < crew; i++) {
+              if (i < ratio[x][c].length){
+                value.push([ratio[x][c][i], factHours[x][c][i]]);
+              } else {
+                value.push([0, 0]);
+              }
+
+            }
+          } else {
+            value = [];
+            for (let i = 0; i < crew; i++) {
+              if (i < ratio[x][c / 2].length) {
+                value.push([ratio[x][c / 2][i], factHours[x][c / 2][i]]);
+              } else {
+                value.push([0, 0]);
+              }
+
+            }
+          }
+
+          await crud.updateData(value, config.ssId.mts_dev, range)
+          //.then(async result => {console.log(result);})
+            .catch(console.log);
+
+          // = The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
+          await sleep(800);
+        }
+      }
 
       //------------------------------------------------------------------------
       // Build params for Margin

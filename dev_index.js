@@ -33,7 +33,7 @@ router
   })
   .get('/profi1', async function() {
 
-    const profi1 = require('./ss-scripts/profi1');
+    const profi1 = require('./ss-scripts/profi1_db');
     this.body = await profi1();
 
   })
@@ -41,7 +41,7 @@ router
 
     let months = [this.params.pre_month, this.params.curr_month];
 
-    const profi1 = require('./ss-scripts/profi1');
+    const profi1 = require('./ss-scripts/profi1_db');
     this.body = await profi1(months);
 
   })

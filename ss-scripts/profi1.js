@@ -106,8 +106,8 @@ async function profi1(mon) {
       //console.log(srcRows[0][5]);
 
        await dbRefresh(pool, 'dds_lera', srcRows)
-      .then(async (result) => {console.log(result);})
-      .catch(console.log);
+        .then(async (result) => {console.log(result);})
+        .catch(console.log);
 
       //-------------------------------------------------------------
       // Read data from Profi to RAM & combine params arrays (2 steps)
