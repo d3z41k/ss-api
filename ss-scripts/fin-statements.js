@@ -28,8 +28,6 @@ async function finStatements(nowMonths) {
       // Read data from DDS to RAM
       //-------------------------------------------------------------
 
-      let spreadsheetId = '1AxHOwz7zVZ6j6ulTKx7_XqVmKLDSwNf5Y2PqRrurQak';
-
       let srcRows = {
         lera: '',
         olga: ''
@@ -42,7 +40,7 @@ async function finStatements(nowMonths) {
       let list = encodeURIComponent('ДДС_Лера');
       let range = list + '!A6:AC';
 
-      srcRows.lera = await crud.readData(spreadsheetId, range);
+      srcRows.lera = await crud.readData(config.ssId.dds, range);
       srcRows.lera.length = normLength(srcRows.lera);
 
       //-------------------------------------------------------------
@@ -52,7 +50,7 @@ async function finStatements(nowMonths) {
       list = encodeURIComponent('ДДС_Ольга');
       range = list + '!A6:AK';
 
-      srcRows.olga = await crud.readData(spreadsheetId, range);
+      srcRows.olga = await crud.readData(config.ssId.dds, range);
       srcRows.olga.length = normLength(srcRows.olga);
 
       //---------------------------------------------------------------
@@ -76,23 +74,21 @@ async function finStatements(nowMonths) {
       await Promise.all([
         dbRefresh(pool, 'dds_lera', srcRows.lera),
         dbRefresh(pool, 'dds_olga', srcRows.olga)
-      ]).then(async (results) => {
-        console.log(results);
-      }).catch(async (err) => {console.log(err)});
+      ])
+      //.then(async (results) => {console.log(results);})
+        .catch(console.log);
 
       //await pool.end();
 
       //-------------------------------------------------------------
-      // 
+      //
       //-------------------------------------------------------------
-
-      spreadsheetId = '1bg1eC-VLZ7PYr2fw4dIscYcxKBJjl3_Blwm5p6SVEKI';
 
       let divisions = config.divisions;
       let params = [[], [], []];
       list = encodeURIComponent('МТС');
       range = list + '!B8:B98';
-      params[1] = await crud.readData(spreadsheetId, range);
+      params[1] = await crud.readData(config.ssId.fin_statements, range);
       const factQuery = require('../models/db_fact-query');
 
       let months = nowMonths;
@@ -106,20 +102,13 @@ async function finStatements(nowMonths) {
 
         let cols = await getCols(auth, division, divisions[division].length, months);
 
-        console.log(cols);
-
-
         for (let m = 0; m < months.length; m++) {
           params[0][0] = [];
           params[0][0] = months[m];
 
-          console.log(params[0][0]);
-
           for (let p = 0; p < divisions[division].length; p++) {
             params[2] = [];
             params[2].push(divisions[division][p]);
-
-            console.log(params[2]);
 
             //make Promise.all!!!
             let sum1 = await factQuery(pool, 'dds_lera', params);
@@ -133,13 +122,11 @@ async function finStatements(nowMonths) {
             list = encodeURIComponent(division);
             range = list + '!' + cols[m].fact[p] + '8:' + cols[m].fact[p] + '98';
 
-            console.log(range);
+            await crud.updateData(sum, config.ssId.fin_statements, range)
+            //.then(async (result) => {console.log(result);})
+              .catch(console.log);
 
-            await crud.updateData(sum, spreadsheetId, range)
-              .then(async (result) => {console.log(result)})
-              .catch(err => {console.log(err)});
-
-              resolve('complite!');
+            resolve('complite!');
 
           }
         }
@@ -151,7 +138,6 @@ async function finStatements(nowMonths) {
       //-------------------------------------------------------------
       // Update date-time in "Monitoring"
       //-------------------------------------------------------------
-      let logSpreadsheetId = '1BWIgoCKT98IoYo8QJYas3BICqcFsOpePOcH19XMCD90';
 
       if (mode) {
         range = 'sheet1!C15';
@@ -164,9 +150,9 @@ async function finStatements(nowMonths) {
         [formatDate(now)]
       ];
 
-      await crud.updateData(now, logSpreadsheetId, range)
-        .then(async (result) => {console.log(result)})
-        .catch(err => {console.log(err)});
+      await crud.updateData(now, config.ssId.monit, range)
+      //.then(async (result) => {console.log(result);})
+        .catch(console.log);
 
       //resolve('complite!');
 

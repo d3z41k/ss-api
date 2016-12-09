@@ -335,7 +335,7 @@ async function mtsDevSite() {
       range = list + '!A6:AK';
 
       srcRows = await crud.readData(config.ssId.dds, range);
-      let srcRowslength = normLength(srcRows);
+      srcRows = normLength(srcRows);
 
       //---------------------------------------------------------------
       // Normalizing of length "srcRows"
@@ -416,7 +416,7 @@ async function mtsDevSite() {
           value = [[values[c], values[c + 1]]];
 
           await crud.updateData(value, config.ssId.mts_dev, range)
-            //.then(async result => {console.log(result);})
+            .then(async result => {console.log(result);})
             .catch(console.log);
 
           // = The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =

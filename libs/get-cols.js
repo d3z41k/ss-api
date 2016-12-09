@@ -14,8 +14,6 @@ async function getCols(auth, products, quantity, months) {
     let iRows = [];
     let monthCols = [];
 
-    console.log('row: ' + row[0]);
-
     row[0].forEach((value, i) => {
       months.forEach((month) => {
         if (value == month) {
@@ -25,8 +23,6 @@ async function getCols(auth, products, quantity, months) {
     });
 
     quantity = quantity * 3;
-
-    console.log(iRows);
 
     iRows.forEach((iRow) => {
 

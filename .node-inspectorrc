@@ -1,0 +1,12 @@
+{
+  "web-port": 8088,
+  "web-host": null,
+  "debug-port": 5858,
+  "save-live-edit": true,
+  "preload": false,
+  "hidden": ["node_modules/"],
+  "nodejs": ["--harmony-async-await"],
+  "stack-trace-limit": 50,
+  "ssl-key": "./ssl/key.pem",
+  "ssl-cert": "./ssl/cert.pem"
+}
