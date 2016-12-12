@@ -6,7 +6,6 @@ async function mtsDevQuery(pool, tableName, params) {
     for (let m = 0; m < params[2].length; m++) {
       for (let i = 0; i < params[1].length; i++) {
 
-
         await pool.execute('SELECT SUM(`Сумма итого руб`) FROM '+ tableName +' WHERE ' +
             '`Направление деятельноcти` = ? ' +
             'AND `Статья движения денег` = ? ' +
@@ -16,17 +15,15 @@ async function mtsDevQuery(pool, tableName, params) {
               params[0],
               params[1][i],
               params[2][m],
-              params[3],
-              params[4]
+              params[3][0],
+              params[4][0]
             ])
           .then(([col, feilds]) => {
             for (let key in col[0]) {
               values.push(col[0][key] ? col[0][key] : 0);
             }
           })
-          .catch(err => {
-            console.log(err)
-          });
+          .catch(console.log);
       }
     }
 

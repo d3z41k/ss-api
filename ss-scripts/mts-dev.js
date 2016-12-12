@@ -202,6 +202,7 @@ async function mtsDevSite() {
 
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
+    const normLength = require('../libs/normalize-length');
     const sleep = require('../libs/sleep');
     const dbRefresh = require('../models/db_refresh');
     const pool = require('../models/db_pool');
@@ -228,6 +229,8 @@ async function mtsDevSite() {
 
       xArray.pop();
       xArray.unshift(6);
+
+      // xArray = [246];
 
       //------------------------------------------------------------------------
       // Get data from 'dev-registry'
@@ -291,9 +294,11 @@ async function mtsDevSite() {
       for (let x = 0; x < xArray.length; x++) {
         range = list + '!K'+ xArray[x] +':K' + (xArray[x] + crew - 1);
         await crud.updateData(allHours[x], config.ssId.mts_dev, range)
-          .then(async result => {console.log(result);})
+          //.then(async result => {console.log(result);})
           .catch(console.log);
       }
+
+      console.log('* Get and Update allHours *');
 
       //------------------------------------------------------------------------
       // Get and normalize "Contract Sum"
@@ -326,6 +331,53 @@ async function mtsDevSite() {
         actionMonth[x].length = 2;
       }
 
+      //--------------------------------------------------------------------------
+      // Get & Insert "Mounth of The Act"
+      //--------------------------------------------------------------------------
+
+      let monthAct = clientInfo.map((row) => {
+        return [
+          row[0], row[16] ? row[16] : 0,
+          Number(row[13].replace(/\s/g, ''))
+          ? Number(row[13].replace(/\s/g, '')) : 0
+        ];
+      });
+
+      //console.log(monthAct);
+
+      let colsAct = {
+        '7': 'R',
+        '8': 'AE',
+        '9': 'AQ',
+        '10': 'BC',
+        '11': 'BO',
+        '12': 'CA'
+       };
+
+      for (let x = 0; x < xArray.length; x++) {
+        for (let i = 0; i < monthAct.length; i++) {
+          if (devRegistry[xArray[x] - 6][0]  == monthAct[i][0]) {
+            let month = monthAct[i][1] && Number(monthAct[i][1].substr(3, 2)) > 6 ? Number(monthAct[i][1].substr(3, 2)) : '';
+
+            list = encodeURIComponent('Разработка (реестр)');
+            range = list + '!H' + xArray[x];
+
+            // await crud.updateData([[month]], config.ssId.mts_dev, range)
+            //   //.then(async result => {console.log(result);})
+            //   .catch(console.log);
+
+            if (colsAct[month]) {
+              range = list + '!' + colsAct[month] + xArray[x];
+
+              await crud.updateData([[monthAct[i][2]]], config.ssId.mts_dev, range)
+                //.then(async result => {console.log(result);})
+                .catch(console.log);
+            }
+
+          }
+        }
+      }
+
       //------------------------------------------------------------------------
       // The receipt of money from customers (prepaid & finalLy)
       //------------------------------------------------------------------------
@@ -335,25 +387,13 @@ async function mtsDevSite() {
       range = list + '!A6:AK';
 
       srcRows = await crud.readData(config.ssId.dds, range);
-      srcRows = normLength(srcRows);
 
-      //---------------------------------------------------------------
-      // Normalizing of length "srcRows"
-      //---------------------------------------------------------------
-
-      function normLength(srcRows){
-        for (let i = 0; i < srcRows.length; i++) {
-          if (srcRows[i][0] == '' &&
-            srcRows[i + 1][0] == '' &&
-            srcRows[i + 2][0] == '') {
-            return srcRows.length = i;
-          }
-        }
-      }
+      // = Normalizing of length "srcRows" =
+      normLength(srcRows);
 
       await dbRefresh(pool, 'dds_olga', srcRows)
-        .then(async (results) => {console.log(results)})
-        .catch(async (err) => {console.log(err)});
+        .then(async (results) => {console.log(results);})
+        .catch(console.log);
 
       //---------------------------------------------------------------
       // Get Actual months for a projects
@@ -416,15 +456,16 @@ async function mtsDevSite() {
           value = [[values[c], values[c + 1]]];
 
           await crud.updateData(value, config.ssId.mts_dev, range)
-            .then(async result => {console.log(result);})
+            //.then(async result => {console.log(result);})
             .catch(console.log);
 
           // = The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
-          await sleep(800);
-
+          await sleep(1000);
         }
 
       }
+
+      console.log('* The receipt of money from customers (prepaid & finalLy) *');
 
       //--------------------------------------------------------------------------
       // Build ratioParams for "Ratio" and "factHours"
@@ -468,6 +509,7 @@ async function mtsDevSite() {
       range = list + '!A6:ER77';
 
       let salary = await crud.readData(config.ssId.salary, range);
+
 
       //--------------------------------------------------------------------------
       // Get & Insert "Ratio & factHours"
@@ -514,9 +556,11 @@ async function mtsDevSite() {
             .catch(console.log);
 
           // = The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
-          await sleep(800);
+          await sleep(1000);
         }
       }
+
+      console.log('* ratioParams for Ratio and factHours *');
 
       //------------------------------------------------------------------------
       // Build params for Margin
@@ -584,17 +628,35 @@ async function mtsDevSite() {
         // = cut to 2 number after poin =
         margins = margins.toFixed(2);
 
-        console.log([[margin, margins]]);
+        //console.log([[margin, margins]]);
 
         list = encodeURIComponent('Разработка (реестр)');
         range = list + '!N' + xArray[x] + ':O' + xArray[x];
 
         await crud.updateData([[margin, margins]], config.ssId.mts_dev, range)
-          .then(async result => {console.log(result)})
-          .catch(async err => {console.log(err)});
+          //.then(async result => {console.log(result);})
+          .catch(console.log);
 
       }
-    }
+
+      console.log('* Build params for Margin *');
+
+      //-------------------------------------------------------------
+      // Update date-time in "Monitoring"
+      //-------------------------------------------------------------
+
+      range = 'sheet1!B4';
+
+      let now = new Date();
+      now = [
+        [formatDate(now)]
+      ];
+
+      await crud.updateData(now, config.ssId.monit, range)
+      //.then(async (result) => {console.log(result);})
+        .catch(console.log);
+
+    } // = End start function =
 
     resolve('complite!');
 

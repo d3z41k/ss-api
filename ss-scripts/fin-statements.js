@@ -156,7 +156,7 @@ async function finStatements(nowMonths) {
 
       //resolve('complite!');
 
-    }
+    }// = End start function =
   });
 }
 
