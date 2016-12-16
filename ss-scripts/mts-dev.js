@@ -31,16 +31,6 @@ async function getAllHours(normaHour, normaType, params) {
         for (let h = 0; h < normaHour.length; h++) {
           if (params[1][p][i] == normaHour[h][0]) {
             allHours[p].push([Number(normaHour[h][1]) * Number(ratio[p])]);
-
-            //= Get hours manager and tecnical director = *DELETE*
-            if (params[1][p][i] == 'Проект-менеджер' || params[1][p][i] == 'Тех дир-р') {
-              if(ratio[p]) {
-                hoursMaragerDirector[p].push(Number(normaHour[h][1]) * Number(ratio[p]));
-              } else {
-                hoursMaragerDirector[p].push(Number(normaHour[h][1]));
-              }
-
-            }
           }
         }
         //= Push '' if a value not found
@@ -59,12 +49,12 @@ async function getAllHours(normaHour, normaType, params) {
       }
     }
 
-    resolve([allHours, hoursMaragerDirector]);
+    resolve(allHours);
   });
 
 }
 
-async function getRatio(salary, lawt, params, cutContractMonths) {
+async function getRatio(salary, lawt, params, cutContractMonths, indexExtraWork) {
   return new Promise(async(resolve, reject) => {
 
     if (!salary || !lawt || !params) {
@@ -96,11 +86,7 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
       }
     }
 
-    //console.log(sum);
-
     //= Build divider =
-
-  //  console.log(lawt.table[6][0]);
 
     let months = [7, 8, 9, 10, 11, 12];
 
@@ -125,7 +111,10 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
 
     let worksHours = {
       'manager': 0,
-      'tecDirector': 0
+      'tecDirector': {
+        'dev': 0,
+        'extra': 0
+      }
     };
 
     for (let n = 0; n < lawt.name.length; n++) {
@@ -137,15 +126,17 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
           } else if ((lawt.name[n].trim() == 'Заводов Павел')
             && (lawt.table[n][t][1].trim() == 'Разработка сайта')
             && (lawt.table[n][t][5])) {
-             worksHours.tecDirector = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+             worksHours.tecDirector.dev = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+          } else if ((lawt.name[n].trim() == 'Заводов Павел')
+            && (lawt.table[n][t][1].trim() == 'Доп.работы по разработке (МТС)')
+            && (lawt.table[n][t][5])) {
+             worksHours.tecDirector.extra = Number(lawt.table[n][t][5].replace(/,/g, '.'));
           }
 
         }
     }
 
     //console.log(worksHours);
-
-    //console.log(dividers);
 
     //= Build ratio =
     const crew = 10;
@@ -175,25 +166,42 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
 
     //= Build quantinty of a projects =
     let quantityProjects = {
-      '7': [],
-      '8': [],
-      '9': [],
-      '10': [],
-      '11': [],
-      '12': [],
+      'dev': {
+        '7': [],
+        '8': [],
+        '9': [],
+        '10': [],
+        '11': [],
+        '12': [],
+      },
+      'extra': {
+        '7': [],
+        '8': [],
+        '9': [],
+        '10': [],
+        '11': [],
+        '12': [],
+      }
+
     };
 
     for (let i = 0; i < cutContractMonths.length; i++) {
       for (let j = 0; j < cutContractMonths[i].length; j++) {
-        quantityProjects[cutContractMonths[i][j]].push(cutContractMonths[i][j]);
+        if (indexExtraWork.includes(i)) {
+          quantityProjects.extra[cutContractMonths[i][j]].push(cutContractMonths[i][j]);
+        } else {
+          quantityProjects.dev[cutContractMonths[i][j]].push(cutContractMonths[i][j]);
+        }
       }
     }
 
-    for (let key in quantityProjects) {
-      quantityProjects[key] = quantityProjects[key].length;
+    for (let key in quantityProjects.extra) {
+      quantityProjects.extra[key] = quantityProjects.extra[key].length;
     }
 
-    //console.log(quantityProject);
+    for (let key in quantityProjects.dev) {
+      quantityProjects.dev[key] = quantityProjects.dev[key].length;
+    }
 
     let factHours = [];
     let warrentyHours = [];
@@ -217,14 +225,20 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
               if (lawt.name[n].trim() == 'Сребняк Кирилл') {
                 if (cutContractMonths[p][m]) {
                   let currMonth = cutContractMonths[p][m];
-                    factHours[p][m].push(Math.round(worksHours.manager / quantityProjects[currMonth] * 100) / 100);
+                    factHours[p][m].push(Math.round(worksHours.manager / quantityProjects.dev[currMonth] * 100) / 100);
                 } else {
                   factHours[p][m].push(0);
                 }
               } else if (lawt.name[n].trim() == 'Заводов Павел') {
                 if (cutContractMonths[p][m]) {
                   let currMonth = cutContractMonths[p][m];
-                  factHours[p][m].push(Math.round(worksHours.tecDirector / quantityProjects[currMonth] * 100) / 100);
+                  if (indexExtraWork.includes(p)) {
+
+                    factHours[p][m].push(Math.round(worksHours.tecDirector.extra / quantityProjects.extra[currMonth] * 100) / 100);
+                  } else {
+                    factHours[p][m].push(Math.round(worksHours.tecDirector.dev / quantityProjects.dev[currMonth] * 100) / 100);
+                  }
+
                  } else {
                    factHours[p][m].push(0);
                  }
@@ -265,12 +279,11 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
       }
     }
 
-   //console.log(warrentyHours);
+   //console.log(factHours);
 
    resolve([ratio, factHours, warrentyHours]);
 
   });
-
 }
 
 async function getMargin(contractSum, params) {
@@ -306,6 +319,8 @@ async function getMargin(contractSum, params) {
 
 async function mtsDevSite() {
   return new Promise(async(resolve, reject) => {
+
+    console.log('Start: ' + new Date());
 
     //--------------------------------------------------------------------------
     // Usres libs
@@ -365,15 +380,15 @@ async function mtsDevSite() {
       // Build params for allHours
       //------------------------------------------------------------------------
 
-      // let paramsHours = [[], []];
-      //
-      // for (let x = 0; x < xArray.length; x++) {
-      //   paramsHours[0].push(devRegistry[xArray[x] - 6][4]);
-      //   paramsHours[1].push([]);
-      //   for (let c = (xArray[x] - 6); c < (xArray[x] - 6 + crew); c++) {
-      //       paramsHours[1][x].push(devRegistry[c][6]);
-      //   }
-      // }
+      let paramsHours = [[], []];
+
+      for (let x = 0; x < xArray.length; x++) {
+        paramsHours[0].push(devRegistry[xArray[x] - 6][4]);
+        paramsHours[1].push([]);
+        for (let c = (xArray[x] - 6); c < (xArray[x] - 6 + crew); c++) {
+            paramsHours[1][x].push(devRegistry[c][6]);
+        }
+      }
 
       //------------------------------------------------------------------------
       // Get data (hours and type) from 'normative'
@@ -388,12 +403,12 @@ async function mtsDevSite() {
       //
       // //= Normalize srcNormaType =
       // let normaType = normType(srcNormaType);
-      //
-      // //------------------------------------------------------------------------
-      // // Get and Update allHours
-      // //------------------------------------------------------------------------
-      //
-      // let [allHours, hoursMaragerDirector]= await getAllHours(normaHour, normaType, paramsHours);
+
+      //------------------------------------------------------------------------
+      // Get and Update allHours
+      //------------------------------------------------------------------------
+
+      // let allHours = await getAllHours(normaHour, normaType, paramsHours);
       //
       // list = encodeURIComponent('Разработка (реестр)');
       //
@@ -402,8 +417,11 @@ async function mtsDevSite() {
       //   await crud.updateData(allHours[x], config.ssId.mts_dev, range)
       //     //.then(async result => {console.log(result);})
       //     .catch(console.err);
-      // }
+      //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
+      //     await sleep(1000);
       //
+      // }
+      // console.log(new Date());
       // console.log('* Get and Update allHours *');
 
       //------------------------------------------------------------------------
@@ -441,48 +459,48 @@ async function mtsDevSite() {
       // Get & Insert mounth and amount of the act
       //--------------------------------------------------------------------------
 
-      let monthAct = clientInfo.map((row) => {
-        return [
-          row[0], row[16] ? row[16] : 0,
-          Number(row[13].replace(/\s/g, ''))
-          ? Number(row[13].replace(/\s/g, '')) : 0
-        ];
-      });
-
-      let colsAct = config.colsAct;
-
-      for (let x = 0; x < xArray.length; x++) {
-
-        let month = 0;
-
-        for (let i = 0; i < monthAct.length; i++) {
-          if (devRegistry[xArray[x] - 6][0]  == monthAct[i][0]) {
-            if (monthAct[i][1]) {
-              month = Number(monthAct[i][1].substr(3, 2)) > 6 ? Number(monthAct[i][1].substr(3, 2)) : 7;
-            } else {
-              month = '';
-            }
-
-            list = encodeURIComponent('Разработка (реестр)');
-            range = list + '!H' + xArray[x];
-
-            await crud.updateData([[month]], config.ssId.mts_dev, range)
-              //.then(async result => {console.log(result);})
-              .catch(console.err);
-
-            if (colsAct[month]) {
-              range = list + '!' + colsAct[month] + xArray[x];
-
-              await crud.updateData([[monthAct[i][2]]], config.ssId.mts_dev, range)
-                //.then(async result => {console.log(result);})
-                .catch(console.err);
-            }
-
-          }
-        }
-      }
-
-      console.log('* Get & Insert mounth and amount of the act *');
+      // let monthAct = clientInfo.map((row) => {
+      //   return [
+      //     row[0], row[16] ? row[16] : 0,
+      //     Number(row[13].replace(/\s/g, ''))
+      //     ? Number(row[13].replace(/\s/g, '')) : 0
+      //   ];
+      // });
+      //
+      // let colsAct = config.colsAct;
+      //
+      // for (let x = 0; x < xArray.length; x++) {
+      //
+      //   let month = 0;
+      //
+      //   for (let i = 0; i < monthAct.length; i++) {
+      //     if (devRegistry[xArray[x] - 6][0]  == monthAct[i][0]) {
+      //       if (monthAct[i][1]) {
+      //         month = Number(monthAct[i][1].substr(3, 2)) > 6 ? Number(monthAct[i][1].substr(3, 2)) : 7;
+      //       } else {
+      //         month = '';
+      //       }
+      //
+      //       list = encodeURIComponent('Разработка (реестр)');
+      //       range = list + '!H' + xArray[x];
+      //
+      //       await crud.updateData([[month]], config.ssId.mts_dev, range)
+      //         .then(async result => {console.log(result);})
+      //         .catch(console.err);
+      //
+      //       if (colsAct[month]) {
+      //         range = list + '!' + colsAct[month] + xArray[x];
+      //
+      //         await crud.updateData([[monthAct[i][2]]], config.ssId.mts_dev, range)
+      //           .then(async result => {console.log(result);})
+      //           .catch(console.err);
+      //       }
+      //
+      //     }
+      //   }
+      // }
+      // console.log(new Date());
+      // console.log('* Get & Insert mounth and amount of the act *');
 
       //------------------------------------------------------------------------
       // The receipt of money from customers (prepaid & finally)
@@ -536,6 +554,14 @@ async function mtsDevSite() {
         }
       });
 
+      let indexExtraWork = [];
+
+      for (let x = 0; x < xArray.length; x++) {
+        if(devRegistry[xArray[x] - 6][4].trim() == 'Доп функционал по разработке') {
+          indexExtraWork.push(x);
+        }
+      }
+
       //---------------------------------------------------------------
       // Build receiptParams
       //---------------------------------------------------------------
@@ -572,14 +598,14 @@ async function mtsDevSite() {
       //     value = [[values[c], values[c + 1]]];
       //
       //     await crud.updateData(value, config.ssId.mts_dev, range)
-      //       //.then(async result => {console.log(result);})
+      //       .then(async result => {console.log(result);})
       //       .catch(console.err);
       //
       //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
       //     await sleep(1000);
       //   }
       // }
-      //
+      // console.log(new Date());
       // console.log('* The receipt of money from customers (prepaid & finalLy) *');
 
       //--------------------------------------------------------------------------
@@ -630,7 +656,7 @@ async function mtsDevSite() {
       // // Get & Insert "Ratio & factHours"
       // //--------------------------------------------------------------------------
       //
-      // let [ratio, factHours, warrentyHours] = await getRatio(salary, lawt, ratioParams, cutContractMonths);
+      // let [ratio, factHours, warrentyHours] = await getRatio(salary, lawt, ratioParams, cutContractMonths, indexExtraWork);
       //
       // list = encodeURIComponent('Разработка (реестр)');
       //
@@ -675,133 +701,133 @@ async function mtsDevSite() {
       //     await sleep(1000);
       //
       //   }
-
-        // let value = [];
-        //
-        // for (let m = 0; m < cutActionMonths[x].length; m++) {
-        //    cols[2] = cols[2].concat(colMonths[cutActionMonths[x][m]].slice(4));
-        // }
-        //
-        // for (let c = 0; c < cols[2].length; c++) {
-        //   range = list + '!' + cols[2][c] + xArray[x] + ':' + cols[2][c] + (xArray[x] + (crew - 1));
-        //   value = [];
-        //
-        //   for (let i = 0; i < crew; i++) {
-        //     value.push([warrentyHours[x][c][i] ? warrentyHours[x][c][i] : 0]);
-        //   }
-        //
-        //   await crud.updateData(value, config.ssId.mts_dev, range)
-        //     .then(async result => {console.log(result);})
-        //     .catch(console.err);
-        //
-        //   //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
-        //   await sleep(1000);
-        //
-        // }
-
-      // }
       //
+      //   let value = [];
+      //
+      //   for (let m = 0; m < cutActionMonths[x].length; m++) {
+      //      cols[2] = cols[2].concat(colMonths[cutActionMonths[x][m]].slice(4));
+      //   }
+      //
+      //   for (let c = 0; c < cols[2].length; c++) {
+      //     range = list + '!' + cols[2][c] + xArray[x] + ':' + cols[2][c] + (xArray[x] + (crew - 1));
+      //     value = [];
+      //
+      //     for (let i = 0; i < crew; i++) {
+      //       value.push([warrentyHours[x][c][i] ? warrentyHours[x][c][i] : 0]);
+      //     }
+      //
+      //     await crud.updateData(value, config.ssId.mts_dev, range)
+      //       .then(async result => {console.log(result);})
+      //       .catch(console.err);
+      //
+      //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
+      //     await sleep(1000);
+      //
+      //   }
+      //
+      // }
+      // console.log(new Date());
       // console.log('* ratioParams for Ratio and factHours *');
 
       //------------------------------------------------------------------------
       // Build params for Margin
       //------------------------------------------------------------------------
 
-      // //= Build ABC for margin params =
-      // abc = abc.slice(2, 120);
-      // let colsMargin = config.colsMargin;
-      //
-      // const quantity = 4;
-      // let jArray = [];
-      //
-      // for (let x = 0; x < xArray.length; x++) {
-      //   let paramsMargin = [];
-      //
-      //   for (let i = 0; i < 26; i++) {
-      //     paramsMargin.push([]);
-      //   }
-      //
-      //   //= Push site in params =
-      //   paramsMargin[0].push(devRegistry[xArray[x] - 6][0]);
-      //
-      //   //= Push debt "P" in params =
-      //   let col = abc.indexOf(colsMargin.debt);
-      //   devRegistry[xArray[x] - 6][col] && Number(devRegistry[xArray[x] - 6][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //     ? paramsMargin[1].push(devRegistry[xArray[x] - 6][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //     : paramsMargin[1].push(0);
-      //
-      //   //= Push salary 'Y', 'AN', 'BC', 'BR', 'CG', 'CV' (x10 crew) in params =
-      //   for (let i = xArray[x] - 6; i < xArray[x] - 6 + crew; i++) {
-      //     let count = 0;
-      //     for (let j = 2; j < (paramsMargin.length - 3); j += quantity) {
-      //       let col = abc.indexOf(colsMargin.salary[count]);
-      //       devRegistry[i][col] && Number(devRegistry[i][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //           ? paramsMargin[j].push(devRegistry[i][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //           : paramsMargin[j].push(0);
-      //
-      //       jArray.push(j);
-      //       count++;
-      //     }
-      //   }
-      //
-      //   //= Push other cost 'AB', 'AC', 'AD', 'AQ', 'AR', 'AS'... (common for project) in params =
-      //   let count = 0;
-      //
-      //   for (let n = 3; n < paramsMargin.length; n++) {
-      //     if (!jArray.includes(n)) {
-      //       let col = abc.indexOf(colsMargin.other[count]);
-      //       devRegistry[xArray[x] - 6][col] && Number(devRegistry[xArray[x] - 6][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //         ? paramsMargin[n].push(devRegistry[xArray[x] - 6][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //         : paramsMargin[n].push(0);
-      //       count++;
-      //     }
-      //   }
-      //
-      //   //console.log(paramsMargin);
-      //
-      //   //= Get & Insert values of "Margin & Margins" =
-      //   let margin = await getMargin(contractSum, paramsMargin);
-      //   let margins = 0;
-      //
-      //   for (var c = 0; c < contractSum.length; c++) {
-      //     if(contractSum[c][0] == paramsMargin[0]) {
-      //       margins = margin ? margin / contractSum[c][1] : 0;
-      //       //console.log(contractSum[c][1]);
-      //     }
-      //   }
-      //
-      //   //= Cut to 2 number after poin =
-      //   margins = margins.toFixed(2);
-      //
-      //   //console.log([[margin, margins]]);
-      //
-      //   // list = encodeURIComponent('Разработка (реестр)');
-      //   // range = list + '!N' + xArray[x] + ':O' + xArray[x];
-      //   //
-      //   // await crud.updateData([[margin, margins]], config.ssId.mts_dev, range)
-      //   //   //.then(async result => {console.log(result);})
-      //   //   .catch(console.err);
-      //
-      //     console.log([margin, margins]);
-      //
-      //   }
-      //
-      //   console.log('* Update for Margin *');
+      //= Build ABC for margin params =
+      abc = abc.slice(2, 120);
+      let colsMargin = config.colsMargin;
+
+      const quantity = 4;
+      let jArray = [];
+
+      for (let x = 0; x < xArray.length; x++) {
+        let paramsMargin = [];
+
+        for (let i = 0; i < 26; i++) {
+          paramsMargin.push([]);
+        }
+
+        //= Push site in params =
+        paramsMargin[0].push(devRegistry[xArray[x] - 6][0]);
+
+        //= Push debt "P" in params =
+        let col = abc.indexOf(colsMargin.debt);
+        devRegistry[xArray[x] - 6][col] && Number(devRegistry[xArray[x] - 6][col].replace(/\s/g, '').replace(/,/g, '.'))
+          ? paramsMargin[1].push(devRegistry[xArray[x] - 6][col].replace(/\s/g, '').replace(/,/g, '.'))
+          : paramsMargin[1].push(0);
+
+        //= Push salary 'Y', 'AN', 'BC', 'BR', 'CG', 'CV' (x10 crew) in params =
+        for (let i = xArray[x] - 6; i < xArray[x] - 6 + crew; i++) {
+          let count = 0;
+          for (let j = 2; j < (paramsMargin.length - 3); j += quantity) {
+            let col = abc.indexOf(colsMargin.salary[count]);
+            devRegistry[i][col] && Number(devRegistry[i][col].replace(/\s/g, '').replace(/,/g, '.'))
+                ? paramsMargin[j].push(devRegistry[i][col].replace(/\s/g, '').replace(/,/g, '.'))
+                : paramsMargin[j].push(0);
+
+            jArray.push(j);
+            count++;
+          }
+        }
+
+        //= Push other cost 'AB', 'AC', 'AD', 'AQ', 'AR', 'AS'... (common for project) in params =
+        let count = 0;
+
+        for (let n = 3; n < paramsMargin.length; n++) {
+          if (!jArray.includes(n)) {
+            let col = abc.indexOf(colsMargin.other[count]);
+            devRegistry[xArray[x] - 6][col] && Number(devRegistry[xArray[x] - 6][col].replace(/\s/g, '').replace(/,/g, '.'))
+              ? paramsMargin[n].push(devRegistry[xArray[x] - 6][col].replace(/\s/g, '').replace(/,/g, '.'))
+              : paramsMargin[n].push(0);
+            count++;
+          }
+        }
+
+        //console.log(paramsMargin);
+
+        //= Get & Insert values of "Margin & Margins" =
+        let margin = await getMargin(contractSum, paramsMargin);
+        let margins = 0;
+
+        for (var c = 0; c < contractSum.length; c++) {
+          if(contractSum[c][0] == paramsMargin[0]) {
+            margins = margin ? margin / contractSum[c][1] : 0;
+            //console.log(contractSum[c][1]);
+          }
+        }
+
+        //= Cut to 2 number after poin =
+        margins = margins.toFixed(2);
+
+        list = encodeURIComponent('Разработка (реестр)');
+        range = list + '!N' + xArray[x] + ':O' + xArray[x];
+
+        await crud.updateData([[margin, margins]], config.ssId.mts_dev, range)
+          .then(async result => {console.log(result);})
+          .catch(console.err);
+
+        console.log([margin, margins]);
+
+        }
+        console.log(new Date());
+        console.log('* Update for Margin *');
 
       //-------------------------------------------------------------
       // Update date-time in "Monitoring"
       //-------------------------------------------------------------
 
-      // range = 'sheet1!B4';
-      //
-      // let now = new Date();
-      // now = [
-      //   [formatDate(now)]
-      // ];
-      //
-      // await crud.updateData(now, config.ssId.monit, range)
-      //   .then(async (result) => {console.log(result);})
-      //   .catch(console.err);
+      range = 'sheet1!B4';
+
+      let now = new Date();
+      now = [
+        [formatDate(now)]
+      ];
+
+      await crud.updateData(now, config.ssId.monit, range)
+        //.then(async (result) => {console.log(result);})
+        .catch(console.err);
+
+      console.log('End: ' + new Date());
 
     } // = End start function =
 
