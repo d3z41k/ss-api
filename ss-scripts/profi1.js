@@ -12,8 +12,10 @@ async function profi1(mon) {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
+    const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models/db_refresh');
     const pool = require('../models/db_pool');
+    const profiQuery = require('../models/db_profi_query');
 
     async function handlerParams1(rows, params) {
       return new Promise(async (resolve, reject) => {
@@ -76,6 +78,8 @@ async function profi1(mon) {
     async function start(auth) {
 
       const crud = new Crud(auth);
+      let list = '';
+      let range = '';
 
       let directions = config.directions.profi1;
 
@@ -83,27 +87,13 @@ async function profi1(mon) {
       // Read data from DDS to RAM
       //-------------------------------------------------------------
 
-      let list = encodeURIComponent('ДДС_Лера');
-      let range = list + '!A6:AC';
+      list = encodeURIComponent('ДДС_Лера');
+      range = list + '!A6:AC';
 
       let srcRows = await crud.readData(config.ssId.dds, range);
-      srcRows.length = normLength(srcRows);
 
-      //-------------------------------------------------------------
-      // Normalizing of length "srcRows"
-      //-------------------------------------------------------------
-
-      function normLength(srcRows){
-        for (let i = 0; i < srcRows.length; i++) {
-          if (srcRows[i][0] == '' &&
-            srcRows[i + 1][0] == '' &&
-            srcRows[i + 2][0] == '') {
-            return srcRows.length = i;
-          }
-        }
-      }
-
-      //console.log(srcRows[0][5]);
+      // = Normalizing of length "srcRows" =
+      normLength(srcRows);
 
        await dbRefresh(pool, 'dds_lera', srcRows)
         .then(async (result) => {console.log(result);})
@@ -113,57 +103,56 @@ async function profi1(mon) {
       // Read data from Profi to RAM & combine params arrays (2 steps)
       //-------------------------------------------------------------;
 
-      // const profiQuery = require('../models/db_profi-query');
-      //
-      // for (let month in months) {
-      //
-      //   for (let m = 0; m < directions.length; m++){
-      //
-      //     list = encodeURIComponent(directions[m]);
-      //
-      //     for (let i = 0; i < months[month].length; i++) {
-      //
-      //       range = list + '!' + months[month][i] + '2:' + months[month][i] + '4';
-      //
-      //       let dstRows = await crud.readData(config.ssId.dev_prof1, range);
-      //
-      //       let params = [[], [], [], [], [], []];
-      //       params = await handlerParams1(dstRows, params);
-      //
-      //       range = list + '!C7:G';
-      //       dstRows = await crud.readData(config.ssId.dev_prof1, range);
-      //
-      //       params = await handlerParams2(dstRows, params);
-      //
-      //       let sumValues = await profiQuery(pool, params);
-      //
-      //       //console.log(filalData);
-      //
-      //       range = list + '!' + months[month][i] + '7:' + months[month][i];
-      //       await crud.updateData(sumValues, config.ssId.dev_prof1, range)
-      //         .then((result) => {console.log(result)});
-      //
-      //     }
-      //
-      //   }
-      // }
+      for (let month in months) {
+
+        for (let m = 0; m < directions.length; m++){
+
+          list = encodeURIComponent(directions[m]);
+
+          for (let i = 0; i < months[month].length; i++) {
+
+            range = list + '!' + months[month][i] + '2:' + months[month][i] + '4';
+
+            let dstRows = await crud.readData(config.ssId.profi1, range);
+
+            let params = [[], [], [], [], [], []];
+            params = await handlerParams1(dstRows, params);
+
+            range = list + '!C7:G';
+            dstRows = await crud.readData(config.ssId.profi1, range);
+
+            params = await handlerParams2(dstRows, params);
+
+            let sumValues = await profiQuery(pool, params);
+
+            //console.log(filalData);
+
+            range = list + '!' + months[month][i] + '7:' + months[month][i];
+            await crud.updateData(sumValues, config.ssId.profi1, range)
+              .then((result) => {console.log(result);})
+              .catch(console.log);
+
+          }
+
+        }
+      }
 
       //-------------------------------------------------------------
       // Update date-time in "Monitoring"
       //-------------------------------------------------------------
 
-      // if (mode) {
-      //   range = 'sheet1!C11';
-      // } else {
-      //   range = 'sheet1!B11';
-      // }
-      //
-      // let now = new Date();
-      // now = [[formatDate(now)]];
-      //
-      // await crud.updateData(now, config.ssId.monit, range);
+      if (mode) {
+        range = 'sheet1!C11';
+      } else {
+        range = 'sheet1!B11';
+      }
 
-    }
+      let now = new Date();
+      now = [[formatDate(now)]];
+
+      await crud.updateData(now, config.ssId.monit, range);
+
+    } //= End start function =
 
     //crutch for avoid timeout
     resolve('complite!');

@@ -54,7 +54,7 @@ async function getAllHours(normaHour, normaType, params) {
 
 }
 
-async function getRatio(salary, lawt, params, cutContractMonths, indexExtraWork) {
+async function getRatio(salary, lawt, params, cutContractMonths) {
   return new Promise(async(resolve, reject) => {
 
     if (!salary || !lawt || !params) {
@@ -111,10 +111,7 @@ async function getRatio(salary, lawt, params, cutContractMonths, indexExtraWork)
 
     let worksHours = {
       'manager': 0,
-      'tecDirector': {
-        'dev': 0,
-        'extra': 0
-      }
+      'tecDirector': 0
     };
 
     for (let n = 0; n < lawt.name.length; n++) {
@@ -126,17 +123,12 @@ async function getRatio(salary, lawt, params, cutContractMonths, indexExtraWork)
           } else if ((lawt.name[n].trim() == 'Заводов Павел')
             && (lawt.table[n][t][1].trim() == 'Разработка сайта')
             && (lawt.table[n][t][5])) {
-             worksHours.tecDirector.dev = Number(lawt.table[n][t][5].replace(/,/g, '.'));
-          } else if ((lawt.name[n].trim() == 'Заводов Павел')
-            && (lawt.table[n][t][1].trim() == 'Доп.работы по разработке (МТС)')
-            && (lawt.table[n][t][5])) {
-             worksHours.tecDirector.extra = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+             worksHours.tecDirector = Number(lawt.table[n][t][5].replace(/,/g, '.'));
           }
-
         }
     }
 
-    //console.log(worksHours);
+    console.log(worksHours);
 
     //= Build ratio =
     const crew = 10;
@@ -166,41 +158,22 @@ async function getRatio(salary, lawt, params, cutContractMonths, indexExtraWork)
 
     //= Build quantinty of a projects =
     let quantityProjects = {
-      'dev': {
         '7': [],
         '8': [],
         '9': [],
         '10': [],
         '11': [],
         '12': [],
-      },
-      'extra': {
-        '7': [],
-        '8': [],
-        '9': [],
-        '10': [],
-        '11': [],
-        '12': [],
-      }
-
     };
 
     for (let i = 0; i < cutContractMonths.length; i++) {
       for (let j = 0; j < cutContractMonths[i].length; j++) {
-        if (indexExtraWork.includes(i)) {
-          quantityProjects.extra[cutContractMonths[i][j]].push(cutContractMonths[i][j]);
-        } else {
-          quantityProjects.dev[cutContractMonths[i][j]].push(cutContractMonths[i][j]);
-        }
+          quantityProjects[cutContractMonths[i][j]].push(cutContractMonths[i][j]);
       }
     }
 
-    for (let key in quantityProjects.extra) {
-      quantityProjects.extra[key] = quantityProjects.extra[key].length;
-    }
-
-    for (let key in quantityProjects.dev) {
-      quantityProjects.dev[key] = quantityProjects.dev[key].length;
+    for (let key in quantityProjects) {
+      quantityProjects[key] = quantityProjects[key].length;
     }
 
     let factHours = [];
@@ -225,19 +198,16 @@ async function getRatio(salary, lawt, params, cutContractMonths, indexExtraWork)
               if (lawt.name[n].trim() == 'Сребняк Кирилл') {
                 if (cutContractMonths[p][m]) {
                   let currMonth = cutContractMonths[p][m];
-                    factHours[p][m].push(Math.round(worksHours.manager / quantityProjects.dev[currMonth] * 100) / 100);
+                    factHours[p][m].push(Math.round(worksHours.manager / quantityProjects[currMonth] * 100) / 100);
                 } else {
                   factHours[p][m].push(0);
                 }
               } else if (lawt.name[n].trim() == 'Заводов Павел') {
                 if (cutContractMonths[p][m]) {
                   let currMonth = cutContractMonths[p][m];
-                  if (indexExtraWork.includes(p)) {
 
-                    factHours[p][m].push(Math.round(worksHours.tecDirector.extra / quantityProjects.extra[currMonth] * 100) / 100);
-                  } else {
-                    factHours[p][m].push(Math.round(worksHours.tecDirector.dev / quantityProjects.dev[currMonth] * 100) / 100);
-                  }
+                    factHours[p][m].push(Math.round(worksHours.tecDirector / quantityProjects[currMonth] * 100) / 100);
+
 
                  } else {
                    factHours[p][m].push(0);
@@ -279,7 +249,7 @@ async function getRatio(salary, lawt, params, cutContractMonths, indexExtraWork)
       }
     }
 
-   //console.log(factHours);
+   //console.log(factHours[0][0]);
 
    resolve([ratio, factHours, warrentyHours]);
 
@@ -380,15 +350,15 @@ async function mtsDevSite() {
       // Build params for allHours
       //------------------------------------------------------------------------
 
-      let paramsHours = [[], []];
-
-      for (let x = 0; x < xArray.length; x++) {
-        paramsHours[0].push(devRegistry[xArray[x] - 6][4]);
-        paramsHours[1].push([]);
-        for (let c = (xArray[x] - 6); c < (xArray[x] - 6 + crew); c++) {
-            paramsHours[1][x].push(devRegistry[c][6]);
-        }
-      }
+      // let paramsHours = [[], []];
+      //
+      // for (let x = 0; x < xArray.length; x++) {
+      //   paramsHours[0].push(devRegistry[xArray[x] - 6][4]);
+      //   paramsHours[1].push([]);
+      //   for (let c = (xArray[x] - 6); c < (xArray[x] - 6 + crew); c++) {
+      //       paramsHours[1][x].push(devRegistry[c][6]);
+      //   }
+      // }
 
       //------------------------------------------------------------------------
       // Get data (hours and type) from 'normative'
@@ -554,13 +524,13 @@ async function mtsDevSite() {
         }
       });
 
-      let indexExtraWork = [];
-
-      for (let x = 0; x < xArray.length; x++) {
-        if(devRegistry[xArray[x] - 6][4].trim() == 'Доп функционал по разработке') {
-          indexExtraWork.push(x);
-        }
-      }
+      // let indexExtraWork = [];
+      //
+      // for (let x = 0; x < xArray.length; x++) {
+      //   if(devRegistry[xArray[x] - 6][4].trim() == 'Доп функционал по разработке') {
+      //     indexExtraWork.push(x);
+      //   }
+      // }
 
       //---------------------------------------------------------------
       // Build receiptParams
@@ -656,7 +626,9 @@ async function mtsDevSite() {
       // // Get & Insert "Ratio & factHours"
       // //--------------------------------------------------------------------------
       //
-      // let [ratio, factHours, warrentyHours] = await getRatio(salary, lawt, ratioParams, cutContractMonths, indexExtraWork);
+      // let [ratio, factHours, warrentyHours] = await getRatio(salary, lawt, ratioParams, cutContractMonths);
+      //
+      // //console.log(factHours);
       //
       // list = encodeURIComponent('Разработка (реестр)');
       //
@@ -816,18 +788,18 @@ async function mtsDevSite() {
       // Update date-time in "Monitoring"
       //-------------------------------------------------------------
 
-      range = 'sheet1!B4';
-
-      let now = new Date();
-      now = [
-        [formatDate(now)]
-      ];
-
-      await crud.updateData(now, config.ssId.monit, range)
-        //.then(async (result) => {console.log(result);})
-        .catch(console.err);
-
-      console.log('End: ' + new Date());
+      // range = 'sheet1!B4';
+      //
+      // let now = new Date();
+      // now = [
+      //   [formatDate(now)]
+      // ];
+      //
+      // await crud.updateData(now, config.ssId.monit, range)
+      //   //.then(async (result) => {console.log(result);})
+      //   .catch(console.err);
+      //
+      // console.log('End: ' + new Date());
 
     } // = End start function =
 

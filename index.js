@@ -27,7 +27,7 @@ router
   })
   .get('/profi1', async function() {
 
-    const profi1 = require('./ss-scripts/profi1_db');
+    const profi1 = require('./ss-scripts/profi1');
     this.body = await profi1();
 
   })
@@ -35,13 +35,13 @@ router
 
     let months = [this.params.pre_month, this.params.curr_month];
 
-    const profi1 = require('./ss-scripts/profi1_db');
+    const profi1 = require('./ss-scripts/profi1');
     this.body = await profi1(months);
 
   })
   .get('/profi2', async function() {
 
-    const profi2 = require('./ss-scripts/profi2_db');
+    const profi2 = require('./ss-scripts/profi2');
     this.body = await profi2();
 
   })
@@ -49,7 +49,7 @@ router
 
     let months = [this.params.pre_month, this.params.curr_month];
 
-    const profi2 = require('./ss-scripts/profi2_db');
+    const profi2 = require('./ss-scripts/profi2');
     this.body = await profi2(months);
   })
   .get('/fin-statements', async function() {
@@ -71,4 +71,4 @@ router
 
 app.use(router.routes());
 
-app.listen(3000, () => {console.log('Server start on port 3000...')});
+app.listen(3000, () => {console.log('Server start on port 3000...');});

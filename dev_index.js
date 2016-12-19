@@ -31,6 +31,12 @@ router
     this.body = await mtsDev();
 
   })
+  .get('/amo', async function() {
+
+    const amo = require('./ss-scripts/amo');
+    this.body = await amo();
+
+  })
   .get('/profi1', async function() {
 
     const profi1 = require('./ss-scripts/profi1');
