@@ -3,10 +3,12 @@ async function amoQuery(pool, tableName, params) {
 
   let values = [];
 
-    //for (let t = 0; t < params[3].length; t++) {
+    for (let t = 0; t < params[3].length; t++) {
+      values.push([]);
       for (let i = 0; i < params[0].length; i++) {
+        values[t].push([]);
 
-        await pool.execute('SELECT SUM(`Сумма итого руб`) FROM '+ tableName +' WHERE ' +
+        await pool.execute('SELECT SUM(`Сумма итого руб`), `Дата` FROM '+ tableName +' WHERE ' +
             '`Проекты AMO` = ? ' +
             'AND `Контрагент AMO` = ? ' +
             'AND `Направление деятельноcти` = ? ' +
@@ -14,16 +16,18 @@ async function amoQuery(pool, tableName, params) {
               params[0][i].trim(),
               params[1][i].trim(),
               params[2][i].trim(),
-              params[3][0].trim()
+              params[3][t].trim()
             ])
           .then(([col, feilds]) => {
             for (let key in col[0]) {
-              values.push(col[0][key] ? col[0][key] : 0);
+              values[t][i].push(col[0][key] ? col[0][key] : '');
+
             }
+
           })
           .catch(console.log);
       }
-    //}
+    }
 
     //console.log(values);
 

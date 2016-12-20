@@ -24,7 +24,7 @@ async function amo() {
     async function start(auth) {
 
       const crud = new Crud(auth);
-      const amoClientsStart = 5;
+      const amoClientsStart = 4;
 
       let list = '';
       let range = '';
@@ -45,10 +45,6 @@ async function amo() {
       //   .then(async (result) => {console.log(result);})
       //   .catch(console.log);
 
-      //-------------------------------------------------------------
-      // Build params
-      //-------------------------------------------------------------
-
       //------------------------------------------------------------------------
       // Get data from 'dev-registry'
       //------------------------------------------------------------------------
@@ -56,6 +52,10 @@ async function amo() {
       list = encodeURIComponent('Клиенты (AMO)');
       range = list + '!B1:U';
       let amoClients = await crud.readData(config.ssId.dev_amo, range);
+
+      //------------------------------------------------------------------------
+      // Build paramsAmoCients and get & update Pay & date in amo clients
+      //------------------------------------------------------------------------
 
       let paramsAmoCients = [[], [], [], []];
 
@@ -77,29 +77,34 @@ async function amo() {
 
       } catch (e) {
         console.log(e.stack);
+      } finally {
+
+        let values = await amoQuery(pool, 'dds_lera', paramsAmoCients);
+
+        console.log(values);
+
+        let prePayRange = list + '!P5:Q' + (values[0].length + 5);
+        let addPayRange = list + '!T5:U' + (values[1].length + 5);
+
+        await Promise.all([
+          crud.updateData(values[0], config.ssId.dev_amo, prePayRange),
+          crud.updateData(values[1], config.ssId.dev_amo, addPayRange)
+        ])
+          .then(async results => {console.log(results);})
+          .catch(console.log);
+
       }
 
-      //console.log(paramsAmoCients[0][1]);
-
-      let values = await amoQuery(pool, 'dds_lera', paramsAmoCients);
-
-      console.log(values);
-
-
-      //-------------------------------------------------------------
+      //------------------------------------------------------------------------
       // Update date-time in "Monitoring"
-      //-------------------------------------------------------------
+      //------------------------------------------------------------------------
 
-      // if (mode) {
-      //   range = 'sheet1!C11';
-      // } else {
-      //   range = 'sheet1!B11';
-      // }
-      //
-      // let now = new Date();
-      // now = [[formatDate(now)]];
-      //
-      // await crud.updateData(now, config.ssId.monit, range);
+      range = 'sheet1!B18';
+
+      let now = new Date();
+      now = [[formatDate(now)]];
+
+      await crud.updateData(now, config.ssId.monit, range);
 
       resolve('complite!');
 

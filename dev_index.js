@@ -37,6 +37,12 @@ router
     this.body = await amo();
 
   })
+  .get('/amo-reg', async function() {
+
+    const amoReg = require('./ss-scripts/amo-reg');
+    this.body = await amoReg();
+
+  })
   .get('/profi1', async function() {
 
     const profi1 = require('./ss-scripts/profi1');
