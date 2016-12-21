@@ -1,4 +1,3 @@
-
 exports.init = app => app.use(async (ctx, next) => {
   try {
     await next();

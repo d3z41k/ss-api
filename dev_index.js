@@ -25,10 +25,10 @@ router
     this.body = await mtsSales();
 
   })
-  .get('/mts-dev', async function() {
+  .get('/dev-reg', async function() {
 
-    const mtsDev = require('./ss-scripts/mts-dev');
-    this.body = await mtsDev();
+    const devReg = require('./ss-scripts/dev-reg');
+    this.body = await devReg();
 
   })
   .get('/amo', async function() {
@@ -88,4 +88,4 @@ router
 
 app.use(router.routes());
 
-app.listen(3030, () => {console.log('Dev server start on port 3030...')});
+app.listen(3030, () => {console.log('Dev server start on port 3030...');});

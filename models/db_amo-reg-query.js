@@ -1,4 +1,4 @@
-async function devRegQuery(pool, tableName, params) {
+async function amoRegQuery(pool, tableName, params) {
   return new Promise(async(resolve, reject) => {
 
   let values = [];
@@ -10,9 +10,9 @@ async function devRegQuery(pool, tableName, params) {
             '`Направление деятельноcти` = ? ' +
             'AND `Статья движения денег` = ? ' +
             'AND `Месяц` = ? ' +
-            'AND `Проекты разработка` = ? ' +
-            'AND `Контрагент Разработка` = ?', [
-              params[0],
+            'AND `Проекты AMO` = ? ' +
+            'AND `Контрагент AMO` = ?', [
+              params[0][0],
               params[1][i],
               params[2][m],
               params[3][0],
@@ -31,4 +31,4 @@ async function devRegQuery(pool, tableName, params) {
   });
 }
 
-module.exports = devRegQuery;
+module.exports = amoRegQuery;
