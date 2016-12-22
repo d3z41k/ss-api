@@ -323,7 +323,7 @@ async function devReg() {
       let range = '';
 
       // //= Get months cols for develope registry =
-      const colMonths = config.dev_colMonths;
+      const colMonths = config.reg_colMonths;
       let cols = '';
 
       //------------------------------------------------------------------------
@@ -332,7 +332,7 @@ async function devReg() {
 
       list = encodeURIComponent('Разработка (реестр)');
       range = list + '!A1:A';
-      let xLable = await crud.readData(config.ssId.mts_dev, range);
+      let xLable = await crud.readData(config.ssId.dev, range);
       let xArray = [];
 
       xLable.forEach((value, x) => {
@@ -349,7 +349,7 @@ async function devReg() {
       //------------------------------------------------------------------------
 
       range = list + '!C6:CL' + xLable.length;
-      let devRegistry = await crud.readData(config.ssId.mts_dev, range);
+      let devRegistry = await crud.readData(config.ssId.dev, range);
 
       //------------------------------------------------------------------------
       // Build params for allHours
@@ -371,10 +371,10 @@ async function devReg() {
 
       list = encodeURIComponent('Нормативы');
       range = list + '!B72:C75';
-      let normaHour = await crud.readData(config.ssId.mts_dev, range);
+      let normaHour = await crud.readData(config.ssId.dev, range);
 
       range = list + '!B24:E48';
-      let srcNormaType = await crud.readData(config.ssId.mts_dev, range);
+      let srcNormaType = await crud.readData(config.ssId.dev, range);
 
       //= Normalize srcNormaType =
       let normaType = normType(srcNormaType);
@@ -389,7 +389,7 @@ async function devReg() {
       //
       // for (let x = 0; x < xArray.length; x++) {
       //   range = list + '!K'+ xArray[x] +':K' + (xArray[x] + CREW - 1);
-      //   await crud.updateData(allHours[x], config.ssId.mts_dev, range)
+      //   await crud.updateData(allHours[x], config.ssId.dev, range)
       //     //.then(async result => {console.log(result);})
       //     .catch(console.err);
       //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
@@ -406,7 +406,7 @@ async function devReg() {
       list = encodeURIComponent('Клиенты (разработка)');
       range = list + '!A6:U300';
 
-      let clientInfo = await crud.readData(config.ssId.mts_dev, range);
+      let clientInfo = await crud.readData(config.ssId.dev, range);
 
       let contractSum = clientInfo.map((row) => {
         return [row[0], Number(row[13].replace(/\s/g, ''))
@@ -442,7 +442,7 @@ async function devReg() {
       //   ];
       // });
       //
-      // let colsAct = config.colsAct;
+      // let colsAct = config.reg_colsAct;
       //
       // for (let x = 0; x < xArray.length; x++) {
       //
@@ -459,20 +459,21 @@ async function devReg() {
       //       list = encodeURIComponent('Разработка (реестр)');
       //       range = list + '!H' + xArray[x];
       //
-      //       await crud.updateData([[month]], config.ssId.mts_dev, range)
+      //       await crud.updateData([[month]], config.ssId.dev, range)
       //         .then(async result => {console.log(result);})
       //         .catch(console.err);
       //
       //       if (colsAct[month]) {
       //         range = list + '!' + colsAct[month] + xArray[x];
       //
-      //         await crud.updateData([[monthAct[i][2]]], config.ssId.mts_dev, range)
+      //         await crud.updateData([[monthAct[i][2]]], config.ssId.dev, range)
       //           .then(async result => {console.log(result);})
       //           .catch(console.err);
       //       }
       //
       //     }
       //   }
+      //   console.log('Project: ' + x);
       // }
       // console.log(new Date());
       // console.log('* Get & Insert mounth and amount of the act *');
@@ -529,9 +530,9 @@ async function devReg() {
         }
       });
 
-      //---------------------------------------------------------------
-      // Build receiptParams
-      //---------------------------------------------------------------
+      // ---------------------------------------------------------------
+      // Build params & update receipt of money from customers (prepaid & finalLy)
+      // ---------------------------------------------------------------
 
       // list = encodeURIComponent('Разработка (реестр)');
       // let receiptParams = [[], [[],[]], [], [], []];
@@ -557,14 +558,14 @@ async function devReg() {
       //     cols[1] = cols[1].concat(colMonths[cutActionMonths[x][m]].slice(2, 4));
       //   }
       //
-      //   let values = await mtsDevQuery(pool, 'dds_olga', receiptParams);
+      //   let values = await devRegQuery(pool, 'dds_olga', receiptParams);
       //
       //   for (let c = 0; c < cols[0].length; c += 2) {
       //
       //     range = list + '!' + cols[0][c] + xArray[x] + ':' + cols[0][c + 1] + xArray[x];
       //     value = [[values[c], values[c + 1]]];
       //
-      //     await crud.updateData(value, config.ssId.mts_dev, range)
+      //     await crud.updateData(value, config.ssId.dev, range)
       //       .then(async result => {console.log(result);})
       //       .catch(console.err);
       //
@@ -575,132 +576,132 @@ async function devReg() {
       // console.log(new Date());
       // console.log('* The receipt of money from customers (prepaid & finalLy) *');
 
-      //--------------------------------------------------------------------------
+      // --------------------------------------------------------------------------
       // Build ratioParams for "Ratio" and "factHours"
-      //--------------------------------------------------------------------------
+      // --------------------------------------------------------------------------
 
-      let ratioParams = [[], [], []];
-
-      //= l.a.w.t - The list accounting work time =
-      let lawt = {
-        name: [],
-        table: []
-      };
-
-      for (let x = 0; x < xArray.length; x++) {
-
-        ratioParams[0].push([]);
-        ratioParams[1].push([]);
-        ratioParams[2].push([]);
-
-        for (let i = (xArray[x] - START); i < (xArray[x] - START) + CREW; i++) {
-           if (devRegistry[i][7]) {
-             ratioParams[0][x].push(devRegistry[i][7]);
-
-             // = Get object lawt name[0] -> table[0] etc. =
-             if (!lawt.name.includes(devRegistry[i][7])) {
-               lawt.name.push(devRegistry[i][7]);
-               list = encodeURIComponent(devRegistry[i][7]);
-               range = list + '!B10:L1000';
-               lawt.table.push(await crud.readData(config.ssId.lawt, range));
-             }
-          }
-        }
-
-        for (var m = 0; m < cutActionMonths[x].length; m++) {
-            ratioParams[1][x].push(cutActionMonths[x][m]);
-        }
-        ratioParams[2][x].push(devRegistry[xArray[x] - START][0]);
-
-      }
-
-      list = encodeURIComponent('ФОТ (факт)');
-      range = list + '!A6:ER77';
-
-      let salary = await crud.readData(config.ssId.salary, range);
-
-      //--------------------------------------------------------------------------
-      // Get & Insert "Ratio & factHours"
-      //--------------------------------------------------------------------------
-
-      let [ratio, factHours, warrentyHours] = await getRatio(salary, lawt, ratioParams, cutContractMonths);
-
-      //console.log(factHours);
-
-      list = encodeURIComponent('Разработка (реестр)');
-
-      for (let x = 0; x < xArray.length; x++) {
-        cols = [[], [], []];
-
-        for (let m = 0; m < cutActionMonths[x].length; m++) {
-           cols[1] = cols[1].concat(colMonths[cutActionMonths[x][m]].slice(2, 4));
-        }
-
-        for (let c = 0; c < cols[1].length; c += 2) {
-
-          range = list + '!' + cols[1][c] + xArray[x] + ':' + cols[1][c + 1] + (xArray[x] + (CREW - 1));
-          let value = [];
-          if (!c) {
-            value = [];
-            for (let i = 0; i < CREW; i++) {
-              if (i < ratio[x][c].length){
-                value.push([ratio[x][c][i], factHours[x][c][i]]);
-              } else {
-                value.push([0, 0]);
-              }
-
-            }
-          } else {
-            value = [];
-            for (let i = 0; i < CREW; i++) {
-              if (i < ratio[x][c / 2].length) {
-                value.push([ratio[x][c / 2][i], factHours[x][c / 2][i]]);
-              } else {
-                value.push([0, 0]);
-              }
-
-            }
-          }
-
-          await crud.updateData(value, config.ssId.mts_dev, range)
-            .then(async result => {console.log(result);})
-            .catch(console.err);
-
-          //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
-          await sleep(500);
-
-        }
-
-        let value = [];
-
-        for (let m = 0; m < cutActionMonths[x].length; m++) {
-           cols[2] = cols[2].concat(colMonths[cutActionMonths[x][m]].slice(4));
-        }
-
-        for (let c = 0; c < cols[2].length; c++) {
-          range = list + '!' + cols[2][c] + xArray[x] + ':' + cols[2][c] + (xArray[x] + (CREW - 1));
-          value = [];
-
-          for (let i = 0; i < CREW; i++) {
-            value.push([warrentyHours[x][c][i] ? warrentyHours[x][c][i] : 0]);
-          }
-
-          await crud.updateData(value, config.ssId.mts_dev, range)
-            .then(async result => {console.log(result);})
-            .catch(console.err);
-
-
-
-          //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
-          await sleep(500);
-
-        }
-
-      console.log('x: ' + x + ' m: ' + m);
-
-      }
-      console.log(new Date());
-      console.log('* ratioParams for Ratio and factHours *');
+      // let ratioParams = [[], [], []];
+      //
+      // //= l.a.w.t - The list accounting work time =
+      // let lawt = {
+      //   name: [],
+      //   table: []
+      // };
+      //
+      // for (let x = 0; x < xArray.length; x++) {
+      //
+      //   ratioParams[0].push([]);
+      //   ratioParams[1].push([]);
+      //   ratioParams[2].push([]);
+      //
+      //   for (let i = (xArray[x] - START); i < (xArray[x] - START) + CREW; i++) {
+      //      if (devRegistry[i][7]) {
+      //        ratioParams[0][x].push(devRegistry[i][7]);
+      //
+      //        // = Get object lawt name[0] -> table[0] etc. =
+      //        if (!lawt.name.includes(devRegistry[i][7])) {
+      //          lawt.name.push(devRegistry[i][7]);
+      //          list = encodeURIComponent(devRegistry[i][7]);
+      //          range = list + '!B10:L1000';
+      //          lawt.table.push(await crud.readData(config.ssId.lawt, range));
+      //        }
+      //     }
+      //   }
+      //
+      //   for (var m = 0; m < cutActionMonths[x].length; m++) {
+      //       ratioParams[1][x].push(cutActionMonths[x][m]);
+      //   }
+      //   ratioParams[2][x].push(devRegistry[xArray[x] - START][0]);
+      //
+      // }
+      //
+      // list = encodeURIComponent('ФОТ (факт)');
+      // range = list + '!A6:ER77';
+      //
+      // let salary = await crud.readData(config.ssId.salary, range);
+      //
+      // //--------------------------------------------------------------------------
+      // // Get & Insert "Ratio & factHours"
+      // //--------------------------------------------------------------------------
+      //
+      // let [ratio, factHours, warrentyHours] = await getRatio(salary, lawt, ratioParams, cutContractMonths);
+      //
+      // //console.log(factHours);
+      //
+      // list = encodeURIComponent('Разработка (реестр)');
+      //
+      // for (let x = 0; x < xArray.length; x++) {
+      //   cols = [[], [], []];
+      //
+      //   for (let m = 0; m < cutActionMonths[x].length; m++) {
+      //      cols[1] = cols[1].concat(colMonths[cutActionMonths[x][m]].slice(2, 4));
+      //   }
+      //
+      //   for (let c = 0; c < cols[1].length; c += 2) {
+      //
+      //     range = list + '!' + cols[1][c] + xArray[x] + ':' + cols[1][c + 1] + (xArray[x] + (CREW - 1));
+      //     let value = [];
+      //     if (!c) {
+      //       value = [];
+      //       for (let i = 0; i < CREW; i++) {
+      //         if (i < ratio[x][c].length){
+      //           value.push([ratio[x][c][i], factHours[x][c][i]]);
+      //         } else {
+      //           value.push([0, 0]);
+      //         }
+      //
+      //       }
+      //     } else {
+      //       value = [];
+      //       for (let i = 0; i < CREW; i++) {
+      //         if (i < ratio[x][c / 2].length) {
+      //           value.push([ratio[x][c / 2][i], factHours[x][c / 2][i]]);
+      //         } else {
+      //           value.push([0, 0]);
+      //         }
+      //
+      //       }
+      //     }
+      //
+      //     await crud.updateData(value, config.ssId.dev, range)
+      //       .then(async result => {console.log(result);})
+      //       .catch(console.err);
+      //
+      //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
+      //     await sleep(500);
+      //
+      //   }
+      //
+      //   let value = [];
+      //
+      //   for (let m = 0; m < cutActionMonths[x].length; m++) {
+      //      cols[2] = cols[2].concat(colMonths[cutActionMonths[x][m]].slice(4));
+      //   }
+      //
+      //   for (let c = 0; c < cols[2].length; c++) {
+      //     range = list + '!' + cols[2][c] + xArray[x] + ':' + cols[2][c] + (xArray[x] + (CREW - 1));
+      //     value = [];
+      //
+      //     for (let i = 0; i < CREW; i++) {
+      //       value.push([warrentyHours[x][c][i] ? warrentyHours[x][c][i] : 0]);
+      //     }
+      //
+      //     await crud.updateData(value, config.ssId.dev, range)
+      //       .then(async result => {console.log(result);})
+      //       .catch(console.err);
+      //
+      //
+      //
+      //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
+      //     await sleep(500);
+      //    console.log('Month: ' + m);
+      //   }
+      //
+      // console.log('Project: ' + x);
+      //
+      // }
+      // console.log(new Date());
+      // console.log('* ratioParams for Ratio and factHours *');
 
       //------------------------------------------------------------------------
       // Build params for Margin
@@ -758,32 +759,32 @@ async function devReg() {
 
         //console.log(paramsMargin);
 
-        //= Get & Insert values of "Margin & Margins" =
-        let margin = await getMargin(contractSum, paramsMargin);
-        let margins = 0;
-
-        for (var c = 0; c < contractSum.length; c++) {
-          if(contractSum[c][0] == paramsMargin[0]) {
-            margins = margin ? margin / contractSum[c][1] : 0;
-            //console.log(contractSum[c][1]);
-          }
-        }
-
-        //= Cut to 2 number after poin =
-        margins = margins.toFixed(2);
-
-        list = encodeURIComponent('Разработка (реестр)');
-        range = list + '!N' + xArray[x] + ':O' + xArray[x];
-
-        await crud.updateData([[margin, margins]], config.ssId.mts_dev, range)
-          .then(async result => {console.log(result);})
-          .catch(console.err);
-
-        console.log([margin, margins]);
-
-        }
-        console.log(new Date());
-        console.log('* Update for Margin *');
+        // //= Get & Insert values of "Margin & Margins" =
+        // let margin = await getMargin(contractSum, paramsMargin);
+        // let margins = 0;
+        //
+        // for (var c = 0; c < contractSum.length; c++) {
+        //   if(contractSum[c][0] == paramsMargin[0]) {
+        //     margins = margin ? margin / contractSum[c][1] : 0;
+        //     //console.log(contractSum[c][1]);
+        //   }
+        // }
+        //
+        // //= Cut to 2 number after poin =
+        // margins = margins.toFixed(2);
+        //
+        // list = encodeURIComponent('Разработка (реестр)');
+        // range = list + '!N' + xArray[x] + ':O' + xArray[x];
+        //
+        // await crud.updateData([[margin, margins]], config.ssId.dev, range)
+        //   .then(async result => {console.log(result);})
+        //   .catch(console.err);
+        //
+        // console.log([margin, margins]);
+        //
+        // }
+        // console.log(new Date());
+        // console.log('* Update for Margin *');
 
       //-------------------------------------------------------------
       // Update date-time in "Monitoring"

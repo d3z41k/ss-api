@@ -271,7 +271,7 @@ async function amoReg() {
       let range = '';
 
       // //= Get months cols for develope registry =
-      const colMonths = config.amo_colMonths;
+      const colMonths = config.reg_colMonths;
       let cols = '';
 
       //------------------------------------------------------------------------
@@ -299,7 +299,7 @@ async function amoReg() {
       }
 
       //------------------------------------------------------------------------
-      // Get data from 'dev-registry'
+      // Get data from 'amo-registry'
       //------------------------------------------------------------------------
 
       range = list + '!C10:CL';
@@ -354,7 +354,7 @@ async function amoReg() {
       //   ];
       // });
       //
-      // let colsAct = config.amo_colsAct;
+      // let colsAct = config.reg_colsAct;
       //
       // for (let x = 0; x < xArray.length; x++) {
       //
@@ -385,6 +385,9 @@ async function amoReg() {
       //
       //     }
       //   }
+      //
+      //   console.log('Project: ' + x);
+      //
       // }
       // console.log(new Date());
       // console.log('* Get & Insert mounth and amount of the act *');
@@ -444,7 +447,7 @@ async function amoReg() {
       //---------------------------------------------------------------
       // Build receiptParams The receipt of money from customers (prepaid & finalLy)
       //---------------------------------------------------------------
-
+      //
       // list = encodeURIComponent('AMO (реестр)');
       // let receiptParams = [[], [[],[]], [], [], []];
       // let value = [];
@@ -484,6 +487,8 @@ async function amoReg() {
       //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
       //     await sleep(1000);
       //   }
+      //
+      //   console.log('Project: ' + x);
       //
       // }
       // console.log(new Date());
@@ -537,80 +542,79 @@ async function amoReg() {
       // Get & Insert "Ratio & factHours"
       //--------------------------------------------------------------------------
 
-      let [ratio, factHours, warrentyHours] = await getRatio(salary, lawt, ratioParams, cutContractMonths);
-
-      list = encodeURIComponent('AMO (реестр)');
-
-      for (let x = 0; x < xArray.length; x++) {
-        cols = [[], [], []];
-
-        for (let m = 0; m < cutActionMonths[x].length; m++) {
-           cols[1] = cols[1].concat(colMonths[cutActionMonths[x][m]].slice(2, 4));
-        }
-
-        for (let c = 0; c < cols[1].length; c += 2) {
-
-          range = list + '!' + cols[1][c] + xArray[x] + ':' + cols[1][c + 1] + (xArray[x] + (CREW - 1));
-          let value = [];
-          if (!c) {
-            value = [];
-            for (let i = 0; i < CREW; i++) {
-              if (i < ratio[x][c].length){
-                value.push([ratio[x][c][i], factHours[x][c][i]]);
-              } else {
-                value.push([0, 0]);
-              }
-
-            }
-          } else {
-            value = [];
-            for (let i = 0; i < CREW; i++) {
-              if (i < ratio[x][c / 2].length) {
-                value.push([ratio[x][c / 2][i], factHours[x][c / 2][i]]);
-              } else {
-                value.push([0, 0]);
-              }
-
-            }
-          }
-
-          await crud.updateData(value, config.ssId.dev_amo, range)
-            .then(async result => {console.log(result);})
-            .catch(console.err);
-
-          //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
-          await sleep(500);
-
-        }
-
-        let value = [];
-
-        for (let m = 0; m < cutActionMonths[x].length; m++) {
-           cols[2] = cols[2].concat(colMonths[cutActionMonths[x][m]].slice(4));
-        }
-
-        for (let c = 0; c < cols[2].length; c++) {
-          range = list + '!' + cols[2][c] + xArray[x] + ':' + cols[2][c] + (xArray[x] + (CREW - 1));
-          value = [];
-
-          for (let i = 0; i < CREW; i++) {
-            value.push([warrentyHours[x][c][i] ? warrentyHours[x][c][i] : 0]);
-          }
-
-          await crud.updateData(value, config.ssId.dev_amo, range)
-            .then(async result => {console.log(result);})
-            .catch(console.err);
-
-          //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
-          await sleep(500);
-
-        }
-
-        console.log('===== x: ' + x);
-
-      }
-      console.log(new Date());
-      console.log('* ratioParams for Ratio and factHours *');
+      // let [ratio, factHours, warrentyHours] = await getRatio(salary, lawt, ratioParams, cutContractMonths);
+      //
+      // list = encodeURIComponent('AMO (реестр)');
+      //
+      // for (let x = 0; x < xArray.length; x++) {
+      //   cols = [[], [], []];
+      //
+      //   for (let m = 0; m < cutActionMonths[x].length; m++) {
+      //      cols[1] = cols[1].concat(colMonths[cutActionMonths[x][m]].slice(2, 4));
+      //   }
+      //
+      //   for (let c = 0; c < cols[1].length; c += 2) {
+      //
+      //     range = list + '!' + cols[1][c] + xArray[x] + ':' + cols[1][c + 1] + (xArray[x] + (CREW - 1));
+      //     let value = [];
+      //     if (!c) {
+      //       value = [];
+      //       for (let i = 0; i < CREW; i++) {
+      //         if (i < ratio[x][c].length){
+      //           value.push([ratio[x][c][i], factHours[x][c][i]]);
+      //         } else {
+      //           value.push([0, 0]);
+      //         }
+      //
+      //       }
+      //     } else {
+      //       value = [];
+      //       for (let i = 0; i < CREW; i++) {
+      //         if (i < ratio[x][c / 2].length) {
+      //           value.push([ratio[x][c / 2][i], factHours[x][c / 2][i]]);
+      //         } else {
+      //           value.push([0, 0]);
+      //         }
+      //
+      //       }
+      //     }
+      //
+      //     await crud.updateData(value, config.ssId.dev_amo, range)
+      //       .then(async result => {console.log(result);})
+      //       .catch(console.err);
+      //
+      //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
+      //     await sleep(500);
+      //
+      //   }
+      //
+      //   let value = [];
+      //
+      //   for (let m = 0; m < cutActionMonths[x].length; m++) {
+      //      cols[2] = cols[2].concat(colMonths[cutActionMonths[x][m]].slice(4));
+      //   }
+      //
+      //   for (let c = 0; c < cols[2].length; c++) {
+      //     range = list + '!' + cols[2][c] + xArray[x] + ':' + cols[2][c] + (xArray[x] + (CREW - 1));
+      //     value = [];
+      //
+      //     for (let i = 0; i < CREW; i++) {
+      //       value.push([warrentyHours[x][c][i] ? warrentyHours[x][c][i] : 0]);
+      //     }
+      //
+      //     await crud.updateData(value, config.ssId.dev_amo, range)
+      //       .then(async result => {console.log(result);})
+      //       .catch(console.err);
+      //
+      //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
+      //     await sleep(500);
+      //   }
+      //
+      //   console.log('Project: ' + x);
+      //
+      // }
+      // console.log(new Date());
+      // console.log('* ratioParams for Ratio and factHours *');
 
       //------------------------------------------------------------------------
       // Build params for Margin

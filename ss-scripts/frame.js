@@ -53,3 +53,5 @@ async function func() {
 
   });
 }
+
+module.exports = func;
