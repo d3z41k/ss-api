@@ -3,7 +3,7 @@
 const config = require('config');
 
 async function domain() {
-  return new Promise(async(resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
 
     //-------------------------------------------------------------------------
     // Usres libs
@@ -35,17 +35,17 @@ async function domain() {
       // Read data from DDS and refresh DB
       //-------------------------------------------------------------
 
-      // list = encodeURIComponent('ДДС_Ольга');
-      // range = list + '!A6:AK';
-      //
-      // let srcRows = await crud.readData(config.ssId.dds, range);
-      //
-      // // = Normalizing of length "srcRows" =
-      // normLength(srcRows);
-      //
-      //  await dbRefresh(pool, 'dds_olga', srcRows)
-      //   .then(async (result) => {console.log(result);})
-      //   .catch(console.log);
+      list = encodeURIComponent('ДДС_Ольга');
+      range = list + '!A6:AK';
+
+      let srcRows = await crud.readData(config.ssId.dds, range);
+
+      // =Normalizing of length "srcRows" =
+      normLength(srcRows);
+
+       await dbRefresh(pool, 'dds_olga', srcRows)
+        .then(async (result) => {console.log(result);})
+        .catch(console.log);
 
         //------------------------------------------------------------------------
         // Get data from 'domain-registry'
@@ -86,24 +86,20 @@ async function domain() {
           let prePayRangeH = list + '!' + colMonths[m][2] + '6:' + colMonths[m][2] + (values[0][0].length + 6);
           let addPayRangeH = list + '!' + colMonths[m][3] + '6:' + colMonths[m][3] + (values[0][0].length + 6);
 
-          // await Promise.all([
-          //   crud.updateData(values[0][0], config.ssId.domain, prePayRangeD),
-          //   crud.updateData(values[0][1], config.ssId.domain, addPayRangeD),
-          //   crud.updateData(values[1][0], config.ssId.domain, prePayRangeH),
-          //   crud.updateData(values[1][1], config.ssId.domain, addPayRangeH)
-          // ])
-          //   .then(async results => {console.log(results);})
-          //   .catch(console.log);
-
-          // console.log(domainClients.length);
-          // console.log(values[1][1].length);
+          await Promise.all([
+            crud.updateData(values[0][0], config.ssId.domain, prePayRangeD),
+            crud.updateData(values[0][1], config.ssId.domain, addPayRangeD),
+            crud.updateData(values[1][0], config.ssId.domain, prePayRangeH),
+            crud.updateData(values[1][1], config.ssId.domain, addPayRangeH)
+          ])
+            .then(async results => {console.log(results);})
+            .catch(console.log);
 
         }
 
-      //-------------------------------------------------------------
+      //------------------------------------------------------------------------
       // Update date-time in "Monitoring"
-      //-------------------------------------------------------------
-
+      //------------------------------------------------------------------------
 
       range = 'sheet1!B19';
 

@@ -31,6 +31,12 @@ router
     ctx.body = await devReg();
 
   })
+  .get('/extra-reg', async ctx => {
+
+    const extraReg = require('./ss-scripts/extra-reg');
+    ctx.body = await extraReg();
+
+  })
   .get('/amo', async ctx => {
 
     const amo = require('./ss-scripts/amo');

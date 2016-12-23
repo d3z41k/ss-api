@@ -266,7 +266,7 @@ async function amoReg() {
 
       const CREW = 7;
       const START = 10;
-      const yearMonths = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+      const YEAR = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
       let list = '';
       let range = '';
 
@@ -417,8 +417,8 @@ async function amoReg() {
       let contractMonths = [];
 
       actionMonth.forEach((months) => {
-          actionMonths.push(yearMonths.slice(months[0]));
-          contractMonths.push(yearMonths.slice(months[0], months[1] + 1));
+          actionMonths.push(YEAR.slice(months[0]));
+          contractMonths.push(YEAR.slice(months[0], months[1] + 1));
       });
 
       let cutActionMonths = [];

@@ -33,17 +33,17 @@ async function amo() {
       // Read data from DDS and refresh DB
       //-------------------------------------------------------------
 
-      // list = encodeURIComponent('ДДС_Лера');
-      // range = list + '!A6:AJ';
-      //
-      // let srcRows = await crud.readData(config.ssId.dds, range);
-      //
-      // // = Normalizing of length "srcRows" =
-      // normLength(srcRows);
-      //
-      //  await dbRefresh(pool, 'dds_lera', srcRows)
-      //   .then(async (result) => {console.log(result);})
-      //   .catch(console.log);
+      list = encodeURIComponent('ДДС_Лера');
+      range = list + '!A6:AJ';
+
+      let srcRows = await crud.readData(config.ssId.dds, range);
+
+      // = Normalizing of length "srcRows" =
+      normLength(srcRows);
+
+       await dbRefresh(pool, 'dds_lera', srcRows)
+        .then(async (result) => {console.log(result);})
+        .catch(console.log);
 
       //------------------------------------------------------------------------
       // Get data from 'dev-registry'
@@ -51,7 +51,7 @@ async function amo() {
 
       list = encodeURIComponent('Клиенты (AMO)');
       range = list + '!B1:U';
-      let amoClients = await crud.readData(config.ssId.dev_amo, range);
+      let amoClients = await crud.readData(config.ssId.amo, range);
 
       //------------------------------------------------------------------------
       // Build paramsAmoCients and get & update Pay & date in amo clients
@@ -87,8 +87,8 @@ async function amo() {
         let addPayRange = list + '!T5:U' + (values[1].length + 5);
 
         await Promise.all([
-          crud.updateData(values[0], config.ssId.dev_amo, prePayRange),
-          crud.updateData(values[1], config.ssId.dev_amo, addPayRange)
+          crud.updateData(values[0], config.ssId.amo, prePayRange),
+          crud.updateData(values[1], config.ssId.amo, addPayRange)
         ])
           .then(async results => {console.log(results);})
           .catch(console.log);

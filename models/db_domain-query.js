@@ -34,14 +34,8 @@ async function domainQuery(pool, tableName, params) {
       }
     }
 
-    console.log(values[0][0].length);
-
-    console.log(params[2].length);
-    console.log(params[3].length);
-    console.log(params[0].length);
-
-
     resolve(values);
+    
   });
 }
 
