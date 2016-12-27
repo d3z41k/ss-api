@@ -82,19 +82,19 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
 
               switch(lawt.table[n][t][1].trim()) {
                 case 'Интеграция (AMO)':
-                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+                  worksHours.manager[lawt.table[n][t][1]] += Number(lawt.table[n][t][5].replace(/,/g, '.'));
                   break;
                 case 'Обслуживание (AMO)':
-                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+                  worksHours.manager[lawt.table[n][t][1]] += Number(lawt.table[n][t][5].replace(/,/g, '.'));
                   break;
                 case 'Виджеты разработка (AMO)':
-                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+                  worksHours.manager[lawt.table[n][t][1]] += Number(lawt.table[n][t][5].replace(/,/g, '.'));
                   break;
                 case 'Виджеты готовые (AMO)':
-                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+                  worksHours.manager[lawt.table[n][t][1]] += Number(lawt.table[n][t][5].replace(/,/g, '.'));
                   break;
                 case 'Доп. работы (АМО)':
-                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+                  worksHours.manager[lawt.table[n][t][1]] += Number(lawt.table[n][t][5].replace(/,/g, '.'));
                   break;
                 default: break;
               }
