@@ -61,12 +61,18 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
       reject('Empty arguments!');
     }
 
+    const CREW = 10;
+    let sal = 0;
+    let div = 0;
     let sum = [];
     let divider = 0;
     let dividers = [];
     let ratio = [];
+    let factHours = [];
+    let warrentyHours = [];
+    let months = [7, 8, 9, 10, 11, 12];
 
-
+    //= The Numbers of cols in Salary
     let ratioMonth = config.ratioMonth;
 
     //= Build the salary sum for each month =
@@ -90,9 +96,6 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
     //console.log(sum);
 
     //= Build divider =
-
-    let months = [7, 8, 9, 10, 11, 12];
-
     for (let n = 0; n < lawt.name.length; n++) {
       dividers.push([]);
       dividers[n].push(lawt.name[n]);
@@ -138,9 +141,6 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
     //console.log(worksHours);
 
     //= Build ratio =
-    const CREW = 10;
-    let sal = 0;
-    let div = 0;
 
     for (let p = 0; p < params[0].length ; p++) {
       ratio.push([]);
@@ -183,10 +183,7 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
       quantityProjects[key] = quantityProjects[key].length;
     }
 
-    console.log(quantityProjects);
-
-    let factHours = [];
-    let warrentyHours = [];
+    //console.log(quantityProjects);
 
     //= Build factHours and warrentyHours =
 
@@ -811,7 +808,6 @@ async function devReg() {
         for (let c = 0; c < contractSum.length; c++) {
           if(contractSum[c][0] == paramsMargin[0]) {
             margins = margin ? margin / contractSum[c][1] : 0;
-            //console.log(contractSum[c][1]);
           }
         }
 
