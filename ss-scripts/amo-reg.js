@@ -75,6 +75,7 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
       'tecDirector': 0
     };
 
+
     for (let n = 0; n < lawt.name.length; n++) {
         for (let t = 0; t < lawt.table[n].length; t++) {
 
@@ -203,9 +204,12 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
       'Доп. работы (АМО)',
     ];
 
-    for (let i = 0; i < cutContractMonths.length; i++) {
-      for (let j = 0; j < cutContractMonths[i].length; j++) {
-          quantityProjects.tecDirector[cutContractMonths[i][j]].push(cutContractMonths[i][j]);
+    for (let p = 0; p < cutContractMonths.length; p++) {
+      for (let i = 0; i < cutContractMonths[p].length; i++) {
+        //= Filter 'Лицензии (AMO)'
+        if (types.includes(params[2][p][1])) {
+          quantityProjects.tecDirector[cutContractMonths[p][i]].push(cutContractMonths[p][i]);
+        }
       }
     }
 
@@ -215,12 +219,12 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
 
     //console.log(Object.getOwnPropertyNames(quantityProjects.manager[7])[0]);
 
-    for (let i = 0; i < cutContractMonths.length; i++) {
-      for (let j = 0; j < cutContractMonths[i].length; j++) {
+    for (let p = 0; p < cutContractMonths.length; p++) {
+      for (let i = 0; i < cutContractMonths[p].length; i++) {
         for (let t = 0; t < types.length; t++) {
-          if (Object.getOwnPropertyNames(quantityProjects.manager[cutContractMonths[i][j]])[t]
-            == params[2][i][1]) {
-            quantityProjects.manager[cutContractMonths[i][j]][types[t]].push(cutContractMonths[i][j]);
+          if (Object.getOwnPropertyNames(quantityProjects.manager[cutContractMonths[p][i]])[t]
+            == params[2][p][1]) {
+            quantityProjects.manager[cutContractMonths[p][i]][types[t]].push(cutContractMonths[p][i]);
           }
         }
       }
@@ -232,7 +236,7 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
       }
     }
 
-    //console.log(quantityProjects.manager);
+    //console.log(quantityProjects);
 
     //= Build factHours and warrentyHours =
 
@@ -253,6 +257,8 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
               if (lawt.name[n].trim() == 'Драниченко Максим') {
                 if (cutContractMonths[p][m]) {
                   let currMonth = cutContractMonths[p][m];
+
+                  //= Danger!!! may div by zero=
 
                     switch(params[2][p][1]) {
                       case 'Интеграция (AMO)':
@@ -418,12 +424,12 @@ async function amoReg() {
       }
 
       //------------------------------------------------------------------------
-      // Get data from 'amo-registry'
+      // Get data from 'Registry'
       //------------------------------------------------------------------------
 
       range = list + '!C10:DI';
 
-      let amoRegistry = await crud.readData(config.ssId.amo, range);
+      let registry = await crud.readData(config.ssId.amo, range);
 
       //------------------------------------------------------------------------
       // Get and normalize "Contract Sum"
@@ -435,8 +441,11 @@ async function amoReg() {
       let clientInfo = await crud.readData(config.ssId.amo, range);
 
       let contractSum = clientInfo.map((row) => {
-        return [row[0], row[10] && Number(row[10].replace(/\s/g, ''))
-        ? Number(row[10].replace(/\s/g, '')) : 0]
+        return [
+          row[0],
+          row[10] && Number(row[10].replace(/\s/g, ''))
+          ? Number(row[10].replace(/\s/g, '')) : 0
+        ]
       });
 
       //console.log(contractSum);
@@ -450,7 +459,7 @@ async function amoReg() {
       for (let x = 0; x < xArray.length; x++) {
         actionMonth.push([]);
         for (let i = 0; i < clientInfo.length; i++) {
-          if (amoRegistry[xArray[x] - START][0]  == clientInfo[i][0]) {
+          if (registry[xArray[x] - START][0]  == clientInfo[i][0]) {
             actionMonth[x].push(clientInfo[i][7] ? Number(clientInfo[i][7].slice(3,5)) : 6);
             actionMonth[x].push(clientInfo[i][11] ? Number(clientInfo[i][11].slice(3,5)) : 12);
           }
@@ -480,7 +489,7 @@ async function amoReg() {
       //   let month = 0;
       //
       //   for (let i = 0; i < monthAct.length; i++) {
-      //     if (amoRegistry[xArray[x] - START][0]  == monthAct[i][0]) {
+      //     if (registry[xArray[x] - START][0]  == monthAct[i][0]) {
       //       if (monthAct[i][1]) {
       //         month = Number(monthAct[i][1].substr(3, 2)) > 6 ? Number(monthAct[i][1].substr(3, 2)) : 7;
       //       } else {
@@ -583,9 +592,9 @@ async function amoReg() {
       //   receiptParams[4] = [];
       //   cols = [[], []];
       //
-      //   receiptParams[0].push(amoRegistry[xArray[x] - START][4]);
-      //   receiptParams[3].push(amoRegistry[xArray[x] - START][0]);
-      //   receiptParams[4].push(amoRegistry[xArray[x] - START][1]);
+      //   receiptParams[0].push(registry[xArray[x] - START][4]);
+      //   receiptParams[3].push(registry[xArray[x] - START][0]);
+      //   receiptParams[4].push(registry[xArray[x] - START][1]);
       //
       //   for (let m = 0; m < cutActionMonths[x].length; m++) {
       //     receiptParams[2].push(cutActionMonths[x][m]);
@@ -633,13 +642,13 @@ async function amoReg() {
         ratioParams[2].push([]);
 
         for (let i = (xArray[x] - START); i < (xArray[x] - START) + CREW; i++) {
-           if (amoRegistry[i][7]) {
-             ratioParams[0][x].push(amoRegistry[i][7]);
+           if (registry[i][7]) {
+             ratioParams[0][x].push(registry[i][7]);
 
              // = Get object lawt name[0] -> table[0] etc. =
-             if (!lawt.name.includes(amoRegistry[i][7])) {
-               lawt.name.push(amoRegistry[i][7]);
-               list = encodeURIComponent(amoRegistry[i][7]);
+             if (!lawt.name.includes(registry[i][7])) {
+               lawt.name.push(registry[i][7]);
+               list = encodeURIComponent(registry[i][7]);
                range = list + '!B10:L1000';
                lawt.table.push(await crud.readData(config.ssId.lawt, range));
              }
@@ -649,8 +658,8 @@ async function amoReg() {
         for (var m = 0; m < cutActionMonths[x].length; m++) {
             ratioParams[1][x].push(cutActionMonths[x][m]);
         }
-        ratioParams[2][x].push(amoRegistry[xArray[x] - START][0]);
-        ratioParams[2][x].push(amoRegistry[xArray[x] - START][4]);
+        ratioParams[2][x].push(registry[xArray[x] - START][0]);
+        ratioParams[2][x].push(registry[xArray[x] - START][4]);
 
       }
 
@@ -665,77 +674,79 @@ async function amoReg() {
 
       let [ratio, factHours, warrentyHours] = await getRatio(salary, lawt, ratioParams, cutContractMonths);
 
-      list = encodeURIComponent('AMO (реестр)');
+      //console.log(factHours);
 
-      for (let x = 0; x < xArray.length; x++) {
-        cols = [[], [], []];
-
-        for (let m = 0; m < cutActionMonths[x].length; m++) {
-           cols[1] = cols[1].concat(colMonths[cutActionMonths[x][m]].slice(2, 4));
-        }
-
-        for (let c = 0; c < cols[1].length; c += 2) {
-
-          range = list + '!' + cols[1][c] + xArray[x] + ':' + cols[1][c + 1] + (xArray[x] + (CREW - 1));
-          let value = [];
-          if (!c) {
-            value = [];
-            for (let i = 0; i < CREW; i++) {
-              if (i < ratio[x][c].length){
-                value.push([ratio[x][c][i], factHours[x][c][i]]);
-              } else {
-                value.push([0, 0]);
-              }
-
-            }
-          } else {
-            value = [];
-            for (let i = 0; i < CREW; i++) {
-              if (i < ratio[x][c / 2].length) {
-                value.push([ratio[x][c / 2][i], factHours[x][c / 2][i]]);
-              } else {
-                value.push([0, 0]);
-              }
-
-            }
-          }
-
-          await crud.updateData(value, config.ssId.amo, range)
-            .then(async result => {console.log(result);})
-            .catch(console.err);
-
-          //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
-          await sleep(500);
-
-        }
-
-        let value = [];
-
-        for (let m = 0; m < cutActionMonths[x].length; m++) {
-           cols[2] = cols[2].concat(colMonths[cutActionMonths[x][m]].slice(4));
-        }
-
-        for (let c = 0; c < cols[2].length; c++) {
-          range = list + '!' + cols[2][c] + xArray[x] + ':' + cols[2][c] + (xArray[x] + (CREW - 1));
-          value = [];
-
-          for (let i = 0; i < CREW; i++) {
-            value.push([warrentyHours[x][c][i] ? warrentyHours[x][c][i] : 0]);
-          }
-
-          await crud.updateData(value, config.ssId.amo, range)
-            .then(async result => {console.log(result);})
-            .catch(console.err);
-
-          //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
-          await sleep(500);
-        }
-
-        console.log('Project: ' + x);
-
-      }
-      console.log(new Date());
-      console.log('* ratioParams for Ratio and factHours *');
+      // list = encodeURIComponent('AMO (реестр)');
+      //
+      // for (let x = 0; x < xArray.length; x++) {
+      //   cols = [[], [], []];
+      //
+      //   for (let m = 0; m < cutActionMonths[x].length; m++) {
+      //      cols[1] = cols[1].concat(colMonths[cutActionMonths[x][m]].slice(2, 4));
+      //   }
+      //
+      //   for (let c = 0; c < cols[1].length; c += 2) {
+      //
+      //     range = list + '!' + cols[1][c] + xArray[x] + ':' + cols[1][c + 1] + (xArray[x] + (CREW - 1));
+      //     let value = [];
+      //     if (!c) {
+      //       value = [];
+      //       for (let i = 0; i < CREW; i++) {
+      //         if (i < ratio[x][c].length){
+      //           value.push([ratio[x][c][i], factHours[x][c][i]]);
+      //         } else {
+      //           value.push([0, 0]);
+      //         }
+      //
+      //       }
+      //     } else {
+      //       value = [];
+      //       for (let i = 0; i < CREW; i++) {
+      //         if (i < ratio[x][c / 2].length) {
+      //           value.push([ratio[x][c / 2][i], factHours[x][c / 2][i]]);
+      //         } else {
+      //           value.push([0, 0]);
+      //         }
+      //
+      //       }
+      //     }
+      //
+      //     await crud.updateData(value, config.ssId.amo, range)
+      //       .then(async result => {console.log(result);})
+      //       .catch(console.err);
+      //
+      //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
+      //     await sleep(500);
+      //
+      //   }
+      //
+      //   let value = [];
+      //
+      //   for (let m = 0; m < cutActionMonths[x].length; m++) {
+      //      cols[2] = cols[2].concat(colMonths[cutActionMonths[x][m]].slice(4));
+      //   }
+      //
+      //   for (let c = 0; c < cols[2].length; c++) {
+      //     range = list + '!' + cols[2][c] + xArray[x] + ':' + cols[2][c] + (xArray[x] + (CREW - 1));
+      //     value = [];
+      //
+      //     for (let i = 0; i < CREW; i++) {
+      //       value.push([warrentyHours[x][c][i] ? warrentyHours[x][c][i] : 0]);
+      //     }
+      //
+      //     await crud.updateData(value, config.ssId.amo, range)
+      //       .then(async result => {console.log(result);})
+      //       .catch(console.err);
+      //
+      //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
+      //     await sleep(500);
+      //   }
+      //
+      //   console.log('Project: ' + x);
+      //
+      // }
+      // console.log(new Date());
+      // console.log('* ratioParams for Ratio and factHours *');
 
       //------------------------------------------------------------------------
       // Build params for Margin
@@ -756,12 +767,12 @@ async function amoReg() {
       //   }
       //
       //   //= Push site in params =
-      //   paramsMargin[0].push(amoRegistry[xArray[x] - START][0]);
+      //   paramsMargin[0].push(registry[xArray[x] - START][0]);
       //
       //   //= Push debt "P" in params =
       //   let col = abc.indexOf(colsMargin.debt);
-      //   amoRegistry[xArray[x] - START][col] && Number(amoRegistry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //     ? paramsMargin[1].push(amoRegistry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //   registry[xArray[x] - START][col] && Number(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //     ? paramsMargin[1].push(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
       //     : paramsMargin[1].push(0);
       //
       //   //= Push salary of CREW (x10) in params =
@@ -769,8 +780,8 @@ async function amoReg() {
       //     let count = 0;
       //     for (let j = 2; j < (paramsMargin.length - 3); j += quantity) {
       //       let col = abc.indexOf(colsMargin.salary[count]);
-      //       amoRegistry[i][col] && Number(amoRegistry[i][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //           ? paramsMargin[j].push(amoRegistry[i][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //       registry[i][col] && Number(registry[i][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //           ? paramsMargin[j].push(registry[i][col].replace(/\s/g, '').replace(/,/g, '.'))
       //           : paramsMargin[j].push(0);
       //
       //       jArray.push(j);
@@ -784,8 +795,8 @@ async function amoReg() {
       //   for (let n = 3; n < paramsMargin.length; n++) {
       //     if (!jArray.includes(n)) {
       //       let col = abc.indexOf(colsMargin.other[count]);
-      //       amoRegistry[xArray[x] - START][col] && Number(amoRegistry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //         ? paramsMargin[n].push(amoRegistry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //       registry[xArray[x] - START][col] && Number(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //         ? paramsMargin[n].push(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
       //         : paramsMargin[n].push(0);
       //       count++;
       //     }

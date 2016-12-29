@@ -346,11 +346,11 @@ async function devReg() {
       xArray.unshift(START);
 
       //------------------------------------------------------------------------
-      // Get data from 'dev-registry'
+      // Get data from 'Registry'
       //------------------------------------------------------------------------
 
       range = list + '!C6:DI' + xLable.length;
-      let devRegistry = await crud.readData(config.ssId.dev, range);
+      let registry = await crud.readData(config.ssId.dev, range);
 
       //------------------------------------------------------------------------
       // Build params for allHours
@@ -359,10 +359,10 @@ async function devReg() {
       // let paramsHours = [[], []];
       //
       // for (let x = 0; x < xArray.length; x++) {
-      //   paramsHours[0].push(devRegistry[xArray[x] - START][4]);
+      //   paramsHours[0].push(registry[xArray[x] - START][4]);
       //   paramsHours[1].push([]);
       //   for (let c = (xArray[x] - START); c < (xArray[x] - START + CREW); c++) {
-      //       paramsHours[1][x].push(devRegistry[c][6]);
+      //       paramsHours[1][x].push(registry[c][6]);
       //   }
       // }
 
@@ -410,8 +410,11 @@ async function devReg() {
       let clientInfo = await crud.readData(config.ssId.dev, range);
 
       let contractSum = clientInfo.map((row) => {
-        return [row[0], Number(row[13].replace(/\s/g, ''))
-        ? Number(row[13].replace(/\s/g, '')) : 0]
+        return [
+          row[0],
+          row[13] && Number(row[13].replace(/\s/g, ''))
+          ? Number(row[13].replace(/\s/g, '')) : 0
+        ]
       });
 
       //------------------------------------------------------------------------
@@ -423,7 +426,7 @@ async function devReg() {
       for (let x = 0; x < xArray.length; x++) {
         actionMonth.push([]);
         for (let i = 0; i < clientInfo.length; i++) {
-          if (devRegistry[xArray[x] - START][0]  == clientInfo[i][0]) {
+          if (registry[xArray[x] - START][0]  == clientInfo[i][0]) {
             actionMonth[x].push(clientInfo[i][9] ? Number(clientInfo[i][9].slice(3,5)) : 6);
             actionMonth[x].push(clientInfo[i][16] ? Number(clientInfo[i][16].slice(3,5)) : 12);
           }
@@ -450,7 +453,7 @@ async function devReg() {
       //   let month = 0;
       //
       //   for (let i = 0; i < monthAct.length; i++) {
-      //     if (devRegistry[xArray[x] - START][0]  == monthAct[i][0]) {
+      //     if (registry[xArray[x] - START][0]  == monthAct[i][0]) {
       //       if (monthAct[i][1]) {
       //         month = Number(monthAct[i][1].substr(3, 2)) > 6 ? Number(monthAct[i][1].substr(3, 2)) : 7;
       //       } else {
@@ -496,7 +499,7 @@ async function devReg() {
       // for (let x = 0; x < xArray.length; x++) {
       //
       //   for (let i = 0; i < monthPrepaid.length; i++) {
-      //     if (devRegistry[xArray[x] - START][0]  == monthPrepaid[i][0]) {
+      //     if (registry[xArray[x] - START][0]  == monthPrepaid[i][0]) {
       //       if (!monthPrepaid[i][1] && monthPrepaid[i][2]) {
       //         list = encodeURIComponent('Разработка (реестр)');
       //
@@ -585,8 +588,8 @@ async function devReg() {
       //   receiptParams[4] = [];
       //   cols = [[], []];
       //
-      //   receiptParams[3].push(devRegistry[xArray[x] - START][0]);
-      //   receiptParams[4].push(devRegistry[xArray[x] - START][1]);
+      //   receiptParams[3].push(registry[xArray[x] - START][0]);
+      //   receiptParams[4].push(registry[xArray[x] - START][1]);
       //
       //   for (let m = 0; m < MONTHS.length; m++) {
       //     receiptParams[2].push(MONTHS[m]);
@@ -634,13 +637,13 @@ async function devReg() {
       //   ratioParams[2].push([]);
       //
       //   for (let i = (xArray[x] - START); i < (xArray[x] - START) + CREW; i++) {
-      //      if (devRegistry[i][7]) {
-      //        ratioParams[0][x].push(devRegistry[i][7]);
+      //      if (registry[i][7]) {
+      //        ratioParams[0][x].push(registry[i][7]);
       //
       //        // = Get object lawt name[0] -> table[0] etc. =
-      //        if (!lawt.name.includes(devRegistry[i][7])) {
-      //          lawt.name.push(devRegistry[i][7]);
-      //          list = encodeURIComponent(devRegistry[i][7]);
+      //        if (!lawt.name.includes(registry[i][7])) {
+      //          lawt.name.push(registry[i][7]);
+      //          list = encodeURIComponent(registry[i][7]);
       //          range = list + '!B10:L1000';
       //          lawt.table.push(await crud.readData(config.ssId.lawt, range));
       //        }
@@ -650,7 +653,7 @@ async function devReg() {
       //   for (let m = 0; m < cutActionMonths[x].length; m++) {
       //       ratioParams[1][x].push(cutActionMonths[x][m]);
       //   }
-      //   ratioParams[2][x].push(devRegistry[xArray[x] - START][0]);
+      //   ratioParams[2][x].push(registry[xArray[x] - START][0]);
       //
       // }
       //
@@ -756,12 +759,12 @@ async function devReg() {
         }
 
         //= Push site in params =
-        paramsMargin[0].push(devRegistry[xArray[x] - START][0]);
+        paramsMargin[0].push(registry[xArray[x] - START][0]);
 
         //= Push debt "P" in params =
         let col = abc.indexOf(colsMargin.debt);
-        devRegistry[xArray[x] - START][col] && Number(devRegistry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-          ? paramsMargin[1].push(devRegistry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+        registry[xArray[x] - START][col] && Number(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+          ? paramsMargin[1].push(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
           : paramsMargin[1].push(0);
 
         //= Push salary of CREW (x10) in params =
@@ -769,16 +772,16 @@ async function devReg() {
           let count = 0;
            for (let j = 2; j < (paramsMargin.length - 3); j += quantity) {
             let sCol = abc.indexOf(colsMargin.salary[count]);
-            devRegistry[i][sCol] && Number(devRegistry[i][sCol].replace(/\s/g, '').replace(/,/g, '.'))
-                ? Number(paramsMargin[j].push(devRegistry[i][sCol].replace(/\s/g, '').replace(/,/g, '.')))
+            registry[i][sCol] && Number(registry[i][sCol].replace(/\s/g, '').replace(/,/g, '.'))
+                ? Number(paramsMargin[j].push(registry[i][sCol].replace(/\s/g, '').replace(/,/g, '.')))
                 : paramsMargin[j].push(0);
             jArray.push(j);
 
             j++;
 
             let wCol = abc.indexOf(colsMargin.warranty[count]);
-            devRegistry[i][wCol] && Number(devRegistry[i][wCol].replace(/\s/g, '').replace(/,/g, '.'))
-                ? Number(paramsMargin[j].push(devRegistry[i][wCol].replace(/\s/g, '').replace(/,/g, '.')))
+            registry[i][wCol] && Number(registry[i][wCol].replace(/\s/g, '').replace(/,/g, '.'))
+                ? Number(paramsMargin[j].push(registry[i][wCol].replace(/\s/g, '').replace(/,/g, '.')))
                 : paramsMargin[j].push(0);
 
             jArray.push(j);
@@ -792,8 +795,8 @@ async function devReg() {
         for (let n = 3; n < paramsMargin.length; n++) {
           if (!jArray.includes(n)) {
             let col = abc.indexOf(colsMargin.other[count]);
-            devRegistry[xArray[x] - START][col] && Number(devRegistry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-              ? Number(paramsMargin[n].push(devRegistry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.')))
+            registry[xArray[x] - START][col] && Number(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+              ? Number(paramsMargin[n].push(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.')))
               : paramsMargin[n].push(0);
             count++;
           }
