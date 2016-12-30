@@ -2,13 +2,13 @@
 
 const config = require('config');
 
-async function finStatements(nowMonths) {
+async function finState(nowMonths) {
   return new Promise(async(resolve, reject) => {
 
     //-------------------------------------------------------------------------
     // Usres libs
     //-------------------------------------------------------------------------
-    
+
     require('../libs/auth')(start);
     const getCols = require('../libs/get-cols');
     const Crud = require('../controllers/crud');
@@ -88,7 +88,7 @@ async function finStatements(nowMonths) {
       let params = [[], [], []];
       list = encodeURIComponent('МТС');
       range = list + '!B8:B98';
-      params[1] = await crud.readData(config.ssId.fin_statements, range);
+      params[1] = await crud.readData(config.ssId.fin_state, range);
       const factQuery = require('../models/db_fact-query');
 
       let months = nowMonths;
@@ -122,7 +122,7 @@ async function finStatements(nowMonths) {
             list = encodeURIComponent(division);
             range = list + '!' + cols[m].fact[p] + '8:' + cols[m].fact[p] + '98';
 
-            await crud.updateData(sum, config.ssId.fin_statements, range)
+            await crud.updateData(sum, config.ssId.fin_state, range)
             //.then(async (result) => {console.log(result);})
               .catch(console.log);
 
@@ -160,4 +160,4 @@ async function finStatements(nowMonths) {
   });
 }
 
-module.exports = finStatements;
+module.exports = finState;

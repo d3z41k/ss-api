@@ -86,18 +86,18 @@ router
 
     let months = [7, 8, 9, 10, 11, 12];
 
-    const finStatements = require('./ss-scripts/fin-statements');
-    ctx.body = await finStatements(months);
+    const finState = require('./ss-scripts/fin-state');
+    ctx.body = await finState(months);
 
   })
-  .get('/fin-statements/:pre_month/:curr_month', async ctx => {
+  .get('/fin-state/:pre_month/:curr_month', async ctx => {
 
     let months = [ctx.params.pre_month, ctx.params.curr_month];
 
-    const finStatements = require('./ss-scripts/fin-statements');
-    ctx.body = await finStatements(months);
+    const finState = require('./ss-scripts/fin-state');
+    ctx.body = await finState(months);
 });
 
 app.use(router.routes());
 
-app.listen(3030, () => {console.log('Dev server start on port 3030...');});
+app.listen({ port: 3030 }, () => {console.log('Dev server start on port 3030...');});

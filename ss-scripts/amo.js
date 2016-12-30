@@ -81,8 +81,6 @@ async function amo() {
 
         let values = await amoQuery(pool, 'dds_lera', paramsAmoCients);
 
-        console.log(values);
-
         let prePayRange = list + '!P5:Q' + (values[0].length + 5);
         let addPayRange = list + '!T5:U' + (values[1].length + 5);
 
