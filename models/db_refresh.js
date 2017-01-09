@@ -20,7 +20,7 @@ async function dbRefresh(pool, tableName, srcRows) {
       // Adaptation of values "Sum"
       //-----------------------------------------------------------------------------
 
-      srcRows[i].length = config.width[tableName];
+      srcRows[i].length = config.dds_width[2016][tableName];
 
       if (srcRows[i][5]) {
         if (srcRows[i][5] && srcRows[i][5][0] == '(' && srcRows[i][5][srcRows[i][5].length - 1] == ')') {

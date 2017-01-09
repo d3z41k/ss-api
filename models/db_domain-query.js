@@ -25,9 +25,7 @@ async function domainQuery(pool, tableName, params) {
           .then(([col, feilds]) => {
             for (let key in col[0]) {
               values[d][t][i].push(col[0][key] ? col[0][key] : 0);
-
             }
-
           })
           .catch(console.log);
         }
@@ -35,7 +33,7 @@ async function domainQuery(pool, tableName, params) {
     }
 
     resolve(values);
-    
+
   });
 }
 

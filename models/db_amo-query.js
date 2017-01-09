@@ -14,14 +14,13 @@ async function amoQuery(pool, tableName, params) {
             'AND `Направление деятельноcти` = ? ' +
             'AND `Статья движения денег` = ?', [
               params[0][i].trim(),
-              params[1][i].trim(),
-              params[2][i].trim(),
-              params[3][t].trim()
+              params[1][i],
+              params[2][i],
+              params[3][t]
             ])
           .then(([col, feilds]) => {
             for (let key in col[0]) {
               values[t][i].push(col[0][key] ? col[0][key] : '');
-
             }
 
           })
