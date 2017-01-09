@@ -21,37 +21,37 @@ const router = new Router({
 router
   .get('/mts-sales', async ctx => {
 
-    const mtsSales = require('./ss-scripts/mts-sales');
+    const mtsSales = require('./ss-scripts-2017-1/mts-sales');
     ctx.body = await mtsSales();
 
   })
   .get('/dev-reg', async ctx => {
 
-    const devReg = require('./ss-scripts/dev-reg');
+    const devReg = require('./ss-scripts-2017-1/dev-reg');
     ctx.body = await devReg();
 
   })
   .get('/extra-reg', async ctx => {
 
-    const extraReg = require('./ss-scripts/extra-reg');
+    const extraReg = require('./ss-scripts-2017-1/extra-reg');
     ctx.body = await extraReg();
 
   })
   .get('/amo', async ctx => {
 
-    const amo = require('./ss-scripts/amo');
+    const amo = require('./ss-scripts-2017-1/amo');
     ctx.body = await amo();
 
   })
   .get('/amo-reg', async ctx => {
 
-    const amoReg = require('./ss-scripts/amo-reg');
+    const amoReg = require('./ss-scripts-2017-1/amo-reg');
     ctx.body = await amoReg();
 
   })
   .get('/domain', async ctx => {
 
-    const domain = require('./ss-scripts/domain');
+    const domain = require('./ss-scripts-2017-1/domain');
     ctx.body = await domain();
 
   })
@@ -71,7 +71,7 @@ router
   })
   .get('/profi2', async ctx => {
 
-    const profi2 = require('./ss-scripts/profi2');
+    const profi2 = require('./ss-scripts-2017-1/profi2');
     ctx.body = await profi2();
 
   })
@@ -79,14 +79,14 @@ router
 
     let months = [ctx.params.pre_month, ctx.params.curr_month];
 
-    const profi2 = require('./ss-scripts/profi2');
+    const profi2 = require('./ss-scripts-2017-1/profi2');
     ctx.body = await profi2(months);
   })
   .get('/fin-statements', async ctx => {
 
     let months = [7, 8, 9, 10, 11, 12];
 
-    const finState = require('./ss-scripts/fin-state');
+    const finState = require('./ss-scripts-2017-1/fin-state');
     ctx.body = await finState(months);
 
   })
@@ -94,10 +94,10 @@ router
 
     let months = [ctx.params.pre_month, ctx.params.curr_month];
 
-    const finState = require('./ss-scripts/fin-state');
+    const finState = require('./ss-scripts-2017-1/fin-state');
     ctx.body = await finState(months);
 });
 
 app.use(router.routes());
 
-app.listen({ port: 3030 }, () => {console.log('Dev server start on port 3030...');});
+app.listen({ port: 3017 }, () => {console.log('Dev server start on port 3017...');});

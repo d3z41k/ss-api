@@ -2,7 +2,7 @@
 
 const config = require('config');
 
-async function profi2(mon) {
+async function profi1(mon) {
   return new Promise(async (resolve, reject) => {
 
     //-------------------------------------------------------------------------
@@ -81,7 +81,7 @@ async function profi2(mon) {
       let range = '';
       const START = 8;
 
-      let directions = config.directions.profi2;
+      let directions = config.directions.profi1_2017;
 
       //-------------------------------------------------------------
       // Read data from DDS to RAM
@@ -111,17 +111,17 @@ async function profi2(mon) {
             let params = [[], [], [], [], [], []];
 
             range = list + '!' + months[month][i] + '2:' + months[month][i] + '5';
-            let dstRows = await crud.readData(config.tid2017.profi2, range);
+            let dstRows = await crud.readData(config.tid2017.profi1, range);
             params = await handlerParams1(dstRows, params);
 
             range = list + '!C' + START + ':G';
-            dstRows = await crud.readData(config.tid2017.profi2, range);
+            dstRows = await crud.readData(config.tid2017.profi1, range);
             params = await handlerParams2(dstRows, params);
 
             let sumValues = await profiQuery(pool, params);
 
             range = list + '!' + months[month][i] + START + ':' + months[month][i];
-            await crud.updateData(sumValues, config.tid2017.profi2, range)
+            await crud.updateData(sumValues, config.tid2017.profi1, range)
               .then((result) => {console.log(result);})
               .catch(console.log);
 
@@ -152,4 +152,4 @@ async function profi2(mon) {
   });
 }
 
-module.exports = profi2;
+module.exports = profi1;
