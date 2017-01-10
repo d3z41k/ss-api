@@ -82,7 +82,13 @@ router
     const profi2 = require('./ss-scripts-2017-1/profi2');
     ctx.body = await profi2(months);
   })
-  .get('/fin-statements', async ctx => {
+  .get('/inflow', async ctx => {
+
+    const inflow = require('./ss-scripts-2017-1/inflow');
+    ctx.body = await inflow();
+
+  })
+  .get('/fin-state', async ctx => {
 
     let months = [7, 8, 9, 10, 11, 12];
 

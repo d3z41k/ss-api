@@ -72,8 +72,6 @@ async function amo() {
 
       paramsAmoCients[3].push(amoClients[8][14], amoClients[8][18]);
 
-      //console.log(paramsAmoCients);
-
       let values = await amoQuery(pool, 'dds_lera', paramsAmoCients);
 
       let prePayRange = list + '!P' + START + ':Q' + (values[0].length + START);
@@ -85,7 +83,7 @@ async function amo() {
         crud.updateData(values[0], config.sid_2017.amo, prePayRange),
         crud.updateData(values[1], config.sid_2017.amo, addPayRange)
       ])
-        .then(async results => {console.log(results);})
+      //  .then(async results => {console.log(results);})
         .catch(console.log);
 
 
@@ -93,12 +91,12 @@ async function amo() {
       // Update date-time in "Monitoring"
       //------------------------------------------------------------------------
 
-      // range = 'main!B9';
-      //
-      // let now = new Date();
-      // now = [[formatDate(now)]];
-      //
-      // await crud.updateData(now, config.sid_2017.monit, range);
+      range = 'main!B9';
+
+      let now = new Date();
+      now = [[formatDate(now)]];
+
+      await crud.updateData(now, config.sid_2017.monit, range);
 
     } // = End start function =
 

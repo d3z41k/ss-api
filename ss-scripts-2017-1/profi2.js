@@ -12,6 +12,7 @@ async function profi2(mon) {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
+    const sleep = require('../libs/sleep');
     //const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models-2017-1/db_refresh');
     const pool = require('../models/db_pool');
@@ -59,7 +60,7 @@ async function profi2(mon) {
     // Fetch months
     //-------------------------------------------------------------
 
-    let months = config.profiMonCols2017;
+    let months = config.profi_MonCols_2017;
     var nowMonths  = {};
     var mode = 0;
 
@@ -123,6 +124,7 @@ async function profi2(mon) {
             await crud.updateData(sumValues, config.sid_2017.profi2, range)
               .then((result) => {console.log(result);})
               .catch(console.log);
+            await sleep(500);
 
           }
         }

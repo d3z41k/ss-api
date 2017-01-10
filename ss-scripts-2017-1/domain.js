@@ -29,7 +29,7 @@ async function domain() {
       let range = '';
       const START = 7;
       const MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-      const colMonths = config.domain_colMonths2017;
+      const colMonths = config.domain_colMonths_2017;
 
       //-------------------------------------------------------------
       // Read data from DDS and refresh DB
@@ -40,11 +40,11 @@ async function domain() {
 
       let srcRows = await crud.readData(config.sid_2017.dds, range);
 
-      // =Normalizing of length "srcRows" =
+      //= Normalizing of length "srcRows" (not actual) =
       //normLength(srcRows);
 
        await dbRefresh(pool, 'dds_olga', srcRows)
-        .then(async (result) => {console.log(result);})
+        //.then(async (result) => {console.log(result);})
         .catch(console.log);
 
         //------------------------------------------------------------------------
@@ -79,27 +79,26 @@ async function domain() {
           paramsDomainCients[4] = m;
 
           values = await domainQuery(pool, 'dds_olga', paramsDomainCients);
-          console.log(values.length);
-          
-          // let sellPayRangeD = list + '!' + colMonths[m][0] + START + ':' + colMonths[m][0] + (values[0][0].length + START);
-          // let prePayRangeD = list + '!' + colMonths[m][1] + START + ':' + colMonths[m][1] + (values[0][0].length + START);
-          // let addPayRangeD = list + '!' + colMonths[m][2] + START + ':' + colMonths[m][2] + (values[0][0].length + START);
-          //
-          // let sellPayRangeH = list + '!' + colMonths[m][3] + START + ':' + colMonths[m][3] + (values[0][0].length + START);
-          // let prePayRangeH = list + '!' + colMonths[m][4] + START + ':' + colMonths[m][4] + (values[0][0].length + START);
-          // let addPayRangeH = list + '!' + colMonths[m][5] + START + ':' + colMonths[m][5] + (values[0][0].length + START);
+
+          let sellPayRangeD = list + '!' + colMonths[m][0] + START + ':' + colMonths[m][0] + (values[0][0].length + START);
+          let prePayRangeD = list + '!' + colMonths[m][1] + START + ':' + colMonths[m][1] + (values[0][0].length + START);
+          let addPayRangeD = list + '!' + colMonths[m][2] + START + ':' + colMonths[m][2] + (values[0][0].length + START);
+
+          let sellPayRangeH = list + '!' + colMonths[m][3] + START + ':' + colMonths[m][3] + (values[0][0].length + START);
+          let prePayRangeH = list + '!' + colMonths[m][4] + START + ':' + colMonths[m][4] + (values[0][0].length + START);
+          let addPayRangeH = list + '!' + colMonths[m][5] + START + ':' + colMonths[m][5] + (values[0][0].length + START);
 
 
-          // await Promise.all([
-          //   crud.updateData(values[0][0], config.sid_2017.domain, sellPayRangeD),
-          //   crud.updateData(values[0][1], config.sid_2017.domain, prePayRangeD),
-          //   crud.updateData(values[0][2], config.sid_2017.domain, addPayRangeD),
-          //   crud.updateData(values[1][0], config.sid_2017.domain, sellPayRangeH),
-          //   crud.updateData(values[1][1], config.sid_2017.domain, prePayRangeH),
-          //   crud.updateData(values[1][2], config.sid_2017.domain, addPayRangeH)
-          // ])
-          //   .then(async results => {console.log(results);})
-          //   .catch(console.log);
+          await Promise.all([
+            crud.updateData(values[0][0], config.sid_2017.domain, sellPayRangeD),
+            crud.updateData(values[0][1], config.sid_2017.domain, prePayRangeD),
+            crud.updateData(values[0][2], config.sid_2017.domain, addPayRangeD),
+            crud.updateData(values[1][0], config.sid_2017.domain, sellPayRangeH),
+            crud.updateData(values[1][1], config.sid_2017.domain, prePayRangeH),
+            crud.updateData(values[1][2], config.sid_2017.domain, addPayRangeH)
+          ])
+            //.then(async results => {console.log(results);})
+            .catch(console.log);
 
         }
 
@@ -107,12 +106,12 @@ async function domain() {
       // Update date-time in "Monitoring"
       //------------------------------------------------------------------------
 
-      // range = 'main!B10';
-      //
-      // let now = new Date();
-      // now = [[formatDate(now)]];
-      //
-      // await crud.updateData(now, config.sid_2017.monit, range);
+      range = 'main!B10';
+
+      let now = new Date();
+      now = [[formatDate(now)]];
+
+      await crud.updateData(now, config.sid_2017.monit, range);
 
       //resolve('complite!');
 
