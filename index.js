@@ -84,7 +84,7 @@ router
     ctx.body = await finState(months);
 
   })
-  .get('/fin-statements/:pre_month/:curr_month', async ctx => {
+  .get('/fin-state/:pre_month/:curr_month', async ctx => {
 
     let months = [ctx.params.pre_month, ctx.params.curr_month];
 

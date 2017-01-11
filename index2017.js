@@ -1,4 +1,4 @@
-'use strict';
+                                    'use strict';
 
 const koa = require('koa');
 const app = new koa();
@@ -82,10 +82,10 @@ router
     const profi2 = require('./ss-scripts-2017-1/profi2');
     ctx.body = await profi2(months);
   })
-  .get('/inflow', async ctx => {
+  .get('/inflow/:month', async ctx => {
 
     const inflow = require('./ss-scripts-2017-1/inflow');
-    ctx.body = await inflow();
+    ctx.body = await inflow(ctx.params.month);
 
   })
   .get('/fin-state', async ctx => {

@@ -6,15 +6,16 @@ async function inflowQuery(pool, tableName, params) {
     for (let d = 0; d < params[1].length; d++) {
       sum.push([]);
       for (let i = 0; i < params[3].length; i++) {
+
         await pool.execute('SELECT SUM(`Сумма итого руб`) FROM ' + tableName + ' WHERE ' +
             '`Месяц` = ? ' +
             'AND `Декада` = ? ' +
-            'AND `Направление группа` = ? ' +
+            //'AND `Направление группа` = ? ' +
             'AND `Направление деятельноcти` = ? ' +
             'AND `Статья движения денег` = ?', [
               params[0],
               params[1][d],
-              params[2],
+              //params[2],
               params[3][i],
               params[4][i]
             ])
