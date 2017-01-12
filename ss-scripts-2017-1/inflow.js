@@ -1,6 +1,7 @@
 'use strict';
 
 const config = require('config');
+const util = require('util');
 
 async function inflow(month) {
   return new Promise(async(resolve, reject) => {
@@ -109,27 +110,33 @@ async function inflow(month) {
       };
 
       for (let i = 0; i < inflow.length; i++) {
-        for (let j = 0; j < parishes.length; j++) {
-            if (inflow[i][0]
-              && inflow[i][1].trim() == parishes[j][1]
-              && inflow[i][2].trim() == parishes[j][2]
+        for (let p = 1; p < parishes.length; p++) {
+          if (inflow[i][0]
+              && inflow[i][1] == parishes[p][1]
+              && inflow[i][2].trim() == parishes[p][2]
             ) {
-              parishes[j][parishes[0].indexOf(String(numMonth + 1))]
-                ? values[inflow[i][0]]['check'].push([parishes[j][parishes[0].indexOf(String(numMonth + 1))]])
+              parishes[p][parishes[0].indexOf(String(numMonth))] && parishes[p][parishes[0].indexOf(String(numMonth))] !== '  - '
+                ? values[inflow[i][0]]['check'].push([parishes[p][parishes[0].indexOf(String(numMonth))]])
                 : values[inflow[i][0]]['check'].push(['']);
-            }
-            if (inflow[i][0]
-              && inflow[i][1].trim() == forecast[j][1]
-              && inflow[i][2].trim() == forecast[j][2]
-            ) {
-              for (let d = 0; d < 3; d++) {
-                forecast[j][forecast[0].indexOf(String(numMonth + 1)) + d]
-                  ? values[inflow[i][0]][d + 1].push([forecast[j][forecast[0].indexOf(String(numMonth + 1)) + d]])
-                  : values[inflow[i][0]][d + 1].push(['']);
-              }
-            }
+          }
         }
+        for (let f = 2; f < forecast.length; f++) {
+
+          if (inflow[i][0]
+            && inflow[i][1] == forecast[f][1]
+            && inflow[i][2].trim() == forecast[f][2]
+          ) {
+            for (let d = 0; d < 3; d++) {
+              forecast[f][forecast[0].indexOf(String(numMonth)) + d] && forecast[f][forecast[0].indexOf(String(numMonth)) + d] !== '  - '
+                ? values[inflow[i][0]][d + 1].push([forecast[f][forecast[0].indexOf(String(numMonth)) + d]])
+                : values[inflow[i][0]][d + 1].push(['']);
+            }
+          }
+        }
+
       }
+
+      //console.log(util.inspect(values, false, null));
 
       for (let division in values) {
 

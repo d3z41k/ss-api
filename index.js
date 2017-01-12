@@ -88,7 +88,7 @@ router
 
     let months = [ctx.params.pre_month, ctx.params.curr_month];
 
-    const finStatements = require('./ss-scripts/fin-statements');
+    const finStatements = require('./ss-scripts/fin-state');
     ctx.body = await finStatements(months);
 });
 

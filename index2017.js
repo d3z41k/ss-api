@@ -1,4 +1,4 @@
-                                    'use strict';
+'use strict';
 
 const koa = require('koa');
 const app = new koa();
@@ -29,6 +29,12 @@ router
 
     const devReg = require('./ss-scripts-2017-1/dev-reg');
     ctx.body = await devReg();
+
+  })
+  .get('/extra', async ctx => {
+
+    const extra = require('./ss-scripts-2017-1/extra');
+    ctx.body = await extra();
 
   })
   .get('/extra-reg', async ctx => {

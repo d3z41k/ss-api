@@ -12,7 +12,7 @@ async function finState(nowMonths) {
     require('../libs/auth')(start);
     const getCols = require('../libs/get-cols');
     const Crud = require('../controllers/crud');
-    const formatDate = require('../libs/format-date');
+    //const formatDate = require('../libs/format-date');
     const dbRefresh = require('../models/db_refresh');
     const pool = require('../models/db_pool');
 
@@ -41,7 +41,7 @@ async function finState(nowMonths) {
       let range = list + '!A6:AC';
 
       srcRows.lera = await crud.readData(config.ssId.dds, range);
-      srcRows.lera.length = normLength(srcRows.lera);
+      //srcRows.lera.length = normLength(srcRows.lera);
 
       //-------------------------------------------------------------
       // Read data from dds_olga to RAM
@@ -51,21 +51,21 @@ async function finState(nowMonths) {
       range = list + '!A6:AK';
 
       srcRows.olga = await crud.readData(config.ssId.dds, range);
-      srcRows.olga.length = normLength(srcRows.olga);
+      //srcRows.olga.length = normLength(srcRows.olga);
 
       //---------------------------------------------------------------
       // Normalizing of length "srcRows"
       //---------------------------------------------------------------
 
-      function normLength(srcRows){
-        for (let i = 0; i < srcRows.length; i++) {
-          if (srcRows[i][0] == '' &&
-            srcRows[i + 1][0] == '' &&
-            srcRows[i + 2][0] == '') {
-            return srcRows.length = i;
-          }
-        }
-      }
+      // function normLength(srcRows){
+      //   for (let i = 0; i < srcRows.length; i++) {
+      //     if (srcRows[i][0] == '' &&
+      //       srcRows[i + 1][0] == '' &&
+      //       srcRows[i + 2][0] == '') {
+      //       return srcRows.length = i;
+      //     }
+      //   }
+      // }
 
       //---------------------------------------------------------------
       // Refresh table
@@ -75,7 +75,7 @@ async function finState(nowMonths) {
         dbRefresh(pool, 'dds_lera', srcRows.lera),
         dbRefresh(pool, 'dds_olga', srcRows.olga)
       ])
-      //.then(async (results) => {console.log(results);})
+        .then(async (results) => {console.log(results);})
         .catch(console.log);
 
       //await pool.end();
@@ -102,6 +102,8 @@ async function finState(nowMonths) {
 
         let cols = await getCols(auth, division, divisions[division].length, months);
 
+        //console.log(cols);
+
         for (let m = 0; m < months.length; m++) {
           params[0][0] = [];
           params[0][0] = months[m];
@@ -123,14 +125,11 @@ async function finState(nowMonths) {
             range = list + '!' + cols[m].fact[p] + '8:' + cols[m].fact[p] + '98';
 
             await crud.updateData(sum, config.ssId.fin_state, range)
-            //.then(async (result) => {console.log(result);})
+              .then(async (result) => {console.log(result);})
               .catch(console.log);
-
-            resolve('complite!');
 
           }
         }
-
       }
 
       //await pool.end();
@@ -139,22 +138,22 @@ async function finState(nowMonths) {
       // Update date-time in "Monitoring"
       //-------------------------------------------------------------
 
-      if (mode) {
-        range = 'sheet1!C15';
-      } else {
-        range = 'sheet1!B15';
-      }
+      // if (mode) {
+      //   range = 'sheet1!C15';
+      // } else {
+      //   range = 'sheet1!B15';
+      // }
+      //
+      // let now = new Date();
+      // now = [
+      //   [formatDate(now)]
+      // ];
+      //
+      // await crud.updateData(now, config.ssId.monit, range)
+      // //.then(async (result) => {console.log(result);})
+      //   .catch(console.log);
 
-      let now = new Date();
-      now = [
-        [formatDate(now)]
-      ];
-
-      await crud.updateData(now, config.ssId.monit, range)
-      //.then(async (result) => {console.log(result);})
-        .catch(console.log);
-
-      //resolve('complite!');
+      resolve('complite!');
 
     }// = End start function =
   });
