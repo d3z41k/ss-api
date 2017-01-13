@@ -30,6 +30,14 @@ async function dbRefresh(pool, tableName, srcRows) {
         srcRows[i][5] = Number(srcRows[i][5].replace(/\s/g, ''));
       }
 
+      if (srcRows[i][21] && srcRows[i][21].includes('→')) {
+        srcRows[i][21] = srcRows[i][21].slice(2).trim();
+      }
+
+      if (srcRows[i][29] && srcRows[i][29].includes('→')) {
+        srcRows[i][29] = srcRows[i][29].slice(2).trim();
+      }
+
       //------------------------------------------------------------------------------
 
       await pool.query("INSERT INTO " + tableName + " VALUES (NULL, '" + srcRows[i].join('\', \'') + "')")

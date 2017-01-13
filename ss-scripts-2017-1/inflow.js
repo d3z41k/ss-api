@@ -154,6 +154,7 @@ async function inflow(month) {
 
         let sum1;
         let sum2;
+
         await Promise.all([
           inflowQuery(pool, 'dds_lera', inflowParams),
           inflowQuery(pool, 'dds_olga', inflowParams)

@@ -94,6 +94,12 @@ router
     ctx.body = await inflow(ctx.params.month);
 
   })
+  .get('/salary/:month', async ctx => {
+
+    const salary = require('./ss-scripts-2017-1/salary');
+    ctx.body = await salary(ctx.params.month);
+
+  })
   .get('/fin-state', async ctx => {
 
     let months = [7, 8, 9, 10, 11, 12];
