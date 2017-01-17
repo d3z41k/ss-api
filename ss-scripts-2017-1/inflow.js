@@ -14,7 +14,7 @@ async function inflow(month) {
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
     const dbRefresh = require('../models-2017-1/db_refresh');
-    const pool = require('../models/db_pool');
+    const pool = require('../models-2017-1/db_pool');
     const inflowQuery = require('../models/db_inflow-query');
 
     //---------------------------------------------------------------

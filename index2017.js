@@ -100,6 +100,12 @@ router
     ctx.body = await salary(ctx.params.month);
 
   })
+  .get('/indirect/:month', async ctx => {
+
+    const indirect = require('./ss-scripts-2017-1/indirect');
+    ctx.body = await indirect(ctx.params.month);
+
+  })
   .get('/fin-state', async ctx => {
 
     let months = [7, 8, 9, 10, 11, 12];
@@ -118,4 +124,4 @@ router
 
 app.use(router.routes());
 
-app.listen({ port: 3017 }, () => {console.log('Dev server start on port 3017...');});
+app.listen({ port: 3017 }, () => {console.log('Server 2017 start on port 3017...');});

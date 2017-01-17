@@ -14,7 +14,7 @@ async function extra() {
     const formatDate = require('../libs/format-date');
     const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models-2017-1/db_refresh');
-    const pool = require('../models/db_pool');
+    const pool = require('../models-2017-1/db_pool');
     const extraQuery = require('../models/db_extra-query');
 
     //---------------------------------------------------------------

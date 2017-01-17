@@ -15,7 +15,7 @@ async function profi1(mon) {
     const sleep = require('../libs/sleep');
     //const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models-2017-1/db_refresh');
-    const pool = require('../models/db_pool');
+    const pool = require('../models-2017-1/db_pool');
     const profiQuery = require('../models/db_profi_query');
 
     async function handlerParams1(rows, params) {

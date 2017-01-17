@@ -15,7 +15,7 @@ async function indirect(month) {
     const sleep = require('../libs/sleep');
     //const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models-2017-1/db_refresh');
-    const pool = require('../models/db_pool');
+    const pool = require('../models-2017-1/db_pool');
     const indirectQuery = require('../models/db_indirect-query');
 
     //---------------------------------------------------------------
@@ -81,7 +81,7 @@ async function indirect(month) {
       let dataIndirect = await crud.readData(config.sid_2017.indirect, range);
 
       //------------------------------------------------------------------------
-      // Build paramsSlary and get & update Salary
+      // Build paramsIndirect and get & update Indirect
       //------------------------------------------------------------------------
 
       let paramsIndirect = {
@@ -95,6 +95,8 @@ async function indirect(month) {
 
       let numMonth = MON_COLS[month][0];
 
+      //= Try build params for Indirect (3 type, 2 version)  =
+
       try {
 
         for (let type in paramsIndirect) {
@@ -106,7 +108,7 @@ async function indirect(month) {
 
         for (let i = (START - 1); i < dataIndirect.length; i++) {
 
-          //= Type 1.1  =
+          //= Type 1.1 params =
 
           if ((i >= TYPES[1.1].range1[0] && i <= TYPES[1.1].range1[1])
             || (i >= TYPES[1.1].range2[0] && i <= TYPES[1.1].range2[1] && i != range2[2])
@@ -116,7 +118,7 @@ async function indirect(month) {
             paramsIndirect['2.1'][1].push(dataIndirect[i][1]);
           }
 
-          //= Type 1.2  =
+          //= Type 1.2 params =
 
           if (i >= TYPES[1.2].range1[0] && i <= TYPES[1.2].range1[1]) {
             paramsIndirect['1.2'][1].push(dataIndirect[i][1]);
@@ -125,7 +127,7 @@ async function indirect(month) {
             paramsIndirect['2.2'][2].push(dataIndirect[i][3]);
           }
 
-          //= Type 1.3  =
+          //= Type 1.3 params =
 
           if (i >= TYPES[1.3].range1[0] && i <= TYPES[1.3].range1[1]) {
             paramsIndirect['1.3'][1].push(dataIndirect[i][1]);
@@ -136,10 +138,11 @@ async function indirect(month) {
 
         }
 
-
       } catch (e) {
         reject(e.stack);
       } finally {
+
+        //= Make query to DDS for Indirect  for each type-version (1.1, 1.2 ...)=
 
         for (let type in paramsIndirect) {
 
@@ -160,11 +163,15 @@ async function indirect(month) {
             })
             .catch(console.log);
 
+            //= For version 1 =
+
             if (type[0] == ['1']) {
               for (let i = 0; i < sum1.length; i++) {
                 sumCommon.push([Number(sum1[i][0]) + Number(sum2[i][0])]);
               }
             }
+
+            //= For version 2 =
 
             if (type[0] == ['2']) {
               for (let i = 0; i < sum1.length; i++) {
@@ -175,6 +182,7 @@ async function indirect(month) {
                 }
             }
 
+            //= Common sum 1.1 (1 type 3 part) =
 
             if (type == '1.1') {
 
@@ -213,6 +221,8 @@ async function indirect(month) {
               ])
                 .then(async results => {console.log(results);})
                 .catch(console.log);
+
+            //= Directions sum 2.1 (2 type 3 part) =
 
             } else if (type == '2.1') {
                 for (let d = 0; d < paramsIndirect[type][3].length; d++) {
@@ -253,7 +263,11 @@ async function indirect(month) {
                     .catch(console.log);
                 }
 
+            //= Other sums =
+
             } else {
+
+              //= Type 1 (1.2, 1.3) sum =
 
               if (type[0] == '1') {
 
@@ -267,6 +281,8 @@ async function indirect(month) {
                   .then(async results => {console.log(results);})
                   .catch(console.log);
               }
+
+              //= Type 2 (2.2, 2.3) sum =
 
               if (type[0] == '2') {
                 for (let d = 0; d < paramsIndirect[type][3].length; d++) {

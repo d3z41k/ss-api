@@ -14,37 +14,52 @@ async function getCols(auth, products, quantity, months) {
     let iRows = [];
     let monthCols = [];
 
-    row[0].forEach((value, i) => {
-      months.forEach((month) => {
-        if (value == month) {
-          iRows.push(i);
-        }
+
+
+    let mon = {
+      'Jul': 7,
+      'Aug': 8,
+      'Sep': 9,
+      'Oct': 10,
+      'Nov': 11,
+      'Dec': 12
+    };
+
+
+      row[0].forEach((value, i) => {
+        months.forEach((month) => {
+          if (value == mon[month]) {
+            iRows.push(i);
+          }
+        });
       });
-    });
 
-    quantity = quantity * 3;
+      console.log(iRows);
 
-    iRows.forEach((iRow) => {
+      quantity = quantity * 3;
 
-      var cols = {
-        plan: [],
-        fact: [],
-      };
+      iRows.forEach(iRow => {
 
-      for (var i = 0; i <= quantity; i++) {
-        cols.plan.push(abc[iRow + i]);
-        if (i != (quantity - 2)) {
-          cols.fact.push(abc[iRow + (i + 1)]);
+        let cols = {
+          plan: [],
+          fact: [],
+        };
+
+        for (let i = 0; i <= quantity; i++) {
+          cols.plan.push(abc[iRow + i]);
+          if (i != (quantity - 2)) {
+            cols.fact.push(abc[iRow + (i + 1)]);
+          }
+          i += 2
         }
-        i += 2
-      }
 
-      cols.fact.pop();
-      monthCols.push(cols);
+        cols.fact.pop();
+        monthCols.push(cols);
 
-    });
+      });
 
-    resolve(monthCols)
+      resolve(monthCols);
+
 
   });
 }

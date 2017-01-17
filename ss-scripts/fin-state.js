@@ -12,7 +12,7 @@ async function finState(nowMonths) {
     require('../libs/auth')(start);
     const getCols = require('../libs/get-cols');
     const Crud = require('../controllers/crud');
-    //const formatDate = require('../libs/format-date');
+    const formatDate = require('../libs/format-date');
     const dbRefresh = require('../models/db_refresh');
     const pool = require('../models/db_pool');
 
@@ -37,8 +37,8 @@ async function finState(nowMonths) {
       // Read data from dds_lera to RAM
       //-------------------------------------------------------------
 
-      let list = encodeURIComponent('ДДС_Лера');
-      let range = list + '!A6:AC';
+       let list = encodeURIComponent('ДДС_Лера');
+       let range = list + '!A6:AC';
 
       srcRows.lera = await crud.readData(config.ssId.dds, range);
       //srcRows.lera.length = normLength(srcRows.lera);
@@ -104,9 +104,18 @@ async function finState(nowMonths) {
 
         //console.log(cols);
 
+        let mon = {
+          'Jul': 7,
+          'Aug': 8,
+          'Sep': 9,
+          'Oct': 10,
+          'Nov': 11,
+          'Dec': 12
+        };
+
         for (let m = 0; m < months.length; m++) {
           params[0][0] = [];
-          params[0][0] = months[m];
+          params[0][0] = mon[months[m]];
 
           for (let p = 0; p < divisions[division].length; p++) {
             params[2] = [];
@@ -130,6 +139,7 @@ async function finState(nowMonths) {
 
           }
         }
+
       }
 
       //await pool.end();
@@ -138,24 +148,24 @@ async function finState(nowMonths) {
       // Update date-time in "Monitoring"
       //-------------------------------------------------------------
 
-      // if (mode) {
-      //   range = 'sheet1!C15';
-      // } else {
-      //   range = 'sheet1!B15';
-      // }
-      //
-      // let now = new Date();
-      // now = [
-      //   [formatDate(now)]
-      // ];
-      //
-      // await crud.updateData(now, config.ssId.monit, range)
-      // //.then(async (result) => {console.log(result);})
-      //   .catch(console.log);
+      if (mode) {
+        range = 'sheet1!C15';
+      } else {
+        range = 'sheet1!B15';
+      }
 
-      resolve('complite!');
+      let now = new Date();
+      now = [
+        [formatDate(now)]
+      ];
 
-    }// = End start function =
+      await crud.updateData(now, config.ssId.monit, range)
+      //.then(async (result) => {console.log(result);})
+        .catch(console.log);
+
+    } // = End start function =
+
+    resolve('complite!');
   });
 }
 

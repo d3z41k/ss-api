@@ -14,7 +14,7 @@ async function amo() {
     const formatDate = require('../libs/format-date');
     const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models-2017-1/db_refresh');
-    const pool = require('../models/db_pool');
+    const pool = require('../models-2017/db_pool');
     const amoQuery = require('../models/db_amo-query');
 
     //---------------------------------------------------------------
