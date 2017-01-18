@@ -84,6 +84,12 @@ router
     ctx.body = await finState(months);
 
   })
+  .get('/fin-state-loan', async ctx => {
+
+    const finStateLoan = require('./ss-scripts/fin-state-loan');
+    ctx.body = await finStateLoan();
+
+  })
   .get('/fin-state/:pre_month/:curr_month', async ctx => {
 
     let months = [ctx.params.pre_month, ctx.params.curr_month];

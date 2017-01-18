@@ -27,7 +27,7 @@ router
   })
   .get('/dev-reg', async ctx => {
 
-    const devReg = require('./ss-scripts-2017-1/dev-reg');
+    const devReg = require('./ss-scripts/dev-reg');
     ctx.body = await devReg();
 
   })
@@ -112,6 +112,12 @@ router
 
     const finState = require('./ss-scripts-2017-1/fin-state');
     ctx.body = await finState(months);
+
+  })
+  .get('/fin-state-loan', async ctx => {
+
+    const finStateLoan = require('./ss-scripts/fin-state-loan');
+    ctx.body = await finStateLoan();
 
   })
   .get('/fin-state/:pre_month/:curr_month', async ctx => {

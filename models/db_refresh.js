@@ -30,6 +30,23 @@ async function dbRefresh(pool, tableName, srcRows) {
         srcRows[i][5] = Number(srcRows[i][5].replace(/\s/g, ''));
       }
 
+      // if (srcRows[i][34] && srcRows[i][34].includes('→')) {
+      //   srcRows[i][34] = srcRows[i][34].slice(2).trim();
+      // }
+      // if (srcRows[i][30] && srcRows[i][30].includes('→')) {
+      //   srcRows[i][30] = srcRows[i][30].slice(2).trim();
+      // }
+      
+      if (srcRows[i][24] && srcRows[i][24].includes('→')) {
+        srcRows[i][24] = srcRows[i][24].slice(2).trim();
+      }
+
+      if (srcRows[i][28] && srcRows[i][28].includes('→')) {
+        srcRows[i][28] = srcRows[i][28].slice(2).trim();
+      }
+
+
+
       //------------------------------------------------------------------------------
 
       await pool.query("INSERT INTO " + tableName + " VALUES (NULL, '" + srcRows[i].join('\', \'') + "')")
