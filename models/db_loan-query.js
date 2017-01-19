@@ -26,7 +26,7 @@ async function loanQuery(pool, tableName, params, mode) {
                   ])
                 .then(([col, feilds]) => {
                   for (let key in col[0]) {
-                    sum[d].push([col[0][key] ? col[0][key] : 0]);
+                    sum[d].push([col[0][key] ? (col[0][key] * -1): 0]);
                   }
                 })
                 .catch(err => {
@@ -113,7 +113,7 @@ async function loanQuery(pool, tableName, params, mode) {
                  ])
                .then(([col, feilds]) => {
                  for (let key in col[0]) {
-                   sum[d].push([col[0][key] ? col[0][key] : 0]);
+                   sum[d].push([col[0][key] ? (col[0][key] * -1) : 0]);
                  }
                })
                .catch(err => {

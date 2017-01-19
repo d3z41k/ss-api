@@ -47,7 +47,7 @@ async function finStateLoan() {
       const STEP = 7;
 
       //-------------------------------------------------------------
-      // Read data from dds_lera to RAM
+      // Refresh DDS Lera
       //-------------------------------------------------------------
 
       list = encodeURIComponent('ДДС_Лера');
@@ -55,29 +55,16 @@ async function finStateLoan() {
 
       dataDDS = await crud.readData(config.ssId.dds, range);
 
-      //---------------------------------------------------------------
-      // Refresh table
-      //---------------------------------------------------------------
-
       await dbRefresh(pool, 'dds_lera', dataDDS)
         .then(async (results) => {console.log(results);})
         .catch(console.log);
 
       //-------------------------------------------------------------
-      // Read data from "Loan"
-      //-------------------------------------------------------------
-
-      list = encodeURIComponent('Займы');
-      range = list + '!A1:AZ14';
-
-      let loan = await crud.readData(config.ssId.fin_state, range);
-
-      //-------------------------------------------------------------
-      // Build params
+      // Main functional per each month
       //-------------------------------------------------------------
 
       for (let month in COL_MONTH) {
-        let count = 0;
+
         let paramsLoan = [[], [], [], [], []];
         let balance = [[], []];
         let indexBalance = [];
@@ -88,8 +75,15 @@ async function finStateLoan() {
         let sumLoan = [];
         let sumRefund = [];
 
+        //= Read data from "Loan" =
+        //* Need for get actual balance *
 
-        console.log(month);
+        list = encodeURIComponent('Займы');
+        range = list + '!A1:AZ14';
+
+        let loan = await crud.readData(config.ssId.fin_state, range);
+
+        //= Build params =
 
         paramsLoan[0] = month;
         paramsLoan[1].push(loan[4][0], loan[5][0], loan[9][0], loan[10][0]);
@@ -99,7 +93,6 @@ async function finStateLoan() {
         for (let i = 0; i < COL_MONTH[month].length; i++) {
           indexBalance.push((abc.indexOf(COL_MONTH[month][i])) - STEP);
         }
-
 
         for (let d = 0; d < indexBalance.length; d++) {
           balance[0].push([]);
@@ -154,17 +147,12 @@ async function finStateLoan() {
           })
           .catch(console.log);
 
-
-        //console.log(balance);
-
         for (let i = 0; i < sum11.length; i++) {
           sumLoan.push([]);
           for (let j = 0; j < sum11[i].length; j++) {
             sumLoan[i].push(Number(sum11[i][j][0]) + Number(sum12[i][j][0]) + Number(balance[0][j][i]));
           }
         }
-
-        //console.log(sumLoan);
 
         for (let i = 0; i < sum21.length; i++) {
           sumRefund.push([]);

@@ -207,7 +207,7 @@ async function indirect(month) {
               sumCommon.forEach((value, i) => {
                 if (i <= 26) {
                   sumCommon1.push(value);
-                } else if (i >= 27 && i <= 51) {
+                } else if (i >= 27 && i <= 50) {
                   sumCommon2.push(value);
                 } else {
                   sumCommon3.push(value);
@@ -247,7 +247,7 @@ async function indirect(month) {
                   sumDirections[d].forEach((value, i) => {
                     if (i <= 26) {
                       sumDirections1.push(value);
-                    } else if (i >= 27 && i <= 51) {
+                    } else if (i >= 27 && i <= 50) {
                       sumDirections2.push(value);
                     } else {
                       sumDirections3.push(value);
