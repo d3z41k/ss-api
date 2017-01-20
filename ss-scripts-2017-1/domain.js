@@ -62,43 +62,52 @@ async function domain() {
         for (let m = MONTHS[0]; m <= MONTHS[MONTHS.length - 1]; m++) {
 
           let paramsDomainCients = [[], [], [], [], []];
-          let values = [];
 
-          for (let a = (START - 1); a < domainClients.length; a++) {
-            if (domainClients[a][2] && domainClients[a][3]) {
-              paramsDomainCients[0].push(domainClients[a][2]);
-              paramsDomainCients[1].push(domainClients[a][3]);
-            } else {
-              paramsDomainCients[0].push(' ');
-              paramsDomainCients[1].push(' ');
+          //= Try build params =
+
+          try {
+
+            for (let a = (START - 1); a < domainClients.length; a++) {
+              if (domainClients[a][2] && domainClients[a][3]) {
+                paramsDomainCients[0].push(domainClients[a][2]); //site
+                paramsDomainCients[1].push(domainClients[a][3]); //counterparty
+              } else {
+                paramsDomainCients[0].push(' ');
+                paramsDomainCients[1].push(' ');
+              }
             }
+
+            paramsDomainCients[2].push(domainClients[2][19], domainClients[2][24]); //direction (domain & hosting)
+            paramsDomainCients[3].push(domainClients[3][19], domainClients[3][20], domainClients[3][21]); // articles
+            paramsDomainCients[4] = m; //month
+
+          } catch (e) {
+            reject(e.stack)
+          } finally {
+
+            let values = await domainQuery(pool, 'dds_olga', paramsDomainCients);
+
+            let sellPayRangeD = list + '!' + colMonths[m][0] + START + ':' + colMonths[m][0] + (values[0][0].length + START);
+            let prePayRangeD = list + '!' + colMonths[m][1] + START + ':' + colMonths[m][1] + (values[0][0].length + START);
+            let addPayRangeD = list + '!' + colMonths[m][2] + START + ':' + colMonths[m][2] + (values[0][0].length + START);
+
+            let sellPayRangeH = list + '!' + colMonths[m][3] + START + ':' + colMonths[m][3] + (values[0][0].length + START);
+            let prePayRangeH = list + '!' + colMonths[m][4] + START + ':' + colMonths[m][4] + (values[0][0].length + START);
+            let addPayRangeH = list + '!' + colMonths[m][5] + START + ':' + colMonths[m][5] + (values[0][0].length + START);
+
+
+            await Promise.all([
+              crud.updateData(values[0][0], config.sid_2017.domain, sellPayRangeD),
+              crud.updateData(values[0][1], config.sid_2017.domain, prePayRangeD),
+              crud.updateData(values[0][2], config.sid_2017.domain, addPayRangeD),
+              crud.updateData(values[1][0], config.sid_2017.domain, sellPayRangeH),
+              crud.updateData(values[1][1], config.sid_2017.domain, prePayRangeH),
+              crud.updateData(values[1][2], config.sid_2017.domain, addPayRangeH)
+            ])
+              //.then(async results => {console.log(results);})
+              .catch(console.log);
+
           }
-
-          paramsDomainCients[2].push(domainClients[2][19], domainClients[2][24]);
-          paramsDomainCients[3].push(domainClients[3][19], domainClients[3][20], domainClients[3][21]);
-          paramsDomainCients[4] = m;
-
-          values = await domainQuery(pool, 'dds_olga', paramsDomainCients);
-
-          let sellPayRangeD = list + '!' + colMonths[m][0] + START + ':' + colMonths[m][0] + (values[0][0].length + START);
-          let prePayRangeD = list + '!' + colMonths[m][1] + START + ':' + colMonths[m][1] + (values[0][0].length + START);
-          let addPayRangeD = list + '!' + colMonths[m][2] + START + ':' + colMonths[m][2] + (values[0][0].length + START);
-
-          let sellPayRangeH = list + '!' + colMonths[m][3] + START + ':' + colMonths[m][3] + (values[0][0].length + START);
-          let prePayRangeH = list + '!' + colMonths[m][4] + START + ':' + colMonths[m][4] + (values[0][0].length + START);
-          let addPayRangeH = list + '!' + colMonths[m][5] + START + ':' + colMonths[m][5] + (values[0][0].length + START);
-
-
-          await Promise.all([
-            crud.updateData(values[0][0], config.sid_2017.domain, sellPayRangeD),
-            crud.updateData(values[0][1], config.sid_2017.domain, prePayRangeD),
-            crud.updateData(values[0][2], config.sid_2017.domain, addPayRangeD),
-            crud.updateData(values[1][0], config.sid_2017.domain, sellPayRangeH),
-            crud.updateData(values[1][1], config.sid_2017.domain, prePayRangeH),
-            crud.updateData(values[1][2], config.sid_2017.domain, addPayRangeH)
-          ])
-            //.then(async results => {console.log(results);})
-            .catch(console.log);
 
         }
 

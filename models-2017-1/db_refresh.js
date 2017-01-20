@@ -17,7 +17,7 @@ async function dbRefresh(pool, tableName, srcRows) {
 
     for (let i = 0; i < srcRows.length; i++) {
       //-----------------------------------------------------------------------------
-      // Adaptation of values "Sum"
+      // Adaptation of values "Sum" and cut "→"
       //-----------------------------------------------------------------------------
 
       srcRows[i].length = config.dds_width[2017][tableName];

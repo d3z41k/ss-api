@@ -4,6 +4,7 @@ async function salaryQuery(pool, tableName, params, mode) {
     let sum = [];
 
     try {
+
       if (mode) {
 
         for (let i = 0; i < params[0].length; i++) {
@@ -54,6 +55,7 @@ async function salaryQuery(pool, tableName, params, mode) {
         }
 
       }
+      
     } catch (e) {
       reject(e.stack);
     } finally {

@@ -1,4 +1,4 @@
-async function extraQuery(pool, tableName, params) {
+async function devQuery(pool, tableName, params) {
   return new Promise(async(resolve, reject) => {
 
   let values = [];
@@ -11,8 +11,8 @@ async function extraQuery(pool, tableName, params) {
         values[t].push([]);
 
         await pool.execute('SELECT SUM(`Сумма итого руб`), `Дата` FROM '+ tableName +' WHERE ' +
-            '`Проекты Доп работы` = ? ' +
-            'AND `Контрагент Доп работы` = ? ' +
+            '`Проекты разработка` = ? ' +
+            'AND `Контрагент Разработка` = ? ' +
             'AND `Направление деятельноcти` = ? ' +
             'AND `Статья движения денег` = ?', [
               params[0][i],
@@ -39,4 +39,4 @@ async function extraQuery(pool, tableName, params) {
   });
 }
 
-module.exports = extraQuery;
+module.exports = devQuery;

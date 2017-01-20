@@ -19,10 +19,22 @@ const router = new Router({
 });
 
 router
-  .get('/mts-sales', async ctx => {
+  .get('/sales', async ctx => {
 
-    const mtsSales = require('./ss-scripts-2017-1/mts-sales');
-    ctx.body = await mtsSales();
+    const sales = require('./ss-scripts-2017-1/sales');
+    ctx.body = await sales();
+
+  })
+  .get('/serv', async ctx => {
+
+    const serv = require('./ss-scripts-2017-1/serv');
+    ctx.body = await serv();
+
+  })
+  .get('/dev', async ctx => {
+
+    const dev = require('./ss-scripts-2017-1/dev');
+    ctx.body = await dev();
 
   })
   .get('/dev-reg', async ctx => {

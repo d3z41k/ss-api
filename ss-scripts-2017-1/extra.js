@@ -12,7 +12,7 @@ async function extra() {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
-    const normLength = require('../libs/normalize-length');
+    //const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models-2017-1/db_refresh');
     const pool = require('../models-2017-1/db_pool');
     const extraQuery = require('../models/db_extra-query');
@@ -36,12 +36,12 @@ async function extra() {
       list = encodeURIComponent('ДДС_Ольга');
       range = list + '!A6:AD';
 
-      let srcRows = await crud.readData(config.sid_2017.dds, range);
+      let dataDDS = await crud.readData(config.sid_2017.dds, range);
 
-      // = Normalizing of length "srcRows" =
-      normLength(srcRows);
+      // = Normalizing of length "dataDDS" =
+      //normLength(dataDDS);
 
-       await dbRefresh(pool, 'dds_olga', srcRows)
+       await dbRefresh(pool, 'dds_olga', dataDDS)
         .then(async (result) => {console.log(result);})
         .catch(console.log);
 
@@ -76,13 +76,13 @@ async function extra() {
         paramsExtraCients[3].push(extraClients[1][15], extraClients[1][19]);
 
       } catch (e) {
-        console.log(e.stack);
+        reject(e.stack);
       } finally {
 
         let values = await extraQuery(pool, 'dds_olga', paramsExtraCients);
 
-        let prePayRange = list + '!P5:Q' + (values[0].length + 5);
-        let addPayRange = list + '!T5:U' + (values[1].length + 5);
+        let prePayRange = list + '!P' + START + ':Q' + (values[0].length + START);
+        let addPayRange = list + '!T' + START + ':U' + (values[1].length + START);
 
         await Promise.all([
           crud.updateData(values[0], config.sid_2017.extra, prePayRange),

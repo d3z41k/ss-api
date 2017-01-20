@@ -2,7 +2,7 @@
 
 const config = require('config');
 
-async function amo() {
+async function dev() {
   return new Promise(async(resolve, reject) => {
 
     //-------------------------------------------------------------------------
@@ -15,7 +15,7 @@ async function amo() {
     //const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models-2017-1/db_refresh');
     const pool = require('../models-2017-1/db_pool');
-    const amoQuery = require('../models/db_amo-query');
+    const devQuery = require('../models/db_dev-query');
 
     //---------------------------------------------------------------
     // Main function
@@ -24,7 +24,7 @@ async function amo() {
     async function start(auth) {
 
       const crud = new Crud(auth);
-      const START = 12;
+      const START = 6;
 
       let list = '';
       let range = '';
@@ -33,79 +33,84 @@ async function amo() {
       // Read data from DDS and refresh DB
       //-------------------------------------------------------------
 
-      list = encodeURIComponent('ДДС_Лера');
-      range = list + '!A6:V';
-      let srcRows = await crud.readData(config.sid_2017.dds, range);
+      list = encodeURIComponent('ДДС_Ольга');
+      range = list + '!A6:AD';
+
+      let dataDDS = await crud.readData(config.sid_2017.dds, range);
 
       // = Normalizing of length "srcRows" =
-      //normLength(srcRows);
+      //normLength(dataDDS);
 
-       await dbRefresh(pool, 'dds_lera', srcRows)
-        //.then(async (result) => {console.log(result);})
+       await dbRefresh(pool, 'dds_olga', dataDDS)
+        .then(async (result) => {console.log(result);})
         .catch(console.log);
 
       //------------------------------------------------------------------------
       // Get data from 'dev-registry'
       //------------------------------------------------------------------------
 
-      list = encodeURIComponent('Клиенты (AMO)');
-      range = list + '!B1:U';
-      let amoClients = await crud.readData(config.sid_2017.amo, range);
+      list = encodeURIComponent('Клиенты (разработка)');
+      range = list + '!A1:U';
+      let devClients = await crud.readData(config.sid_2017.dev, range);
 
       //------------------------------------------------------------------------
-      // Build paramsAmoCients and get & update Pay & date in amo clients
+      // Build paramsDevCients and get & update Pay & date in develop clients
       //------------------------------------------------------------------------
 
-      let paramsAmoCients = [[], [], [], []];
+      let paramsDevCients = [[], [], [], []];
 
       try {
 
-        for (let a = (START - 1); a < amoClients.length; a++) {
-          if (amoClients[a][0] && amoClients[a][1] && amoClients[a][3]) {
-            paramsAmoCients[0].push(amoClients[a][0]);
-            paramsAmoCients[1].push(amoClients[a][1]);
-            paramsAmoCients[2].push(amoClients[a][3]);
+        for (let a = (START - 1); a < devClients.length; a++) {
+          if (devClients[a][0] && devClients[a][1]) {
+            paramsDevCients[0].push(devClients[a][0]);
+            paramsDevCients[1].push(devClients[a][1]);
+
           } else {
-            paramsAmoCients[0].push(' ');
-            paramsAmoCients[1].push(' ');
-            paramsAmoCients[2].push(' ');
+            paramsDevCients[0].push(' ');
+            paramsDevCients[1].push(' ');
           }
         }
 
-        paramsAmoCients[3].push(amoClients[8][14], amoClients[8][18]);
+        paramsDevCients[2].push(devClients[0][11].trim());
+        paramsDevCients[3].push(devClients[1][11].trim(), devClients[1][15].trim(), devClients[1][19].trim());
 
       } catch (e) {
         reject(e.stack);
       } finally {
-        let values = await amoQuery(pool, 'dds_lera', paramsAmoCients);
 
+        let values = await devQuery(pool, 'dds_olga', paramsDevCients);
+
+        let sellPayRange = list + '!L' + START + ':M' + (values[0].length + START);
         let prePayRange = list + '!P' + START + ':Q' + (values[0].length + START);
-        let addPayRange = list + '!T' + START + ':U' + (values[1].length + START);
+        let finalPayRange = list + '!T' + START + ':U' + (values[0].length + START);
 
         await Promise.all([
-          crud.updateData(values[0], config.sid_2017.amo, prePayRange),
-          crud.updateData(values[1], config.sid_2017.amo, addPayRange)
+          crud.updateData(values[0], config.sid_2017.dev, sellPayRange),
+          crud.updateData(values[1], config.sid_2017.dev, prePayRange),
+          crud.updateData(values[2], config.sid_2017.dev, finalPayRange)
         ])
-        //  .then(async results => {console.log(results);})
+          .then(async results => {console.log(results);})
           .catch(console.log);
+
       }
 
       //------------------------------------------------------------------------
       // Update date-time in "Monitoring"
       //------------------------------------------------------------------------
 
-      range = 'main!B9';
+      range = 'main!B4';
 
       let now = new Date();
       now = [[formatDate(now)]];
 
       await crud.updateData(now, config.sid_2017.monit, range);
 
-    } // = End start function =
+      resolve('complite!');
 
-    resolve('complite!');
+    } // = End start function =
 
   });
 }
 
-module.exports = amo;
+module.exports = dev;
