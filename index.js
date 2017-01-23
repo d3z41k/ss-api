@@ -78,7 +78,9 @@ router
   })
   .get('/fin-state', async ctx => {
 
-    let months = [7, 8, 9, 10, 11, 12];
+    //let months = [7, 8, 9, 10, 11, 12];
+    let months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 
     const finState = require('./ss-scripts/fin-state');
     ctx.body = await finState(months);

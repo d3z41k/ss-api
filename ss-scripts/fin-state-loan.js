@@ -12,7 +12,7 @@ async function finStateLoan() {
     require('../libs/auth')(start);
     const getCols = require('../libs/get-cols');
     const Crud = require('../controllers/crud');
-    const formatDate = require('../libs/format-date');
+    //const formatDate = require('../libs/format-date');
     const dbRefresh = require('../models/db_refresh');
     const pool = require('../models/db_pool');
     const loanQuery = require('../models/db_loan-query');

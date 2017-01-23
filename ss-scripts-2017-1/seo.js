@@ -2,7 +2,7 @@
 
 const config = require('config');
 
-async function serv() {
+async function seo() {
   return new Promise(async (resolve, reject) => {
 
     //-------------------------------------------------------------------------
@@ -15,7 +15,7 @@ async function serv() {
     //const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models-2017-1/db_refresh');
     const pool = require('../models-2017-1/db_pool');
-    const servQuery = require('../models/db_serv-query');
+    const seoQuery = require('../models/db_seo-query');
 
     //---------------------------------------------------------------
     // Main function
@@ -27,9 +27,9 @@ async function serv() {
 
       let list = '';
       let range = '';
-      const START = 7;
+      const START = 9;
       const MONTHS = [1, 2, 3, 4, 5, 6];
-      const colMonths = config.serv_colMonths_2017;
+      const colMonths = config.seo_colMonths_2017;
 
       //-----------------------------------------------------------------------
       // Read data from DDS and refresh DB
@@ -51,53 +51,50 @@ async function serv() {
         // Get data from 'domain-registry'
         //---------------------------------------------------------------------
 
-        list = encodeURIComponent('Обслуж (реестр)');
-        range = list + '!A1:U';
-        let servClients = await crud.readData(config.sid_2017.serv, range);
+        list = encodeURIComponent('SEO (реестр)');
+        range = list + '!A1:Z';
+        let seoClients = await crud.readData(config.sid_2017.seo, range);
 
         //---------------------------------------------------------------------
-        // Build paramsServCients and get & update Pay & date in domain clients
+        // Build paramsSeoCients and get & update Pay & date in domain clients
         //---------------------------------------------------------------------
 
         for (let m = MONTHS[0]; m <= MONTHS[MONTHS.length - 1]; m++) {
 
-          let paramsServCients = [[], [], [], [], []];
+          let paramsSeoCients = [[], [], [], [], []];
 
           //= Try build params =
 
           try {
 
-            for (let a = (START - 1); a < servClients.length; a++) {
-              if (servClients[a][2] && servClients[a][3]) {
-                paramsServCients[0].push(servClients[a][3]); //site
-                paramsServCients[1].push(servClients[a][2]); //counterparty
+            for (let a = (START - 1); a < seoClients.length; a++) {
+              if (seoClients[a][2] && seoClients[a][3]) {
+                paramsSeoCients[0].push(seoClients[a][3]); //site
+                paramsSeoCients[1].push(seoClients[a][2]); //counterparty
               } else {
-                paramsServCients[0].push(' ');
-                paramsServCients[1].push(' ');
+                paramsSeoCients[0].push(' ');
+                paramsSeoCients[1].push(' ');
               }
             }
 
-            paramsServCients[2] = m; //month
-            paramsServCients[3].push(servClients[2][18]); //direction
-            paramsServCients[4].push(servClients[3][17], servClients[3][18], servClients[3][19]); // articles
+            paramsSeoCients[2] = m; //month
+            paramsSeoCients[3].push(seoClients[4][23]); //direction
+            paramsSeoCients[4].push(seoClients[5][23], seoClients[5][24], seoClients[5][25]); // articles
 
           } catch (e) {
             reject(e.stack);
           } finally {
 
-            //console.log(paramsServCients);
-
-            let values = await servQuery(pool, 'dds_olga', paramsServCients);
-
+            let values = await seoQuery(pool, 'dds_olga', paramsSeoCients);
 
             let sellPayRange = list + '!' + colMonths[m][0] + START + ':' + colMonths[m][0] + (values[0].length + START);
             let prePayRange = list + '!' + colMonths[m][1] + START + ':' + colMonths[m][1] + (values[0].length + START);
             let addPayRange = list + '!' + colMonths[m][2] + START + ':' + colMonths[m][2] + (values[0].length + START);
 
             await Promise.all([
-              crud.updateData(values[0], config.sid_2017.serv, sellPayRange),
-              crud.updateData(values[1], config.sid_2017.serv, prePayRange),
-              crud.updateData(values[2], config.sid_2017.serv, addPayRange),
+              crud.updateData(values[0], config.sid_2017.seo, sellPayRange),
+              crud.updateData(values[1], config.sid_2017.seo, prePayRange),
+              crud.updateData(values[2], config.sid_2017.seo, addPayRange),
             ])
               //.then(async results => {console.log(results);})
               .catch(console.log);
@@ -110,7 +107,7 @@ async function serv() {
       // Update date-time in "Monitoring"
       //------------------------------------------------------------------------
 
-      range = 'main!B5';
+      range = 'main!B6';
 
       let now = new Date();
       now = [[formatDate(now)]];
@@ -126,4 +123,4 @@ async function serv() {
   });
 }
 
-module.exports = serv;
+module.exports = seo;
