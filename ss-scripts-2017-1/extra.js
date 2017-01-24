@@ -61,6 +61,7 @@ async function extra() {
 
       try {
 
+        //= Build params =
         for (let a = (START - 1); a < extraClients.length; a++) {
           if (extraClients[a][0] && extraClients[a][1]) {
             paramsExtraCients[0].push(extraClients[a][0]);
@@ -75,12 +76,10 @@ async function extra() {
         paramsExtraCients[2].push(extraClients[0][15]);
         paramsExtraCients[3].push(extraClients[1][15], extraClients[1][19]);
 
-      } catch (e) {
-        reject(e.stack);
-      } finally {
-
+        //= Get values =
         let values = await extraQuery(pool, 'dds_olga', paramsExtraCients);
 
+        //= Update data =
         let prePayRange = list + '!P' + START + ':Q' + (values[0].length + START);
         let addPayRange = list + '!T' + START + ':U' + (values[1].length + START);
 
@@ -88,9 +87,11 @@ async function extra() {
           crud.updateData(values[0], config.sid_2017.extra, prePayRange),
           crud.updateData(values[1], config.sid_2017.extra, addPayRange)
         ])
-          .then(async results => {console.log(results);})
+          //.then(async results => {console.log(results);})
           .catch(console.log);
 
+      } catch (e) {
+        reject(e.stack);
       }
 
       //------------------------------------------------------------------------

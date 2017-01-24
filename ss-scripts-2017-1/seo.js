@@ -63,10 +63,9 @@ async function seo() {
 
           let paramsSeoCients = [[], [], [], [], []];
 
-          //= Try build params =
-
           try {
 
+            //= Build params =
             for (let a = (START - 1); a < seoClients.length; a++) {
               if (seoClients[a][2] && seoClients[a][3]) {
                 paramsSeoCients[0].push(seoClients[a][3]); //site
@@ -81,12 +80,10 @@ async function seo() {
             paramsSeoCients[3].push(seoClients[4][23]); //direction
             paramsSeoCients[4].push(seoClients[5][23], seoClients[5][24], seoClients[5][25]); // articles
 
-          } catch (e) {
-            reject(e.stack);
-          } finally {
-
+            //= Get values =
             let values = await seoQuery(pool, 'dds_olga', paramsSeoCients);
 
+            //= Update data =
             let sellPayRange = list + '!' + colMonths[m][0] + START + ':' + colMonths[m][0] + (values[0].length + START);
             let prePayRange = list + '!' + colMonths[m][1] + START + ':' + colMonths[m][1] + (values[0].length + START);
             let addPayRange = list + '!' + colMonths[m][2] + START + ':' + colMonths[m][2] + (values[0].length + START);
@@ -99,9 +96,11 @@ async function seo() {
               //.then(async results => {console.log(results);})
               .catch(console.log);
 
+          } catch (e) {
+            reject(e.stack);
           }
 
-        } //end MONTHS
+      } //end MONTHS
 
       //------------------------------------------------------------------------
       // Update date-time in "Monitoring"

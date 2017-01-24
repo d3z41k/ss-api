@@ -86,6 +86,7 @@ async function salary(month) {
 
       try {
 
+        //= Build params =
         for (let a = (START - 1); a < dataSalary.length; a++) {
           if (dataSalary[a][0] && dataSalary[a][3]) {
             paramsSalary[0].push(dataSalary[a][0]);
@@ -100,17 +101,11 @@ async function salary(month) {
         paramsSalary[2].push(numMonth);
         paramsSalary[3] = DIRECTIONS;
 
-      } catch (e) {
-        reject(e.stack);
-      } finally {
-
         //= Get sum Salary =
-
         let sum1;
         let sum2;
 
         //= Get common sum Salary =
-
         await Promise.all([
           salaryQuery(pool, 'dds_lera', paramsSalary, true),
           salaryQuery(pool, 'dds_olga', paramsSalary, true)
@@ -128,7 +123,6 @@ async function salary(month) {
         }
 
         //= Get directions sum Salary =
-
         await Promise.all([
           salaryQuery(pool, 'dds_lera', paramsSalary, false),
           salaryQuery(pool, 'dds_olga', paramsSalary, false)
@@ -149,7 +143,6 @@ async function salary(month) {
         }
 
         //= Update common sum Salary  =
-
         range = list + '!' + MON_COLS[month][1][0] + START + ':'
           + MON_COLS[month][1][0] + (sumCommon.length + START);
 
@@ -158,7 +151,6 @@ async function salary(month) {
           .catch(console.log);
 
         //= Update directions sum Salary =
-
         for (let d = 0; d < DIRECTIONS.length; d++) {
 
           range = list + '!' + MON_COLS[month][1][d + 1] + START + ':'
@@ -170,6 +162,8 @@ async function salary(month) {
           await sleep(1000);
         }
 
+      } catch (e) {
+        reject(e.stack);
       }
 
       //------------------------------------------------------------------------
@@ -184,6 +178,11 @@ async function salary(month) {
       resolve('complite!');
 
     } // = End start function =
+
+      } catch (e) {
+
+      }
+
 
   });
 }

@@ -69,7 +69,7 @@ async function indirect(month) {
         dbRefresh(pool, 'dds_lera', srcRows.lera),
         dbRefresh(pool, 'dds_olga', srcRows.olga)
       ])
-        .then(async (results) => {console.log(results);})
+        //.then(async (results) => {console.log(results);})
         .catch(console.log);
 
       //------------------------------------------------------------------------
@@ -95,9 +95,9 @@ async function indirect(month) {
 
       let numMonth = MON_COLS[month][0];
 
-      //= Try build params for Indirect (3 type, 2 version)  =
-
       try {
+
+        //= Build params for Indirect (3 type, 2 version) =
 
         for (let type in paramsIndirect) {
           paramsIndirect[type][0].push(numMonth);
@@ -109,7 +109,6 @@ async function indirect(month) {
         for (let i = (START - 1); i < dataIndirect.length; i++) {
 
           //= Type 1.1 params =
-
           if ((i >= TYPES[1.1].range1[0] && i <= TYPES[1.1].range1[1])
             || (i >= TYPES[1.1].range2[0] && i <= TYPES[1.1].range2[1] && i != range2[2])
             || (i == TYPES[1.1].range3)
@@ -119,7 +118,6 @@ async function indirect(month) {
           }
 
           //= Type 1.2 params =
-
           if (i >= TYPES[1.2].range1[0] && i <= TYPES[1.2].range1[1]) {
             paramsIndirect['1.2'][1].push(dataIndirect[i][1]);
             paramsIndirect['1.2'][2].push(dataIndirect[i][3]);
@@ -128,7 +126,6 @@ async function indirect(month) {
           }
 
           //= Type 1.3 params =
-
           if (i >= TYPES[1.3].range1[0] && i <= TYPES[1.3].range1[1]) {
             paramsIndirect['1.3'][1].push(dataIndirect[i][1]);
             paramsIndirect['1.3'][2].push(dataIndirect[i][2]);
@@ -138,12 +135,7 @@ async function indirect(month) {
 
         }
 
-      } catch (e) {
-        reject(e.stack);
-      } finally {
-
         //= Make query to DDS for Indirect  for each type-version (1.1, 1.2 ...)=
-
         for (let type in paramsIndirect) {
 
           let sum1;
@@ -183,7 +175,6 @@ async function indirect(month) {
             }
 
             //= Common sum 1.1 (1 type 3 part) =
-
             if (type == '1.1') {
 
               start = TYPES[type].range1[0] + 1;
@@ -219,11 +210,10 @@ async function indirect(month) {
                 crud.updateData(sumCommon2, config.sid_2017.indirect, range2),
                 crud.updateData(sumCommon3, config.sid_2017.indirect, range3)
               ])
-                .then(async results => {console.log(results);})
+                //.then(async results => {console.log(results);})
                 .catch(console.log);
 
             //= Directions sum 2.1 (2 type 3 part) =
-
             } else if (type == '2.1') {
                 for (let d = 0; d < paramsIndirect[type][3].length; d++) {
                   start = TYPES[type].range1[0] + 1;
@@ -259,16 +249,14 @@ async function indirect(month) {
                     crud.updateData(sumDirections2, config.sid_2017.indirect, range2),
                     crud.updateData(sumDirections3, config.sid_2017.indirect, range3)
                   ])
-                    .then(async results => {console.log(results);})
+                    //.then(async results => {console.log(results);})
                     .catch(console.log);
                 }
 
             //= Other sums =
-
             } else {
 
               //= Type 1 (1.2, 1.3) sum =
-
               if (type[0] == '1') {
 
                 start = TYPES[type].range1[0] + 1;
@@ -278,12 +266,11 @@ async function indirect(month) {
                     + MON_COLS[month][1][0] + end;
 
                 await crud.updateData(sumCommon, config.sid_2017.indirect, range)
-                  .then(async results => {console.log(results);})
+                  //.then(async results => {console.log(results);})
                   .catch(console.log);
               }
 
               //= Type 2 (2.2, 2.3) sum =
-
               if (type[0] == '2') {
                 for (let d = 0; d < paramsIndirect[type][3].length; d++) {
                   start = TYPES[type].range1[0] + 1;
@@ -293,7 +280,7 @@ async function indirect(month) {
                       + MON_COLS[month][1][d + 1] + end;
 
                   await crud.updateData(sumDirections[d], config.sid_2017.indirect, range)
-                    .then(async results => {console.log(results);})
+                    //.then(async results => {console.log(results);})
                     .catch(console.log);
                 }
               }
@@ -302,6 +289,8 @@ async function indirect(month) {
 
         }
 
+      } catch (e) {
+        reject(e.stack);
       }
 
       //------------------------------------------------------------------------

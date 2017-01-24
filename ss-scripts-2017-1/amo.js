@@ -60,6 +60,7 @@ async function amo() {
 
       try {
 
+        //= Build params =
         for (let a = (START - 1); a < amoClients.length; a++) {
           if (amoClients[a][0] && amoClients[a][1] && amoClients[a][3]) {
             paramsAmoCients[0].push(amoClients[a][0]);
@@ -74,11 +75,10 @@ async function amo() {
 
         paramsAmoCients[3].push(amoClients[8][14], amoClients[8][18]);
 
-      } catch (e) {
-        reject(e.stack);
-      } finally {
+        //= Get values =
         let values = await amoQuery(pool, 'dds_lera', paramsAmoCients);
 
+        //= Update data =
         let prePayRange = list + '!P' + START + ':Q' + (values[0].length + START);
         let addPayRange = list + '!T' + START + ':U' + (values[1].length + START);
 
@@ -88,6 +88,9 @@ async function amo() {
         ])
         //  .then(async results => {console.log(results);})
           .catch(console.log);
+
+      } catch (e) {
+        reject(e.stack);
       }
 
       //------------------------------------------------------------------------

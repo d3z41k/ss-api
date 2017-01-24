@@ -61,6 +61,7 @@ async function sales() {
 
       try {
 
+        //= Build params =
         for (let a = (START - 1); a < salesClients.length; a++) {
 
           if (salesClients[a][0] && salesClients[a][1]) {
@@ -77,22 +78,18 @@ async function sales() {
 
         paramsSalesCients[3].push(salesClients[3][11].trim());
 
+        //= Get values =
+        let values = await salesQuery(pool, 'dds_olga', paramsSalesCients);
+
+        //= Update data =
+        let sellPayRange = list + '!L' + START + ':M' + (values.length + START);
+
+        await crud.updateData(values, config.sid_2017.sales, sellPayRange)
+          //.then(async results => {console.log(results);})
+          .catch(console.log);
+          
       } catch (e) {
         reject(e.stack);
-      } finally {
-
-        //console.log(paramsSalesCients);
-
-      let values = await salesQuery(pool, 'dds_olga', paramsSalesCients);
-
-      //console.log(values);
-
-      let sellPayRange = list + '!L' + START + ':M' + (values.length + START);
-
-      await crud.updateData(values, config.sid_2017.sales, sellPayRange)
-        .then(async results => {console.log(results);})
-        .catch(console.log);
-
       }
 
       //-----------------------------------------------------------------------

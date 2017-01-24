@@ -61,6 +61,7 @@ async function dev() {
 
       try {
 
+        //= Build params =
         for (let a = (START - 1); a < devClients.length; a++) {
           if (devClients[a][0] && devClients[a][1]) {
             paramsDevCients[0].push(devClients[a][0]);
@@ -75,12 +76,10 @@ async function dev() {
         paramsDevCients[2].push(devClients[0][11].trim());
         paramsDevCients[3].push(devClients[1][11].trim(), devClients[1][15].trim(), devClients[1][19].trim());
 
-      } catch (e) {
-        reject(e.stack);
-      } finally {
-
+        //= Get values =
         let values = await devQuery(pool, 'dds_olga', paramsDevCients);
 
+        //= Update data =
         let sellPayRange = list + '!L' + START + ':M' + (values[0].length + START);
         let prePayRange = list + '!P' + START + ':Q' + (values[0].length + START);
         let finalPayRange = list + '!T' + START + ':U' + (values[0].length + START);
@@ -90,9 +89,11 @@ async function dev() {
           crud.updateData(values[1], config.sid_2017.dev, prePayRange),
           crud.updateData(values[2], config.sid_2017.dev, finalPayRange)
         ])
-          .then(async results => {console.log(results);})
+          //.then(async results => {console.log(results);})
           .catch(console.log);
 
+      } catch (e) {
+        reject(e.stack);
       }
 
       //------------------------------------------------------------------------
