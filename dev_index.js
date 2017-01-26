@@ -57,7 +57,7 @@ router
   })
   .get('/extra-reg', async ctx => {
 
-    const extraReg = require('./ss-scripts-2017-1/extra-reg');
+    const extraReg = require('./ss-scripts/extra-reg');
     ctx.body = await extraReg();
 
   })
@@ -82,6 +82,12 @@ router
   .get('/profi1', async ctx => {
 
     const profi1 = require('./ss-scripts-2017-1/profi1');
+    ctx.body = await profi1();
+
+  })
+  .get('/_profi1', async ctx => {
+
+    const profi1 = require('./ss-scripts-2017-1/_profi1');
     ctx.body = await profi1();
 
   })

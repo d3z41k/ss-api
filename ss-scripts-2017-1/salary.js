@@ -179,11 +179,6 @@ async function salary(month) {
 
     } // = End start function =
 
-      } catch (e) {
-
-      }
-
-
   });
 }
 

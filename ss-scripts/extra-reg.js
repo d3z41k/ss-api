@@ -1,6 +1,7 @@
 'use strict';
 
 const config = require('config');
+const util = require('util');
 
 async function getRatio(salary, lawt, params, cutContractMonths) {
   return new Promise(async(resolve, reject) => {
@@ -56,6 +57,7 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
             && Number(lawt.table[n][t][0].substr(3,2)) == months[m]
             && lawt.table[n][t][5] != '-'
             && lawt.table[n][t][5]) {
+
              divider += Number(lawt.table[n][t][5].replace(/,/g, '.'));
           }
         }
@@ -401,7 +403,7 @@ async function extraReg() {
       //           .catch(console.err);
       //       }
       //
-      //       await sleep(500);
+      //       await sleep(1000);
       //
       //     }
       //   }
@@ -410,9 +412,9 @@ async function extraReg() {
       // console.log(new Date());
       // console.log('* Get & Insert mounth and amount of the act *');
 
-      // ------------------------------------------------------------------------
+      //------------------------------------------------------------------------
       // Refresh DDS (Olga)
-      // ------------------------------------------------------------------------
+      //------------------------------------------------------------------------
 
       // let srcRows = [];
       // list = encodeURIComponent('ДДС_Ольга');
@@ -430,7 +432,7 @@ async function extraReg() {
       //------------------------------------------------------------------------
       // Build params & update receipt of money from customers (prepaid & finalLy)
       //------------------------------------------------------------------------
-      //
+
       // list = encodeURIComponent('Доп. работы (реестр)');
       // let receiptParams = [[], [[],[]], [], [], []];
       // let value = [];
@@ -602,108 +604,108 @@ async function extraReg() {
       // Build params for Margin
       //------------------------------------------------------------------------
 
-      //= Build ABC for margin params =
-      abc = abc.slice(2, 120);
-      let colsMargin = config.colsMargin;
-
-      const quantity = 4;
-      let jArray = [];
-
-      for (let x = 0; x < xArray.length; x++) {
-        let paramsMargin = [];
-
-        for (let i = 0; i < 32; i++) {
-          paramsMargin.push([]);
-        }
-
-        //= Push site in params =
-        paramsMargin[0].push(registry[xArray[x] - START][0]);
-
-        //= Push debt "P" in params =
-        let col = abc.indexOf(colsMargin.debt);
-        registry[xArray[x] - START][col] && Number(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-          ? paramsMargin[1].push(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-          : paramsMargin[1].push(0);
-
-        //= Push salary of CREW (x11) in params =
-        for (let i = xArray[x] - START; i < xArray[x] - START + CREW; i++) {
-          let count = 0;
-           for (let j = 2; j < (paramsMargin.length - 3); j += quantity) {
-            let sCol = abc.indexOf(colsMargin.salary[count]);
-            registry[i][sCol] && Number(registry[i][sCol].replace(/\s/g, '').replace(/,/g, '.'))
-                ? Number(paramsMargin[j].push(registry[i][sCol].replace(/\s/g, '').replace(/,/g, '.')))
-                : paramsMargin[j].push(0);
-            jArray.push(j);
-
-            j++;
-
-            let wCol = abc.indexOf(colsMargin.warranty[count]);
-            registry[i][wCol] && Number(registry[i][wCol].replace(/\s/g, '').replace(/,/g, '.'))
-                ? Number(paramsMargin[j].push(registry[i][wCol].replace(/\s/g, '').replace(/,/g, '.')))
-                : paramsMargin[j].push(0);
-
-            jArray.push(j);
-            count++;
-          }
-        }
-
-        //= Push other cost (common for project) in params =
-        let count = 0;
-
-        for (let n = 3; n < paramsMargin.length; n++) {
-          if (!jArray.includes(n)) {
-            let col = abc.indexOf(colsMargin.other[count]);
-            registry[xArray[x] - START][col] && Number(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-              ? Number(paramsMargin[n].push(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.')))
-              : paramsMargin[n].push(0);
-            count++;
-          }
-        }
-
-        //console.log(paramsMargin);
-
-        //= Get & Insert values of "Margin & Margins" =
-        let margin = await getMargin(contractSum, paramsMargin);
-        let margins = 0;
-
-        for (let c = 0; c < contractSum.length; c++) {
-          if(contractSum[c][0] == paramsMargin[0]) {
-            margins = margin ? margin / contractSum[c][1] : 0;
-          }
-        }
-
-        //= Cut to 2 number after poin =
-        margins = margins.toFixed(2);
-
-        list = encodeURIComponent('Доп. работы (реестр)');
-        range = list + '!N' + xArray[x] + ':O' + xArray[x];
-
-        await crud.updateData([[margin, margins]], config.ssId.extra, range)
-          .then(async result => {console.log(result);})
-          .catch(console.err);
-
-          console.log([margin, margins]);
-
-      }
-      console.log(new Date());
-      console.log('* Update for Margin *');
+      // //= Build ABC for margin params =
+      // abc = abc.slice(2, 120);
+      // let colsMargin = config.colsMargin;
+      //
+      // const quantity = 4;
+      // let jArray = [];
+      //
+      // for (let x = 0; x < xArray.length; x++) {
+      //   let paramsMargin = [];
+      //
+      //   for (let i = 0; i < 32; i++) {
+      //     paramsMargin.push([]);
+      //   }
+      //
+      //   //= Push site in params =
+      //   paramsMargin[0].push(registry[xArray[x] - START][0]);
+      //
+      //   //= Push debt "P" in params =
+      //   let col = abc.indexOf(colsMargin.debt);
+      //   registry[xArray[x] - START][col] && Number(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //     ? paramsMargin[1].push(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //     : paramsMargin[1].push(0);
+      //
+      //   //= Push salary of CREW (x11) in params =
+      //   for (let i = xArray[x] - START; i < xArray[x] - START + CREW; i++) {
+      //     let count = 0;
+      //      for (let j = 2; j < (paramsMargin.length - 3); j += quantity) {
+      //       let sCol = abc.indexOf(colsMargin.salary[count]);
+      //       registry[i][sCol] && Number(registry[i][sCol].replace(/\s/g, '').replace(/,/g, '.'))
+      //           ? Number(paramsMargin[j].push(registry[i][sCol].replace(/\s/g, '').replace(/,/g, '.')))
+      //           : paramsMargin[j].push(0);
+      //       jArray.push(j);
+      //
+      //       j++;
+      //
+      //       let wCol = abc.indexOf(colsMargin.warranty[count]);
+      //       registry[i][wCol] && Number(registry[i][wCol].replace(/\s/g, '').replace(/,/g, '.'))
+      //           ? Number(paramsMargin[j].push(registry[i][wCol].replace(/\s/g, '').replace(/,/g, '.')))
+      //           : paramsMargin[j].push(0);
+      //
+      //       jArray.push(j);
+      //       count++;
+      //     }
+      //   }
+      //
+      //   //= Push other cost (common for project) in params =
+      //   let count = 0;
+      //
+      //   for (let n = 3; n < paramsMargin.length; n++) {
+      //     if (!jArray.includes(n)) {
+      //       let col = abc.indexOf(colsMargin.other[count]);
+      //       registry[xArray[x] - START][col] && Number(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //         ? Number(paramsMargin[n].push(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.')))
+      //         : paramsMargin[n].push(0);
+      //       count++;
+      //     }
+      //   }
+      //
+      //   //console.log(paramsMargin);
+      //
+      //   //= Get & Insert values of "Margin & Margins" =
+      //   let margin = await getMargin(contractSum, paramsMargin);
+      //   let margins = 0;
+      //
+      //   for (let c = 0; c < contractSum.length; c++) {
+      //     if(contractSum[c][0] == paramsMargin[0]) {
+      //       margins = margin ? margin / contractSum[c][1] : 0;
+      //     }
+      //   }
+      //
+      //   //= Cut to 2 number after poin =
+      //   margins = margins.toFixed(2);
+      //
+      //   list = encodeURIComponent('Доп. работы (реестр)');
+      //   range = list + '!N' + xArray[x] + ':O' + xArray[x];
+      //
+      //   await crud.updateData([[margin, margins]], config.ssId.extra, range)
+      //     .then(async result => {console.log(result);})
+      //     .catch(console.err);
+      //
+      //     console.log([margin, margins]);
+      //
+      // }
+      // console.log(new Date());
+      // console.log('* Update for Margin *');
 
       // -------------------------------------------------------------
       // Update date-time in "Monitoring"
       // -------------------------------------------------------------
 
-      range = 'sheet1!B3';
-
-      let now = new Date();
-      now = [
-        [formatDate(now)]
-      ];
-
-      await crud.updateData(now, config.ssId.monit, range)
-        //.then(async (result) => {console.log(result);})
-        .catch(console.err);
-
-      console.log('End: ' + new Date());
+      // range = 'sheet1!B3';
+      //
+      // let now = new Date();
+      // now = [
+      //   [formatDate(now)]
+      // ];
+      //
+      // await crud.updateData(now, config.ssId.monit, range)
+      //   //.then(async (result) => {console.log(result);})
+      //   .catch(console.err);
+      //
+      // console.log('End: ' + new Date());
 
     } // = End start function =
 

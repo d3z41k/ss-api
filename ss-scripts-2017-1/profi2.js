@@ -96,23 +96,26 @@ async function profi2(mon) {
       //normLength(dataDDS);
 
       await dbRefresh(pool, 'dds_lera', dataDDS)
-      //  .then(async (result) => {console.log(result);})
+        .then(async (result) => {console.log(result);})
         .catch(console.log);
 
       //-------------------------------------------------------------
       // Read data from Profi to RAM & combine params arrays (2 steps)
       //-------------------------------------------------------------
 
-      try {
+      // try {
 
         for (let month in months) {
+
+          console.log(months[month][1]);
+
           for (let m = 0; m < directions.length; m++){
             list = encodeURIComponent(directions[m]);
             // "- 2" last cols
-            for (let i = 0; i < months[month].length - 2; i++) {
+            for (let i = 0; i < months[month][1].length - 2; i++) {
               let params = [[], [], [], [], [], []];
 
-              range = list + '!' + months[month][i] + '2:' + months[month][i] + '5';
+              range = list + '!' + months[month][1][i] + '2:' + months[month][1][i] + '5';
               let dstRows = await crud.readData(config.sid_2017.profi2, range);
               params = await handlerParams1(dstRows, params);
 
@@ -120,11 +123,11 @@ async function profi2(mon) {
               dstRows = await crud.readData(config.sid_2017.profi2, range);
               params = await handlerParams2(dstRows, params);
 
-              let sumValues = await profiQuery(pool, params);
+               let sumValues = await profiQuery(pool, params);
 
-              range = list + '!' + months[month][i] + START + ':' + months[month][i];
+              range = list + '!' + months[month][1][i] + START + ':' + months[month][1][i];
               await crud.updateData(sumValues, config.sid_2017.profi2, range)
-              //  .then((result) => {console.log(result);})
+                .then((result) => {console.log(result);})
                 .catch(console.log);
               await sleep(500);
 
@@ -132,25 +135,24 @@ async function profi2(mon) {
           }
         }
 
-      } catch (e) {
-        reject(e.stack);
-      } finally {
+      // } catch (e) {
+      //   reject(e.stack);
+      // }
 
-        //-------------------------------------------------------------
-        // Update date-time in "Monitoring"
-        //-------------------------------------------------------------
+      //-------------------------------------------------------------
+      // Update date-time in "Monitoring"
+      //-------------------------------------------------------------
 
-        if (mode) {
-          range = 'main!C13';
-        } else {
-          range = 'main!B13';
-        }
-        let now = new Date();
-        now = [[formatDate(now)]];
-        
-        await crud.updateData(now, config.sid_2017.monit, range);
-
+      if (mode) {
+        range = 'main!C13';
+      } else {
+        range = 'main!B13';
       }
+      let now = new Date();
+      now = [[formatDate(now)]];
+
+      await crud.updateData(now, config.sid_2017.monit, range);
+
 
     } //= End start function =
 

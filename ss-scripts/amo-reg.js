@@ -560,122 +560,122 @@ async function amoReg() {
       // The receipt of money from customers (prepaid & finally)
       //------------------------------------------------------------------------
 
-      // let srcRows = [];
-      // list = encodeURIComponent('ДДС_Лера');
-      // range = list + '!A6:AC';
-      //
-      // srcRows = await crud.readData(config.ssId.dds, range);
-      //
-      // // = Normalizing of length "srcRows" =
-      // normLength(srcRows);
-      //
-      // await dbRefresh(pool, 'dds_lera', srcRows)
-      //   .then(async (results) => {console.log(results);})
-      //   .catch(console.err);
+      let srcRows = [];
+      list = encodeURIComponent('ДДС_Лера');
+      range = list + '!A6:AC';
+
+      srcRows = await crud.readData(config.ssId.dds, range);
+
+      // = Normalizing of length "srcRows" =
+      normLength(srcRows);
+
+      await dbRefresh(pool, 'dds_lera', srcRows)
+        .then(async (results) => {console.log(results);})
+        .catch(console.err);
 
       //---------------------------------------------------------------
       // Build receiptParams The receipt of money from customers (prepaid & finalLy)
       //---------------------------------------------------------------
 
-      // list = encodeURIComponent('AMO (реестр)');
-      // let receiptParams = [[], [[],[]], [], [], []];
-      // let value = [];
-      //
-      // receiptParams[1][0] = 'Поступление денег от клиентов (предоплата)';
-      // receiptParams[1][1] = 'Поступление от клиентов (оконч. оплата)';
-      //
-      // for (let x = 0; x < xArray.length; x++) {
-      //
-      //   receiptParams[0] = [];
-      //   receiptParams[2] = [];
-      //   receiptParams[3] = [];
-      //   receiptParams[4] = [];
-      //   cols = [[], []];
-      //
-      //   receiptParams[0].push(registry[xArray[x] - START][4]);
-      //   receiptParams[3].push(registry[xArray[x] - START][0]);
-      //   receiptParams[4].push(registry[xArray[x] - START][1]);
-      //
-      //   for (let m = 0; m < cutActionMonths[x].length; m++) {
-      //     receiptParams[2].push(cutActionMonths[x][m]);
-      //     cols[0] = cols[0].concat(colMonths[cutActionMonths[x][m]].slice(0, 2));
-      //     cols[1] = cols[1].concat(colMonths[cutActionMonths[x][m]].slice(2, 4));
-      //   }
-      //
-      //   let values = await amoRegQuery(pool, 'dds_lera', receiptParams);
-      //
-      //   for (let c = 0; c < cols[0].length; c += 2) {
-      //
-      //     range = list + '!' + cols[0][c] + xArray[x] + ':' + cols[0][c + 1] + xArray[x];
-      //     value = [[values[c], values[c + 1]]];
-      //
-      //     await crud.updateData(value, config.ssId.amo, range)
-      //       .then(async result => {console.log(result);})
-      //       .catch(console.err);
-      //
-      //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
-      //     await sleep(1000);
-      //   }
-      //
-      //   console.log('Project: ' + x);
-      //
-      // }
-      // console.log(new Date());
-      // console.log('* The receipt of money from customers (prepaid & finalLy) *');
+      list = encodeURIComponent('AMO (реестр)');
+      let receiptParams = [[], [[],[]], [], [], []];
+      let value = [];
+
+      receiptParams[1][0] = 'Поступление денег от клиентов (предоплата)';
+      receiptParams[1][1] = 'Поступление от клиентов (оконч. оплата)';
+
+      for (let x = 0; x < xArray.length; x++) {
+
+        receiptParams[0] = [];
+        receiptParams[2] = [];
+        receiptParams[3] = [];
+        receiptParams[4] = [];
+        cols = [[], []];
+
+        receiptParams[0].push(registry[xArray[x] - START][4]);
+        receiptParams[3].push(registry[xArray[x] - START][0]);
+        receiptParams[4].push(registry[xArray[x] - START][1]);
+
+        for (let m = 0; m < cutActionMonths[x].length; m++) {
+          receiptParams[2].push(cutActionMonths[x][m]);
+          cols[0] = cols[0].concat(colMonths[cutActionMonths[x][m]].slice(0, 2));
+          cols[1] = cols[1].concat(colMonths[cutActionMonths[x][m]].slice(2, 4));
+        }
+
+        let values = await amoRegQuery(pool, 'dds_lera', receiptParams);
+
+        for (let c = 0; c < cols[0].length; c += 2) {
+
+          range = list + '!' + cols[0][c] + xArray[x] + ':' + cols[0][c + 1] + xArray[x];
+          value = [[values[c], values[c + 1]]];
+
+          await crud.updateData(value, config.ssId.amo, range)
+            .then(async result => {console.log(result);})
+            .catch(console.err);
+
+          //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
+          await sleep(1000);
+        }
+
+        console.log('Project: ' + x);
+
+      }
+      console.log(new Date());
+      console.log('* The receipt of money from customers (prepaid & finalLy) *');
 
       //--------------------------------------------------------------------------
       // Build ratioParams for "Ratio" and "factHours"
       //--------------------------------------------------------------------------
 
-      let ratioParams = [[], [], []];
-
-      //= l.a.w.t - The list accounting work time =
-      let lawt = {
-        name: [],
-        table: []
-      };
-
-      for (let x = 0; x < xArray.length; x++) {
-
-        ratioParams[0].push([]);
-        ratioParams[1].push([]);
-        ratioParams[2].push([]);
-
-        for (let i = (xArray[x] - START); i < (xArray[x] - START) + CREW; i++) {
-           if (registry[i][7]) {
-             ratioParams[0][x].push(registry[i][7]);
-
-             // = Get object lawt name[0] -> table[0] etc. =
-             if (!lawt.name.includes(registry[i][7])) {
-               lawt.name.push(registry[i][7]);
-               list = encodeURIComponent(registry[i][7]);
-               range = list + '!B10:L1000';
-               lawt.table.push(await crud.readData(config.ssId.lawt, range));
-             }
-          }
-        }
-
-        for (var m = 0; m < cutActionMonths[x].length; m++) {
-            ratioParams[1][x].push(cutActionMonths[x][m]);
-        }
-        ratioParams[2][x].push(registry[xArray[x] - START][0]);
-        ratioParams[2][x].push(registry[xArray[x] - START][4]);
-
-      }
-
-      list = encodeURIComponent('ФОТ (факт)');
-      range = list + '!A6:ER77';
-
-      let salary = await crud.readData(config.ssId.salary, range);
-
-      //--------------------------------------------------------------------------
-      // Get & Insert "Ratio & factHours"
-      //--------------------------------------------------------------------------
-
-      let [ratio, factHours, warrentyHours] = await getRatio(salary, lawt, ratioParams, cutContractMonths);
-
-      //console.log(ratio);
-
+      // let ratioParams = [[], [], []];
+      //
+      // //= l.a.w.t - The list accounting work time =
+      // let lawt = {
+      //   name: [],
+      //   table: []
+      // };
+      //
+      // for (let x = 0; x < xArray.length; x++) {
+      //
+      //   ratioParams[0].push([]);
+      //   ratioParams[1].push([]);
+      //   ratioParams[2].push([]);
+      //
+      //   for (let i = (xArray[x] - START); i < (xArray[x] - START) + CREW; i++) {
+      //      if (registry[i][7]) {
+      //        ratioParams[0][x].push(registry[i][7]);
+      //
+      //        // = Get object lawt name[0] -> table[0] etc. =
+      //        if (!lawt.name.includes(registry[i][7])) {
+      //          lawt.name.push(registry[i][7]);
+      //          list = encodeURIComponent(registry[i][7]);
+      //          range = list + '!B10:L1000';
+      //          lawt.table.push(await crud.readData(config.ssId.lawt, range));
+      //        }
+      //     }
+      //   }
+      //
+      //   for (var m = 0; m < cutActionMonths[x].length; m++) {
+      //       ratioParams[1][x].push(cutActionMonths[x][m]);
+      //   }
+      //   ratioParams[2][x].push(registry[xArray[x] - START][0]);
+      //   ratioParams[2][x].push(registry[xArray[x] - START][4]);
+      //
+      // }
+      //
+      // list = encodeURIComponent('ФОТ (факт)');
+      // range = list + '!A6:ER77';
+      //
+      // let salary = await crud.readData(config.ssId.salary, range);
+      //
+      // //--------------------------------------------------------------------------
+      // // Get & Insert "Ratio & factHours"
+      // //--------------------------------------------------------------------------
+      //
+      // let [ratio, factHours, warrentyHours] = await getRatio(salary, lawt, ratioParams, cutContractMonths);
+      //
+      // //console.log(factHours);
+      //
       // list = encodeURIComponent('AMO (реестр)');
       //
       // for (let x = 0; x < xArray.length; x++) {
