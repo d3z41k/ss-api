@@ -33,7 +33,7 @@ async function profiQuery(pool, params) {
               ])
               .then(([col, feilds]) => {
                 for (let key in col[0]) {
-                  sum[m][a].push([col[0][key] ? col[0][key] : 0]);
+                  sum[m][a].push(col[0][key] ? col[0][key] : 0);
                 }
 
               })

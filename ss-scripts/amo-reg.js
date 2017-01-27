@@ -20,8 +20,6 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
     let warrentyHours = [];
     let months = [7, 8, 9, 10, 11, 12];
 
-    //console.log(params[2][1][1]);
-
     //= The Numbers of cols in Salary
     let ratioMonth = config.ratioMonth;
 
@@ -72,7 +70,8 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
         'Виджеты готовые (AMO)': 0,
         'Доп. работы (АМО)': 0
       },
-      'tecDirector': 0
+      'tecDirector': 0,
+      'programmer': 0
     };
 
 
@@ -105,6 +104,9 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
             && lawt.table[n][t][1].trim() == 'Виджеты разработка (AMO)'
             && lawt.table[n][t][5]) {
              worksHours.tecDirector = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+          } else if (lawt.name[n].trim() == 'Резников Александр'
+            && lawt.table[n][t][5]) {
+             worksHours.programmer = Number(lawt.table[n][t][5].replace(/,/g, '.'));
           }
         }
     }
@@ -193,7 +195,8 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
         '10': [],
         '11': [],
         '12': []
-      }
+      },
+
     };
 
     let types = [
@@ -291,6 +294,12 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
                   let currMonth = cutContractMonths[p][m];
                     factHour += Math.round(worksHours.tecDirector / quantityProjects.tecDirector[currMonth] * 10000) / 10000;
                  }
+              } else if (lawt.name[n].trim() == 'Резников Александр') {
+                if (cutContractMonths[p][m]
+                  && types.includes(params[2][p][1])) {
+                  let currMonth = cutContractMonths[p][m];
+                    factHour += Math.round(worksHours.programmer / quantityProjects.tecDirector[currMonth] * 10000) / 10000;
+                 }
               } else {
                 //= Another employee
                 if (cutContractMonths[p][m]) {
@@ -299,7 +308,7 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
                       && Number(lawt.table[n][t][0].substr(3,2)) == params[1][p][m]
                       && lawt.table[n][t][4] == params[2][p][0]
                       && lawt.table[n][t][5].trim() != '-'
-                      //&& lawt.table[n][t][1].trim() == 'Разработка сайта'
+                      && types.includes(lawt.table[n][t][1].trim())
                       && lawt.table[n][t][5]) {
                         factHour += Number(lawt.table[n][t][5].replace(/,/g, '.'));
                     }
@@ -311,7 +320,7 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
                       && Number(lawt.table[n][t][0].substr(3,2)) == params[1][p][m]
                       && lawt.table[n][t][4] == params[2][p][0]
                       && lawt.table[n][t][5].trim() != '-'
-                      //&& lawt.table[n][t][1].trim() == 'Разработка сайта'
+                      && types.includes(lawt.table[n][t][1].trim())
                       && lawt.table[n][t][5]) {
                         warrentyHour += Number(lawt.table[n][t][5].replace(/,/g, '.'));
                     }
@@ -544,7 +553,7 @@ async function amoReg() {
       //         await crud.updateData([[monthAct[i][2]]], config.ssId.amo, range)
       //           .then(async result => {console.log(result);})
       //           .catch(console.err);
-      //         await sleep(500);
+      //         await sleep(1000);
       //       }
       //
       //     }
@@ -577,51 +586,51 @@ async function amoReg() {
       // Build receiptParams The receipt of money from customers (prepaid & finalLy)
       //---------------------------------------------------------------
 
-      list = encodeURIComponent('AMO (реестр)');
-      let receiptParams = [[], [[],[]], [], [], []];
-      let value = [];
-
-      receiptParams[1][0] = 'Поступление денег от клиентов (предоплата)';
-      receiptParams[1][1] = 'Поступление от клиентов (оконч. оплата)';
-
-      for (let x = 0; x < xArray.length; x++) {
-
-        receiptParams[0] = [];
-        receiptParams[2] = [];
-        receiptParams[3] = [];
-        receiptParams[4] = [];
-        cols = [[], []];
-
-        receiptParams[0].push(registry[xArray[x] - START][4]);
-        receiptParams[3].push(registry[xArray[x] - START][0]);
-        receiptParams[4].push(registry[xArray[x] - START][1]);
-
-        for (let m = 0; m < cutActionMonths[x].length; m++) {
-          receiptParams[2].push(cutActionMonths[x][m]);
-          cols[0] = cols[0].concat(colMonths[cutActionMonths[x][m]].slice(0, 2));
-          cols[1] = cols[1].concat(colMonths[cutActionMonths[x][m]].slice(2, 4));
-        }
-
-        let values = await amoRegQuery(pool, 'dds_lera', receiptParams);
-
-        for (let c = 0; c < cols[0].length; c += 2) {
-
-          range = list + '!' + cols[0][c] + xArray[x] + ':' + cols[0][c + 1] + xArray[x];
-          value = [[values[c], values[c + 1]]];
-
-          await crud.updateData(value, config.ssId.amo, range)
-            .then(async result => {console.log(result);})
-            .catch(console.err);
-
-          //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
-          await sleep(1000);
-        }
-
-        console.log('Project: ' + x);
-
-      }
-      console.log(new Date());
-      console.log('* The receipt of money from customers (prepaid & finalLy) *');
+      // list = encodeURIComponent('AMO (реестр)');
+      // let receiptParams = [[], [[],[]], [], [], []];
+      // let value = [];
+      //
+      // receiptParams[1][0] = 'Поступление денег от клиентов (предоплата)';
+      // receiptParams[1][1] = 'Поступление от клиентов (оконч. оплата)';
+      //
+      // for (let x = 0; x < xArray.length; x++) {
+      //
+      //   receiptParams[0] = [];
+      //   receiptParams[2] = [];
+      //   receiptParams[3] = [];
+      //   receiptParams[4] = [];
+      //   cols = [[], []];
+      //
+      //   receiptParams[0].push(registry[xArray[x] - START][4]);
+      //   receiptParams[3].push(registry[xArray[x] - START][0]);
+      //   receiptParams[4].push(registry[xArray[x] - START][1]);
+      //
+      //   for (let m = 0; m < cutActionMonths[x].length; m++) {
+      //     receiptParams[2].push(cutActionMonths[x][m]);
+      //     cols[0] = cols[0].concat(colMonths[cutActionMonths[x][m]].slice(0, 2));
+      //     cols[1] = cols[1].concat(colMonths[cutActionMonths[x][m]].slice(2, 4));
+      //   }
+      //
+      //   let values = await amoRegQuery(pool, 'dds_lera', receiptParams);
+      //
+      //   for (let c = 0; c < cols[0].length; c += 2) {
+      //
+      //     range = list + '!' + cols[0][c] + xArray[x] + ':' + cols[0][c + 1] + xArray[x];
+      //     value = [[values[c], values[c + 1]]];
+      //
+      //     await crud.updateData(value, config.ssId.amo, range)
+      //       .then(async result => {console.log(result);})
+      //       .catch(console.err);
+      //
+      //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
+      //     await sleep(1000);
+      //   }
+      //
+      //   console.log('Project: ' + x);
+      //
+      // }
+      // console.log(new Date());
+      // console.log('* The receipt of money from customers (prepaid & finalLy) *');
 
       //--------------------------------------------------------------------------
       // Build ratioParams for "Ratio" and "factHours"
@@ -672,13 +681,13 @@ async function amoReg() {
       // // Get & Insert "Ratio & factHours"
       // //--------------------------------------------------------------------------
       //
-      // let [ratio, factHours, warrentyHours] = await getRatio(salary, lawt, ratioParams, cutContractMonths);
+      //  let [ratio, factHours, warrentyHours] = await getRatio(salary, lawt, ratioParams, cutContractMonths);
       //
-      // //console.log(factHours);
+      //  //console.log(factHours);
       //
       // list = encodeURIComponent('AMO (реестр)');
       //
-      // for (let x = 0; x < xArray.length; x++) {
+      // for (let x = 15; x < xArray.length; x++) {
       //   cols = [[], [], []];
       //
       //   for (let m = 0; m < cutActionMonths[x].length; m++) {
@@ -752,83 +761,83 @@ async function amoReg() {
       // Build params for Margin
       //------------------------------------------------------------------------
 
-      // //= Build ABC for margin params =
-      // abc = abc.slice(2, 120);
-      // let colsMargin = config.colsMargin;
-      //
-      // const quantity = 4;
-      // let jArray = [];
-      //
-      // for (let x = 0; x < xArray.length; x++) {
-      //   let paramsMargin = [];
-      //
-      //   for (let i = 0; i < 26; i++) {
-      //     paramsMargin.push([]);
-      //   }
-      //
-      //   //= Push site in params =
-      //   paramsMargin[0].push(registry[xArray[x] - START][0]);
-      //
-      //   //= Push debt "P" in params =
-      //   let col = abc.indexOf(colsMargin.debt);
-      //   registry[xArray[x] - START][col] && Number(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //     ? paramsMargin[1].push(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //     : paramsMargin[1].push(0);
-      //
-      //   //= Push salary of CREW (x7) in params =
-      //   for (let i = xArray[x] - START; i < xArray[x] - START + CREW; i++) {
-      //     let count = 0;
-      //     for (let j = 2; j < (paramsMargin.length - 3); j += quantity) {
-      //       let col = abc.indexOf(colsMargin.salary[count]);
-      //       registry[i][col] && Number(registry[i][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //           ? paramsMargin[j].push(registry[i][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //           : paramsMargin[j].push(0);
-      //
-      //       jArray.push(j);
-      //       count++;
-      //     }
-      //   }
-      //
-      //   //= Push other cost (common for project) in params =
-      //   let count = 0;
-      //
-      //   for (let n = 3; n < paramsMargin.length; n++) {
-      //     if (!jArray.includes(n)) {
-      //       let col = abc.indexOf(colsMargin.other[count]);
-      //       registry[xArray[x] - START][col] && Number(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //         ? paramsMargin[n].push(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //         : paramsMargin[n].push(0);
-      //       count++;
-      //     }
-      //   }
-      //
-      //   //console.log(paramsMargin);
-      //
-      //   //= Get & Insert values of "Margin & Margins" =
-      //   let margin = await getMargin(contractSum, paramsMargin);
-      //   let margins = 0;
-      //
-      //   for (var c = 0; c < contractSum.length; c++) {
-      //     if(contractSum[c][0] == paramsMargin[0]) {
-      //       margins = margin ? margin / contractSum[c][1] : 0;
-      //     }
-      //   }
-      //
-      //   //= Cut to 2 number after poin =
-      //   margins = margins.toFixed(2);
-      //
-      //   list = encodeURIComponent('AMO (реестр)');
-      //   range = list + '!N' + xArray[x] + ':O' + xArray[x];
-      //
-      //   await crud.updateData([[margin, margins]], config.ssId.amo, range)
-      //     .then(async result => {console.log(result);})
-      //     .catch(console.err);
-      //
-      //   console.log([margin, margins]);
-      //
-      //   }
-      //   console.log(new Date());
-      //   console.log('* Update for Margin *');
+      //= Build ABC for margin params =
+      abc = abc.slice(2, 120);
+      let colsMargin = config.colsMargin;
+
+      const quantity = 4;
+      let jArray = [];
+
+      for (let x = 0; x < xArray.length; x++) {
+        let paramsMargin = [];
+
+        for (let i = 0; i < 26; i++) {
+          paramsMargin.push([]);
+        }
+
+        //= Push site in params =
+        paramsMargin[0].push(registry[xArray[x] - START][0]);
+
+        //= Push debt "P" in params =
+        let col = abc.indexOf(colsMargin.debt);
+        registry[xArray[x] - START][col] && Number(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+          ? paramsMargin[1].push(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+          : paramsMargin[1].push(0);
+
+        //= Push salary of CREW (x7) in params =
+        for (let i = xArray[x] - START; i < xArray[x] - START + CREW; i++) {
+          let count = 0;
+          for (let j = 2; j < (paramsMargin.length - 3); j += quantity) {
+            let col = abc.indexOf(colsMargin.salary[count]);
+            registry[i][col] && Number(registry[i][col].replace(/\s/g, '').replace(/,/g, '.'))
+                ? paramsMargin[j].push(registry[i][col].replace(/\s/g, '').replace(/,/g, '.'))
+                : paramsMargin[j].push(0);
+
+            jArray.push(j);
+            count++;
+          }
+        }
+
+        //= Push other cost (common for project) in params =
+        let count = 0;
+
+        for (let n = 3; n < paramsMargin.length; n++) {
+          if (!jArray.includes(n)) {
+            let col = abc.indexOf(colsMargin.other[count]);
+            registry[xArray[x] - START][col] && Number(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+              ? paramsMargin[n].push(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+              : paramsMargin[n].push(0);
+            count++;
+          }
+        }
+
+        //console.log(paramsMargin);
+
+        //= Get & Insert values of "Margin & Margins" =
+        let margin = await getMargin(contractSum, paramsMargin);
+        let margins = 0;
+
+        for (var c = 0; c < contractSum.length; c++) {
+          if(contractSum[c][0] == paramsMargin[0]) {
+            margins = margin ? margin / contractSum[c][1] : 0;
+          }
+        }
+
+        //= Cut to 2 number after poin =
+        margins = margins.toFixed(2);
+
+        list = encodeURIComponent('AMO (реестр)');
+        range = list + '!N' + xArray[x] + ':O' + xArray[x];
+
+        await crud.updateData([[margin, margins]], config.ssId.amo, range)
+          .then(async result => {console.log(result);})
+          .catch(console.err);
+
+        console.log([margin, margins]);
+
+        }
+        console.log(new Date());
+        console.log('* Update for Margin *');
 
       //-------------------------------------------------------------
       // Update date-time in "Monitoring"

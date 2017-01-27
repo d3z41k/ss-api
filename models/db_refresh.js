@@ -9,7 +9,7 @@ async function dbRefresh(pool, tableName, srcRows) {
 
     await pool.query("TRUNCATE TABLE " + tableName)
       .then(() => {
-        console.log('table ' + tableName + ' truncate - OK!')
+        //console.log('table ' + tableName + ' truncate - OK!')
       })
       .catch(err => {
         reject(err)
@@ -36,7 +36,7 @@ async function dbRefresh(pool, tableName, srcRows) {
       // if (srcRows[i][30] && srcRows[i][30].includes('→')) {
       //   srcRows[i][30] = srcRows[i][30].slice(2).trim();
       // }
-      
+
       if (srcRows[i][24] && srcRows[i][24].includes('→')) {
         srcRows[i][24] = srcRows[i][24].slice(2).trim();
       }

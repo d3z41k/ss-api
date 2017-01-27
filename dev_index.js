@@ -91,6 +91,14 @@ router
     ctx.body = await profi1();
 
   })
+  .get('/_profi1/:pre_month/:curr_month', async ctx => {
+
+    let months = [ctx.params.pre_month, ctx.params.curr_month];
+
+    const profi1 = require('./ss-scripts-2017-1/_profi1');
+    ctx.body = await profi1(months);
+
+  })
   .get('/profi1/:pre_month/:curr_month', async ctx => {
 
     let months = [ctx.params.pre_month, ctx.params.curr_month];
