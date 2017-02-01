@@ -31,6 +31,12 @@ router
     ctx.body = await serv();
 
   })
+  .get('/context', async ctx => {
+
+    const context = require('./ss-scripts-2017-1/context');
+    ctx.body = await context();
+
+  })
   .get('/seo', async ctx => {
 
     const seo = require('./ss-scripts-2017-1/seo');
