@@ -135,7 +135,12 @@ router
   .get('/salary/:month', async ctx => {
 
     const salary = require('./ss-scripts-2017-1/salary');
-    ctx.body = await salary(ctx.params.month);
+    ctx.body = await salary([ctx.params.month]);
+
+  })
+  .get('/salary', async ctx => {
+    const salary = require('./ss-scripts-2017-1/salary');
+    ctx.body = await salary();
 
   })
   .get('/indirect/:month', async ctx => {
