@@ -1,8 +1,9 @@
 'use strict';
 
 const config = require('config');
+const _ = require('lodash/array');
 
-async function indirect(month) {
+async function indirect(months) {
   return new Promise(async(resolve, reject) => {
 
     //-------------------------------------------------------------------------
@@ -18,9 +19,20 @@ async function indirect(month) {
     const pool = require('../models-2017-1/db_pool');
     const indirectQuery = require('../models/db_indirect-query');
 
-    //---------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    // Fetch months
+    //--------------------------------------------------------------------------
+
+    let mode = false;
+
+    if (!arguments.length) {
+      mode = true;
+      months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    }
+
+    //--------------------------------------------------------------------------
     // Main function
-    //---------------------------------------------------------------
+    //--------------------------------------------------------------------------
 
     async function start(auth) {
 
@@ -34,8 +46,6 @@ async function indirect(month) {
       let range = '';
       let range1 = '';
       let range2 = '';
-      let range3 = '';
-      let mode = 0;
       let srcRows = {
         lera: '',
         olga: ''
@@ -84,25 +94,29 @@ async function indirect(month) {
       // Build paramsIndirect and get & update Indirect
       //------------------------------------------------------------------------
 
-      let paramsIndirect = {
-        '1.1' : [[], []],
-        '1.2' : [[], [], []],
-        '1.3' : [[], [], []],
-        '2.1' : [[], [], []],
-        '2.2' : [[], [], [], []],
-        '2.3' : [[], [], [], []],
-      };
-
-      let numMonth = MON_COLS[month][0];
-
       try {
+
+        let paramsIndirect = {
+          '1.1' : [[], []],
+          '1.2' : [[], [], []],
+          '1.3' : [[], [], []],
+          '2.1' : [[], [], [], []],
+          '2.2' : [[], [], [], []],
+          '2.3' : [[], [], [], []],
+        };
+
+        let numMonth = [];
 
         //= Build params for Indirect (3 type, 2 version) =
 
+        months.forEach(month => {
+          numMonth.push(MON_COLS[month][0]);
+        });
+
         for (let type in paramsIndirect) {
-          paramsIndirect[type][0].push(numMonth);
+          paramsIndirect[type][0] = numMonth; //months
           if (type[0] == '2') {
-            paramsIndirect[type][3] = DIRECTIONS;
+            paramsIndirect[type][3] = DIRECTIONS; //directions
           }
         }
 
@@ -113,24 +127,24 @@ async function indirect(month) {
             || (i >= TYPES[1.1].range2[0] && i <= TYPES[1.1].range2[1] && i != range2[2])
             || (i == TYPES[1.1].range3)
           ) {
-            paramsIndirect['1.1'][1].push(dataIndirect[i][1]);
-            paramsIndirect['2.1'][1].push(dataIndirect[i][1]);
+            paramsIndirect['1.1'][1].push(dataIndirect[i][1]); //articles
+            paramsIndirect['2.1'][1].push(dataIndirect[i][1]); //articles
           }
 
           //= Type 1.2 params =
           if (i >= TYPES[1.2].range1[0] && i <= TYPES[1.2].range1[1]) {
-            paramsIndirect['1.2'][1].push(dataIndirect[i][1]);
-            paramsIndirect['1.2'][2].push(dataIndirect[i][3]);
-            paramsIndirect['2.2'][1].push(dataIndirect[i][1]);
-            paramsIndirect['2.2'][2].push(dataIndirect[i][3]);
+            paramsIndirect['1.2'][1].push(dataIndirect[i][1]); //articles
+            paramsIndirect['1.2'][2].push(dataIndirect[i][3]); //transcript
+            paramsIndirect['2.2'][1].push(dataIndirect[i][1]); //articles
+            paramsIndirect['2.2'][2].push(dataIndirect[i][3]); //transcript
           }
 
           //= Type 1.3 params =
           if (i >= TYPES[1.3].range1[0] && i <= TYPES[1.3].range1[1]) {
-            paramsIndirect['1.3'][1].push(dataIndirect[i][1]);
-            paramsIndirect['1.3'][2].push(dataIndirect[i][2]);
-            paramsIndirect['2.3'][1].push(dataIndirect[i][1]);
-            paramsIndirect['2.3'][2].push(dataIndirect[i][2]);
+            paramsIndirect['1.3'][1].push(dataIndirect[i][1]); //articles
+            paramsIndirect['1.3'][2].push(dataIndirect[i][2]); //company
+            paramsIndirect['2.3'][1].push(dataIndirect[i][1]); //articles
+            paramsIndirect['2.3'][2].push(dataIndirect[i][2]); //company
           }
 
         }
@@ -156,138 +170,222 @@ async function indirect(month) {
             .catch(console.log);
 
             //= For version 1 =
-
             if (type[0] == ['1']) {
-              for (let i = 0; i < sum1.length; i++) {
-                sumCommon.push([Number(sum1[i][0]) + Number(sum2[i][0])]);
+              for (let m = 0; m < sum1.length; m++) {
+                sumCommon.push([]);
+                for (let i = 0; i < sum1[m].length; i++) {
+                  sumCommon[m].push([Number(sum1[m][i]) + Number(sum2[m][i])]);
+                }
               }
             }
 
             //= For version 2 =
-
             if (type[0] == ['2']) {
-              for (let i = 0; i < sum1.length; i++) {
-                  sumDirections.push([]);
-                  for (let j = 0; j < sum1[i].length; j++) {
-                    sumDirections[i].push([Number(sum1[i][j][0]) + Number(sum2[i][j][0])]);
+              for (let m = 0; m < sum1.length; m++) {
+                sumDirections.push([]);
+                for (let d = 0; d < sum1[m].length; d++) {
+                  sumDirections[m].push([]);
+                  for (let i = 0; i < sum1[m][d].length; i++) {
+                    sumDirections[m][d].push(Number(sum1[m][d][i]) + Number(sum2[m][d][i]));
                   }
                 }
+              }
             }
 
-            //= Common sum 1.1 (1 type 3 part) =
-            if (type == '1.1') {
+            //console.log(require('util').inspect(sumCommon, { depth: null }));
 
+            let zipValues = [];
+            let zipValues1 = [];
+            let zipValues2 = [];
+            let zipValues3 = [];
+            let arrRange1 = [];
+            let arrRange2 = [];
+            let arrRange3 = [];
+            let arrFuncions1 = [];
+            let arrFuncions2 = [];
+            let arrFuncions3 = [];
+            let startIndex;
+            let endIndex;
+
+            //------------------------------------------------------------------
+            // Type 1.1 & 2.1 (3 part)
+            //------------------------------------------------------------------
+            if (type == '1.1' || type == '2.1') {
+
+              if(type == '1.1'){
+
+                zipValues = sumCommon;
+                startIndex = 0;
+                endIndex = 0;
+
+              } else if(type == '2.1') {
+
+
+                startIndex = 1;
+                endIndex = 5;
+
+                //= Zip valuses =
+                sumDirections.forEach(val => {
+                  let arrDirections = [];
+                  for (let a = 0; a < val.length; a++) {
+                    arrDirections.push(val[a]);
+                  }
+
+                  // !! Hardcode 5 params, in future possible more than that
+                  zipValues.push(_.zip(
+                    arrDirections[0],
+                    arrDirections[1],
+                    arrDirections[2],
+                    arrDirections[3],
+                    arrDirections[4]
+                  ));
+                });
+
+              }
+
+              //----------------------------------------------------------------
+              // Common part of type 1.1 & 2.1 (3 part)
+              //----------------------------------------------------------------
+
+              //= Split zipValues =
+              zipValues.forEach((monthVal, m) => {
+                zipValues1.push([]);
+                zipValues2.push([]);
+                zipValues3.push([]);
+                monthVal.forEach((lineVal, l) => {
+                  if (l <= 26) {
+                    zipValues1[m].push(lineVal);
+                  } else if (l >= 27 && l <= 50) {
+                    zipValues2[m].push(lineVal);
+                  } else {
+                    zipValues3[m].push(lineVal);
+                  }
+                });
+              });
+
+              //= Prepare array of Range & Functions =
               start = TYPES[type].range1[0] + 1;
               end = TYPES[type].range1[1] + 1;
 
-              range1 = list + '!' + MON_COLS[month][1][0] + start + ':'
-                  + MON_COLS[month][1][0] + end;
+              months.forEach(month => {
+                arrRange1.push(list + '!' + MON_COLS[month][1][startIndex] + start + ':'
+                  + MON_COLS[month][1][endIndex] + end);
+              });
 
               start = TYPES[type].range2[0] + 1;
               end = TYPES[type].range2[1] + 1;
 
-              range2 = list + '!' + MON_COLS[month][1][0] + start + ':'
-                  + MON_COLS[month][1][0] + end;
-
-              range3 = list + '!' + MON_COLS[month][1][0] + TYPES[type].range3;
-
-              let sumCommon1 = [];
-              let sumCommon2 = [];
-              let sumCommon3 = [];
-
-              sumCommon.forEach((value, i) => {
-                if (i <= 26) {
-                  sumCommon1.push(value);
-                } else if (i >= 27 && i <= 50) {
-                  sumCommon2.push(value);
-                } else {
-                  sumCommon3.push(value);
-                }
+              months.forEach(month => {
+                arrRange2.push(list + '!' + MON_COLS[month][1][startIndex] + start + ':'
+                + MON_COLS[month][1][endIndex] + end);
               });
 
-              await Promise.all([
-                crud.updateData(sumCommon1, config.sid_2017.indirect, range1),
-                crud.updateData(sumCommon2, config.sid_2017.indirect, range2),
-                crud.updateData(sumCommon3, config.sid_2017.indirect, range3)
-              ])
-                //.then(async results => {console.log(results);})
+              start = TYPES[type].range3 + 1;
+
+              months.forEach(month => {
+                arrRange3.push(list + '!' + MON_COLS[month][1][startIndex] + start);
+              });
+
+              zipValues1.forEach((arrValues, i)=> {
+                arrFuncions1.push(crud.updateData(arrValues, config.sid_2017.indirect, arrRange1[i]));
+              });
+
+              zipValues2.forEach((arrValues, i)=> {
+                arrFuncions2.push(crud.updateData(arrValues, config.sid_2017.indirect, arrRange2[i]));
+              });
+
+              zipValues3.forEach((arrValues, i)=> {
+                arrFuncions3.push(crud.updateData(arrValues, config.sid_2017.indirect, arrRange3[i]));
+              });
+
+              //= Async update data for Directions =
+              Promise.all(arrFuncions1)
+              //  .then(async (results) => {console.log(results);})
                 .catch(console.log);
 
-            //= Directions sum 2.1 (2 type 3 part) =
-            } else if (type == '2.1') {
-                for (let d = 0; d < paramsIndirect[type][3].length; d++) {
+              Promise.all(arrFuncions2)
+              //  .then(async (results) => {console.log(results);})
+                .catch(console.log);
+
+              Promise.all(arrFuncions3)
+              //  .then(async (results) => {console.log(results);})
+                .catch(console.log);
+
+            //------------------------------------------------------------------
+            // Other types
+            //------------------------------------------------------------------
+            } else {
+              //= Type 1 (1.2, 1.3) sum =
+                if (type[0] == '1') {
+
+                  zipValues = sumCommon;
+                  startIndex = 0;
+                  endIndex = 0;
+
                   start = TYPES[type].range1[0] + 1;
                   end = TYPES[type].range1[1] + 1;
 
-                  range1 = list + '!' + MON_COLS[month][1][d + 1] + start + ':'
-                      + MON_COLS[month][1][d + 1] + end;
-
-                  start = TYPES[type].range2[0] + 1;
-                  end = TYPES[type].range2[1] + 1;
-
-                  range2 = list + '!' + MON_COLS[month][1][d + 1] + start + ':'
-                      + MON_COLS[month][1][d + 1] + end;
-
-                  range3 = list + '!' + MON_COLS[month][1][d + 1] + TYPES[type].range3;
-
-                  let sumDirections1 = [];
-                  let sumDirections2 = [];
-                  let sumDirections3 = [];
-
-                  sumDirections[d].forEach((value, i) => {
-                    if (i <= 26) {
-                      sumDirections1.push(value);
-                    } else if (i >= 27 && i <= 50) {
-                      sumDirections2.push(value);
-                    } else {
-                      sumDirections3.push(value);
-                    }
+                  months.forEach(month => {
+                    arrRange1.push(list + '!' + MON_COLS[month][1][startIndex] + start + ':'
+                      + MON_COLS[month][1][endIndex] + end);
                   });
 
-                  await Promise.all([
-                    crud.updateData(sumDirections1, config.sid_2017.indirect, range1),
-                    crud.updateData(sumDirections2, config.sid_2017.indirect, range2),
-                    crud.updateData(sumDirections3, config.sid_2017.indirect, range3)
-                  ])
-                    //.then(async results => {console.log(results);})
+                  zipValues.forEach((arrValues, i)=> {
+                    arrFuncions1.push(crud.updateData(arrValues, config.sid_2017.indirect, arrRange1[i]));
+                  });
+
+                  await Promise.all(arrFuncions1)
+                  //  .then(async (results) => {console.log(results);})
                     .catch(console.log);
-                }
 
-            //= Other sums =
-            } else {
+                //= Type 2 (2.2, 2.3) sum =
+              } else if (type[0] == '2') {
 
-              //= Type 1 (1.2, 1.3) sum =
-              if (type[0] == '1') {
+                  startIndex = 1;
+                  endIndex = 5;
 
-                start = TYPES[type].range1[0] + 1;
-                end = TYPES[type].range1[1] + 1;
+                  //= Zip valuses =
+                  sumDirections.forEach(val => {
+                    let arrDirections = [];
+                    for (let a = 0; a < val.length; a++) {
+                      arrDirections.push(val[a]);
+                    }
 
-                range = list + '!' + MON_COLS[month][1][0] + start + ':'
-                    + MON_COLS[month][1][0] + end;
+                    // !! Hardcode 5 params, in future possible more than that
+                    zipValues.push(_.zip(
+                      arrDirections[0],
+                      arrDirections[1],
+                      arrDirections[2],
+                      arrDirections[3],
+                      arrDirections[4]
+                    ));
+                  });
 
-                await crud.updateData(sumCommon, config.sid_2017.indirect, range)
-                  //.then(async results => {console.log(results);})
-                  .catch(console.log);
-              }
+                  //console.log(zipValues);
 
-              //= Type 2 (2.2, 2.3) sum =
-              if (type[0] == '2') {
-                for (let d = 0; d < paramsIndirect[type][3].length; d++) {
                   start = TYPES[type].range1[0] + 1;
                   end = TYPES[type].range1[1] + 1;
 
-                  range = list + '!' + MON_COLS[month][1][d + 1] + start + ':'
-                      + MON_COLS[month][1][d + 1] + end;
+                  months.forEach(month => {
+                    arrRange1.push(list + '!' + MON_COLS[month][1][startIndex] + start + ':'
+                      + MON_COLS[month][1][endIndex] + end);
+                  });
 
-                  await crud.updateData(sumDirections[d], config.sid_2017.indirect, range)
-                    //.then(async results => {console.log(results);})
+                  zipValues.forEach((arrValues, i)=> {
+                    arrFuncions1.push(crud.updateData(arrValues, config.sid_2017.indirect, arrRange1[i]));
+                  });
+
+                  await Promise.all(arrFuncions1)
+                  //  .then(async (results) => {console.log(results);})
                     .catch(console.log);
+
                 }
-              }
 
             }
 
-        }
+          await sleep(1000);
+
+        } //end Types loop
 
       } catch (e) {
         reject(e.stack);

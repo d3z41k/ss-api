@@ -46,8 +46,8 @@ async function salary(months) {
       let range1 = '';
       let range2 = '';
       let srcRows = {
-        lera: '',
-        olga: ''
+        'lera': '',
+        'olga': ''
       };
 
       //------------------------------------------------------------------------
@@ -103,7 +103,6 @@ async function salary(months) {
           if (dataSalary[a][0] && dataSalary[a][3]) {
             paramsSalary[0].push(dataSalary[a][0]); //name
             paramsSalary[1].push(dataSalary[a][3]); //departion
-
           } else {
             paramsSalary[0].push(' ');
             paramsSalary[1].push(' ');

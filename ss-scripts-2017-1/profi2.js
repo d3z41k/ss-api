@@ -262,9 +262,9 @@ async function profi2(months) {
       //-------------------------------------------------------------
 
       if (mode) {
-        range = 'main!C12';
+        range = 'main!C13';
       } else {
-        range = 'main!B12';
+        range = 'main!B13';
       }
       let now = new Date();
       now = [[formatDate(now)]];

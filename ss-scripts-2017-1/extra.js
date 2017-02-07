@@ -66,10 +66,6 @@ async function extra() {
           if (extraClients[a][0] && extraClients[a][1]) {
             paramsExtraCients[0].push(extraClients[a][0]);
             paramsExtraCients[1].push(extraClients[a][1]);
-
-          } else {
-            paramsExtraCients[0].push(' ');
-            paramsExtraCients[1].push(' ');
           }
         }
 
