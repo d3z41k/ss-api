@@ -51,7 +51,7 @@ router
   })
   .get('/dev-reg', async ctx => {
 
-    const devReg = require('./ss-scripts/dev-reg');
+    const devReg = require('./ss-scripts-2017-1/dev-reg');
     ctx.body = await devReg();
 
   })

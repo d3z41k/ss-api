@@ -395,7 +395,12 @@ async function indirect(months) {
       // Update date-time in "Monitoring"
       //------------------------------------------------------------------------
 
-      range = 'main!C16';
+      if (mode) {
+        range = 'main!B16';
+      } else {
+        range = 'main!C16';
+      }
+      
       let now = new Date();
       now = [[formatDate(now)]];
       await crud.updateData(now, config.sid_2017.monit, range);

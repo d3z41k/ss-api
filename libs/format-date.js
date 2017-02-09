@@ -1,3 +1,8 @@
+/**
+ * [formatDate description]
+ * @param  {[type]} date [description]
+ * @return {[type]}      [description]
+ */
 function formatDate(date) {
 
   let dd = date.getDate();
