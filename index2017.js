@@ -141,6 +141,12 @@ router
     ctx.body = await indirect([ctx.params.month]);
 
   })
+  .get('/dds_mon', async ctx => {
+
+    const dds_mon = require('./ss-scripts-2017-1/dds_mon');
+    ctx.body = await dds_mon();
+
+  })
   .get('/fin-state', async ctx => {
 
     let months = [7, 8, 9, 10, 11, 12];

@@ -242,8 +242,6 @@ async function getMargin(contractSum, params) {
 async function devReg() {
   return new Promise(async (resolve, reject) => {
 
-    console.log('Start: ' + new Date());
-
     //--------------------------------------------------------------------------
     // Usres libs
     //--------------------------------------------------------------------------
@@ -331,33 +329,33 @@ async function devReg() {
        *** Part 1 - All Plan Hourse
        ************************************************************************/
 
-      //------------------------------------------------------------------------
-      // Get data (hours and type) from 'normative'
-      //------------------------------------------------------------------------
-
-      list = encodeURIComponent('Нормативы');
-      range = list + '!B72:C75';
-      let normaHour = await crud.readData(config.sid_2017.dev, range);
-
-      range = list + '!B24:E48';
-      let srcNormaType = await crud.readData(config.sid_2017.dev, range);
-
-      let normaType = normType(srcNormaType); //normalize srcNormaType
-
-      //------------------------------------------------------------------------
-      // Get and Update allHours
-      //------------------------------------------------------------------------
-
-      let planHours = await getPlanHours(normaHour, normaType, paramsHours);
-
-      list = encodeURIComponent('Разработка (реестр)');
-
-      range = list + '!K'+ xArray[0] +':K';
-      await crud.updateData(planHours, config.sid_2017.dev, range)
-        //.then(async result => {console.log(result);})
-        .catch(console.err);
-
-      console.log('* Get and Update allHours *');
+      // //------------------------------------------------------------------------
+      // // Get data (hours and type) from 'normative'
+      // //------------------------------------------------------------------------
+      //
+      // list = encodeURIComponent('Нормативы');
+      // range = list + '!B72:C75';
+      // let normaHour = await crud.readData(config.sid_2017.dev, range);
+      //
+      // range = list + '!B24:E48';
+      // let srcNormaType = await crud.readData(config.sid_2017.dev, range);
+      //
+      // let normaType = normType(srcNormaType); //normalize srcNormaType
+      //
+      // //------------------------------------------------------------------------
+      // // Get and Update allHours
+      // //------------------------------------------------------------------------
+      //
+      // let planHours = await getPlanHours(normaHour, normaType, paramsHours);
+      //
+      // list = encodeURIComponent('Разработка (реестр)');
+      //
+      // range = list + '!K'+ xArray[0] +':K';
+      // await crud.updateData(planHours, config.sid_2017.dev, range)
+      //   //.then(async result => {console.log(result);})
+      //   .catch(console.err);
+      //
+      // console.log('* Get and Update allHours *');
 
       /*************************************************************************
        *** Part 2 -
@@ -375,8 +373,8 @@ async function devReg() {
       let contractSum = clientInfo.map((row) => {
         return [
           row[0],
-          row[13] && Number(row[13].replace(/\s/g, ''))
-          ? Number(row[13].replace(/\s/g, '')) : 0
+          row[9] && Number(row[9].replace(/\s/g, ''))
+          ? Number(row[9].replace(/\s/g, '')) : 0
         ]
       });
 
@@ -397,16 +395,27 @@ async function devReg() {
           for (let i = 0; i < clientInfo.length; i++) {
             if (registry[xArray[x] - START][0]  == clientInfo[i][0]) {
               if (clientInfo[i][6]
-                && clientInfo[i][6].slice(3,5) < 6
+                && clientInfo[i][6].slice(3,5) < 7
                 && clientInfo[i][6].slice(6) == '2016') {
                 actionMonth[x].push(1);
+                // actionMonth[x].push(clientInfo[i][10] && clientInfo[i][10].slice(3,5) > 7
+                //   ? Number(clientInfo[i][10].slice(3,5)) : 6);
+              } else {
+                actionMonth[x].push(clientInfo[i][6] && clientInfo[i][6].slice(3,5) < 7
+                  ? Number(clientInfo[i][6].slice(3,5)) : 1);
+                if (clientInfo[i][10].slice(3,5) > 7) {
+                  actionMonth[x].push(1);
+                } else {
+                  actionMonth[x].push(clientInfo[i][10] ? Number(clientInfo[i][10].slice(3,5)) : 6);
+                }
+
               }
-              actionMonth[x].push(clientInfo[i][6]  ? Number(clientInfo[i][6].slice(3,5)) : 1);
-              actionMonth[x].push(clientInfo[i][10] ? Number(clientInfo[i][10].slice(3,5)) : 6);
             }
           }
-          actionMonth[x].length = 2;
-        }
+        //   actionMonth[x].length = 2;
+        // }
+
+        console.log('actionMonth');
 
         //= Get Actual months for a projects =
         actionMonth.forEach((months) => {
@@ -441,7 +450,7 @@ async function devReg() {
         reject(e.stack);
       }
 
-      console.log(cutContractMonths);
+      //console.log(cutContractMonths);
 
       //------------------------------------------------------------------------
       // Get & Insert mounth and amount of the act

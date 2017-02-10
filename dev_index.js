@@ -85,6 +85,12 @@ router
     ctx.body = await domain();
 
   })
+  .get('/dds_mon', async ctx => {
+
+    const dds_mon = require('./ss-scripts-2017-1/dds_mon');
+    ctx.body = await dds_mon();
+
+  })
   .get('/profi1', async ctx => {
 
     const profi1 = require('./ss-scripts-2017-1/profi1');
@@ -143,15 +149,15 @@ router
     ctx.body = await salary();
 
   })
-  .get('/_indirect/:month', async ctx => {
+  .get('/indirect/:month', async ctx => {
 
-    const indirect = require('./ss-scripts-2017-1/_indirect');
+    const indirect = require('./ss-scripts-2017-1/indirect');
     ctx.body = await indirect([ctx.params.month]);
 
   })
-  .get('/_indirect', async ctx => {
+  .get('/indirect', async ctx => {
 
-    const indirect = require('./ss-scripts-2017-1/_indirect');
+    const indirect = require('./ss-scripts-2017-1/indirect');
     ctx.body = await indirect();
 
   })

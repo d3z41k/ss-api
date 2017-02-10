@@ -400,7 +400,7 @@ async function indirect(months) {
       } else {
         range = 'main!C16';
       }
-      
+
       let now = new Date();
       now = [[formatDate(now)]];
       await crud.updateData(now, config.sid_2017.monit, range);
