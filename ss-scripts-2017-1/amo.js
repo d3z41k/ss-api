@@ -35,12 +35,12 @@ async function amo() {
 
       list = encodeURIComponent('ДДС_Лера');
       range = list + '!A6:V';
-      let srcRows = await crud.readData(config.sid_2017.dds, range);
+      let ddsData = await crud.readData(config.sid_2017.dds, range);
 
       // = Normalizing of length "srcRows" =
       //normLength(srcRows);
 
-       await dbRefresh(pool, 'dds_lera', srcRows)
+       await dbRefresh(pool, 'dds_lera', ddsData)
         //.then(async (result) => {console.log(result);})
         .catch(console.log);
 

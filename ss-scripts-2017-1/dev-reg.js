@@ -209,7 +209,7 @@ async function getRatio(salary, lawt, params, cutContractMonths) {
 }
 
 async function getMargin(contractSum, params) {
-  return new Promise(async(resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
 
     let margin = 0;
     let sub = 0;
@@ -221,7 +221,7 @@ async function getMargin(contractSum, params) {
     for (let i = 2; i < params.length; i++) {
       params[i].forEach((value) => {
         sub += Number(value);
-      })
+      });
     }
 
     for (let c = 0; c < contractSum.length; c++) {
@@ -266,7 +266,7 @@ async function devReg() {
       const CREW = 11;
       const START = 6;
       const YEAR = [0 ,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-      const MONTHS = YEAR.slice(7);
+      const MONTHS = YEAR.slice(0, 7);
       let list = '';
       let range = '';
 
@@ -379,7 +379,7 @@ async function devReg() {
       });
 
       //------------------------------------------------------------------------
-      // Get "Action months"
+      // Get "Action & Contract months"
       //------------------------------------------------------------------------
 
       let actionMonth = [];
@@ -390,32 +390,34 @@ async function devReg() {
 
       try {
 
-        for (let x = 0; x < xArray.length; x++) {
-          actionMonth.push([]);
-          for (let i = 0; i < clientInfo.length; i++) {
-            if (registry[xArray[x] - START][0]  == clientInfo[i][0]) {
-              if (clientInfo[i][6]
-                && clientInfo[i][6].slice(3,5) < 7
-                && clientInfo[i][6].slice(6) == '2016') {
-                actionMonth[x].push(1);
-                // actionMonth[x].push(clientInfo[i][10] && clientInfo[i][10].slice(3,5) > 7
-                //   ? Number(clientInfo[i][10].slice(3,5)) : 6);
-              } else {
-                actionMonth[x].push(clientInfo[i][6] && clientInfo[i][6].slice(3,5) < 7
-                  ? Number(clientInfo[i][6].slice(3,5)) : 1);
-                if (clientInfo[i][10].slice(3,5) > 7) {
-                  actionMonth[x].push(1);
-                } else {
-                  actionMonth[x].push(clientInfo[i][10] ? Number(clientInfo[i][10].slice(3,5)) : 6);
-                }
+         for (let x = 0; x < xArray.length; x++) {
+           actionMonth.push([]);
+           for (let i = 0; i < clientInfo.length; i++) {
+             if (registry[xArray[x] - START][0]  == clientInfo[i][0]) {
 
-              }
-            }
+               //= Push start month =
+               if (clientInfo[i][6]
+                 && clientInfo[i][6].slice(3,5) < 7
+                 && clientInfo[i][6].slice(6) == '2016') {
+                 actionMonth[x].push(1);
+               } else {
+                 actionMonth[x].push(clientInfo[i][6] && clientInfo[i][6].slice(3,5) < 7
+                   ? Number(clientInfo[i][6].slice(3,5)) : 1);
+               }
+               //= Push end month =
+               if (clientInfo[i][10]
+                 && clientInfo[i][10].slice(6) == '2016') {
+                 actionMonth[x].push(1);
+               } else {
+                 actionMonth[x].push(clientInfo[i][10] && clientInfo[i][10].slice(3,5) < 7
+                    ? Number(clientInfo[i][10].slice(3,5)) : 6);
+               }
+             }
+           }
+            actionMonth[x].length = 2;
           }
-        //   actionMonth[x].length = 2;
-        // }
 
-        console.log('actionMonth');
+        //console.log(actionMonth);
 
         //= Get Actual months for a projects =
         actionMonth.forEach((months) => {
@@ -423,7 +425,7 @@ async function devReg() {
             contractMonths.push(YEAR.slice(months[0], months[1] + 1));
         });
 
-        //= Сut Action months
+        //= Сut Action months for a projects =
         actionMonths.forEach((months) => {
           let line = months.filter((month) => {
             return month < 7;
@@ -439,18 +441,9 @@ async function devReg() {
           cutContractMonths.push(line);
         });
 
-        //= Substitution 1 month there no value =
-        cutContractMonths.forEach((value, i) => {
-          if (!value[0]) {
-              cutContractMonths[i] = [1];
-          }
-        });
-
       } catch (e) {
         reject(e.stack);
       }
-
-      //console.log(cutContractMonths);
 
       //------------------------------------------------------------------------
       // Get & Insert mounth and amount of the act
@@ -458,13 +451,13 @@ async function devReg() {
 
       // let monthAct = clientInfo.map((row) => {
       //   return [
-      //     row[0], row[16] ? row[16] : 0,
-      //     row[13] && Number(row[13].replace(/\s/g, ''))
-      //     ? Number(row[13].replace(/\s/g, '')) : 0
+      //     row[0], row[10] ? row[10] : 0,
+      //     row[9] && Number(row[9].replace(/\s/g, ''))
+      //     ? Number(row[9].replace(/\s/g, '')) : 0
       //   ];
       // });
       //
-      // let colsAct = config.reg_colsAct;
+      // let colsAct = config.reg_colsAct_1;
       //
       // for (let x = 0; x < xArray.length; x++) {
       //
@@ -472,10 +465,11 @@ async function devReg() {
       //
       //   for (let i = 0; i < monthAct.length; i++) {
       //     if (registry[xArray[x] - START][0]  == monthAct[i][0]) {
-      //       if (monthAct[i][1]) {
-      //         month = Number(monthAct[i][1].substr(3, 2)) > 6 ? Number(monthAct[i][1].substr(3, 2)) : 7;
+      //       if (monthAct[i][1]
+      //         && monthAct[i][1].slice(6) == '2016') {
+      //         month = 1;
       //       } else {
-      //         month = '';
+      //         month = monthAct[i][1] ? Number(monthAct[i][1].substr(3, 2)) : '';
       //       }
       //
       //       list = encodeURIComponent('Разработка (реестр)');
@@ -506,13 +500,15 @@ async function devReg() {
 
       // let monthPrepaid = clientInfo.map((row) => {
       //   return [
-      //     row[0], row[15] ? row[15] : 0,
-      //     row[14] && Number(row[14].replace(/\s/g, ''))
-      //     ? Number(row[14].replace(/\s/g, '')) : 0
+      //     row[0], row[12] ? row[12] : 0,
+      //     row[11] && Number(row[11].replace(/\s/g, ''))
+      //     ? Number(row[11].replace(/\s/g, '')) : 0
       //   ];
       // });
       //
       // let colsPrepaid = 'Q';
+      //
+      // console.log(monthPrepaid);
       //
       // for (let x = 0; x < xArray.length; x++) {
       //
@@ -539,67 +535,68 @@ async function devReg() {
       // Refresh DDS (Olga)
       // -----------------------------------------------------------------------
 
-      // let srcRows = [];
-      // list = encodeURIComponent('ДДС_Ольга');
-      // range = list + '!A6:AK';
-      //
-      // srcRows = await crud.readData(config.sid_2017.dds, range);
-      //
-      // // = Normalizing of length "srcRows" =
-      // normLength(srcRows);
-      //
-      // await dbRefresh(pool, 'dds_olga', srcRows)
-      //   .then(async (results) => {console.log(results);})
-      //   .catch(console.err);
+      let ddsData = [];
+      list = encodeURIComponent('ДДС_Ольга');
+      range = list + '!A6:AD';
+
+      ddsData = await crud.readData(config.sid_2017.dds, range);
+
+      // = Normalizing of length "srcRows" =
+      normLength(ddsData);
+
+      await dbRefresh(pool, 'dds_olga', ddsData)
+        .then(async (results) => {console.log(results);})
+        .catch(console.err);
 
       //------------------------------------------------------------------------
       // Build params & update receipt of money from customers (prepaid & finalLy)
       //------------------------------------------------------------------------
 
-      // list = encodeURIComponent('Разработка (реестр)');
-      // let receiptParams = [[], [[],[]], [], [], []];
-      // let value = [];
-      //
-      // receiptParams[0] = 'Разработка сайта';
-      // receiptParams[1][0] = 'Поступление денег от клиентов (предоплата)';
-      // receiptParams[1][1] = 'Поступление от клиентов (оконч. оплата)';
-      //
-      // for (let x = 0; x < xArray.length; x++) {
-      //
-      //   receiptParams[2] = [];
-      //   receiptParams[3] = [];
-      //   receiptParams[4] = [];
-      //   cols = [[], []];
-      //
-      //   receiptParams[3].push(registry[xArray[x] - START][0]);
-      //   receiptParams[4].push(registry[xArray[x] - START][1]);
-      //
-      //   for (let m = 0; m < MONTHS.length; m++) {
-      //     receiptParams[2].push(MONTHS[m]);
-      //     cols[0] = cols[0].concat(colMonths[MONTHS[m]].slice(0, 2));
-      //     cols[1] = cols[1].concat(colMonths[MONTHS[m]].slice(2, 4));
-      //   }
-      //
-      //   let values = await devRegQuery(pool, 'dds_olga', receiptParams);
-      //
-      //   for (let c = 0; c < cols[0].length; c += 2) {
-      //
-      //     range = list + '!' + cols[0][c] + xArray[x] + ':' + cols[0][c + 1] + xArray[x];
-      //     value = [[values[c], values[c + 1]]];
-      //
-      //     console.log(value);
-      //
-      //     await crud.updateData(value, config.sid_2017.dev, range)
-      //       .then(async result => {console.log(result);})
-      //       .catch(console.err);
-      //
-      //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
-      //     await sleep(500);
-      //   }
-      //   console.log('Project: ' + x);
-      // }
-      // console.log(new Date());
-      // console.log('* The receipt of money from customers (prepaid & finalLy) *');
+      list = encodeURIComponent('Разработка (реестр)');
+      let receiptParams = [[], [[], [], []], [], [], []];
+      let value = [];
+
+      receiptParams[0] = 'Разработка сайта';
+      receiptParams[1][0] = 'Поступление от новых клиентов (продажа)';
+      receiptParams[1][1] = 'Поступление денег от сущ.клиентов (предоплата)';
+      receiptParams[1][1] = 'Поступление от сущ.клиентов (оконч. оплата)';
+
+      for (let x = 0; x < xArray.length; x++) {
+
+        receiptParams[2] = [];
+        receiptParams[3] = [];
+        receiptParams[4] = [];
+        cols = [[], []];
+
+        receiptParams[3].push(registry[xArray[x] - START][0]);
+        receiptParams[4].push(registry[xArray[x] - START][1]);
+
+        for (let m = 0; m < MONTHS.length; m++) {
+          receiptParams[2].push(MONTHS[m]);
+          cols[0] = cols[0].concat(colMonths[MONTHS[m]].slice(0, 2));
+          cols[1] = cols[1].concat(colMonths[MONTHS[m]].slice(2, 4));
+        }
+
+        let values = await devRegQuery(pool, 'dds_olga', receiptParams);
+
+        for (let c = 0; c < cols[0].length; c += 2) {
+
+          range = list + '!' + cols[0][c] + xArray[x] + ':' + cols[0][c + 1] + xArray[x];
+          value = [[values[c], values[c + 1]]];
+
+          console.log(value);
+
+          await crud.updateData(value, config.sid_2017.dev, range)
+            .then(async result => {console.log(result);})
+            .catch(console.err);
+
+          //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
+          await sleep(500);
+        }
+        console.log('Project: ' + x);
+      }
+      console.log(new Date());
+      console.log('* The receipt of money from customers (prepaid & finalLy) *');
 
       // --------------------------------------------------------------------------
       // Build ratioParams for "Ratio" and "factHours"

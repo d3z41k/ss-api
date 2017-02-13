@@ -49,6 +49,12 @@ router
     ctx.body = await domain();
 
   })
+  .get('/profi_kz', async ctx => {
+
+    const profi_kz = require('./ss-scripts/profi_kz');
+    ctx.body = await profi_kz();
+
+  })
   .get('/profi1', async ctx => {
 
     const profi1 = require('./ss-scripts/profi1');

@@ -2,7 +2,7 @@
 
 const config = require('config');
 
-async function dds_mon() {
+async function profi_kz() {
   return new Promise(async(resolve, reject) => {
 
     //-------------------------------------------------------------------------
@@ -11,12 +11,11 @@ async function dds_mon() {
 
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
-    const formatDate = require('../libs/format-date');
-    const sleep = require('../libs/sleep');
+    //const formatDate = require('../libs/format-date');
     //const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models-2017-1/db_refresh');
     const pool = require('../models-2017-1/db_pool');
-    const dds_monQuery = require('../models/db_dds_mon-query');
+    const profiKZuery = require('../models/db_profi_kz-query');
 
     //---------------------------------------------------------------
     // Main function
@@ -25,10 +24,8 @@ async function dds_mon() {
     async function start(auth) {
 
       const crud = new Crud(auth);
-      const START = 8;
-      const END = 100;
-      const DIRECTIONS = config.directions.common_cut;
-      const DEC = '(декада)';
+      const START =  'D27';
+      const END = 'I29';
 
       let list = '';
       let range = '';
@@ -38,7 +35,6 @@ async function dds_mon() {
         lera: '',
         olga: ''
       };
-
 
       //-------------------------------------------------------------
       // Read data from dds_lera to RAM
@@ -72,62 +68,51 @@ async function dds_mon() {
         .catch(console.log);
 
       //------------------------------------------------------------------------
-      // Build paramsMonDDS and get & update
+      // Build paramsProfiKZ and get & update
       //------------------------------------------------------------------------
 
-      let paramsMonDDS = [[], [], []];
+      let paramsProfiKZ = [[], [], []];
       let values = [];
       let sum1;
       let sum2;
 
       try {
 
-        for (let d = 0; d < DIRECTIONS.length; d++) {
+        //= Build params =
 
-          //= Get data from 'DDS_Jan' =
-          list = encodeURIComponent(DIRECTIONS[d] + DEC);
-          range = list + '!B1:C' + END;
-          let monDDS = await crud.readData(config.sid_2017.dds_jan, range);
+        paramsProfiKZ[0] = ['1', '2', '3', '4', '5', '6'];
+        paramsProfiKZ[1] = ['Готовый сайт (профи)'];
+        paramsProfiKZ[2] = [
+          'Поступление от новых клиентов (продажа)',
+          'Поступление денег от сущ.клиентов (предоплата)',
+          'Поступление от сущ.клиентов (оконч. оплата)'
+        ];
 
-          //= Build params =
-          paramsMonDDS[0].push(monDDS[3][0].slice(2));
-          paramsMonDDS[1].push(monDDS[1][1].trim());
+        //= Get values =
+        await Promise.all([
+          profiKZuery(pool, 'dds_lera', paramsProfiKZ),
+          profiKZuery(pool, 'dds_olga', paramsProfiKZ)
+        ])
+          .then(async ([s1, s2]) => {
+            sum1 = s1;
+            sum2 = s2;
+          })
+          .catch(console.log);
 
-
-          for (let a = (START - 1); a < monDDS.length; a++) {
-            if (monDDS[a][0] && monDDS[a][0][0] != '→') {
-              paramsMonDDS[2].push(monDDS[a][0].trim());
-            } else {
-              paramsMonDDS[2].push(' ');
-            }
+        for (let a = 0; a < sum1.length; a++) {
+          values.push([]);
+          for (let m = 0; m < sum1[a].length; m++) {
+            values[a].push(Number(sum1[a][m]) + Number(sum2[a][m]));
           }
+        }
 
-          //= Get values =
-          await Promise.all([
-            dds_monQuery(pool, 'dds_lera', paramsMonDDS),
-            dds_monQuery(pool, 'dds_olga', paramsMonDDS)
-          ])
-            .then(async ([s1, s2]) => {
-              sum1 = s1;
-              sum2 = s2;
-            })
-            .catch(console.log);
+        list = encodeURIComponent('Результаты');
+        range = list + '!' + START + ':' + END;
 
-          for (let i = 0; i < sum1.length; i++) {
-            values.push([Number(sum1[i]) + Number(sum2[i])]);
-          }
+        await crud.updateData(values, config.sid_2017.profi_kz, range)
+        //   .then(async results => {console.log(results);})
+           .catch(console.log);
 
-          console.log(values);
-
-          //= Update data =
-          range = list + '!N' + START + ':N' + END;
-
-          // await crud.updateData(values, config.sid_2017.dds_jan, range)
-          // //  .then(async results => {console.log(results);})
-          //   .catch(console.log);
-
-          await sleep(1000);
-        }// end direcions loop
 
       } catch (e) {
         reject(e.stack);
@@ -143,6 +128,7 @@ async function dds_mon() {
       // now = [[formatDate(now)]];
       //
       // await crud.updateData(now, config.sid_2017.monit, range);
+      //
 
     } // = End start function =
 
@@ -151,4 +137,4 @@ async function dds_mon() {
   });
 }
 
-module.exports = dds_mon;
+module.exports = profi_kz;
