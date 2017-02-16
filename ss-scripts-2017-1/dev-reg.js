@@ -1,6 +1,7 @@
 'use strict';
 
 const config = require('config');
+const _ = require('lodash/array');
 
 async function getRatio(salary, lawt, params, cutContractMonths) {
   return new Promise(async(resolve, reject) => {
@@ -253,9 +254,9 @@ async function devReg() {
     const normLength = require('../libs/normalize-length');
     const normType = require('../libs/normalize-type');
     const sleep = require('../libs/sleep');
-    const dbRefresh = require('../models/db_refresh');
-    const pool = require('../models/db_pool');
-    const devRegQuery = require('../models/db_dev-reg-query');
+    const dbRefresh = require('../models-2017-1/db_refresh');
+    const pool = require('../models-2017-1/db_pool');
+    const devRegQuery = require('../models-2017-1/db_dev-reg-query');
     const getPlanHours = require('../libs/dev-reg/getPlanHours');
     let abc = require('../libs/abc')();
 
@@ -265,13 +266,13 @@ async function devReg() {
 
       const CREW = 11;
       const START = 6;
-      const YEAR = [0 ,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-      const MONTHS = YEAR.slice(0, 7);
+      const YEAR = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+      const MONTHS = YEAR.slice(0, 6); // change half-year
       let list = '';
       let range = '';
 
       // //= Get months cols for develope registry =
-      const colMonths = config.reg_colMonths;
+      const COL_MONTH = config.reg_colMonths_1;
       let cols = '';
 
       //------------------------------------------------------------------------
@@ -548,99 +549,115 @@ async function devReg() {
         .then(async (results) => {console.log(results);})
         .catch(console.err);
 
-      //------------------------------------------------------------------------
-      // Build params & update receipt of money from customers (prepaid & finalLy)
-      //------------------------------------------------------------------------
-
-      list = encodeURIComponent('Разработка (реестр)');
-      let receiptParams = [[], [[], [], []], [], [], []];
-      let value = [];
-
-      receiptParams[0] = 'Разработка сайта';
-      receiptParams[1][0] = 'Поступление от новых клиентов (продажа)';
-      receiptParams[1][1] = 'Поступление денег от сущ.клиентов (предоплата)';
-      receiptParams[1][1] = 'Поступление от сущ.клиентов (оконч. оплата)';
-
-      for (let x = 0; x < xArray.length; x++) {
-
-        receiptParams[2] = [];
-        receiptParams[3] = [];
-        receiptParams[4] = [];
-        cols = [[], []];
-
-        receiptParams[3].push(registry[xArray[x] - START][0]);
-        receiptParams[4].push(registry[xArray[x] - START][1]);
-
-        for (let m = 0; m < MONTHS.length; m++) {
-          receiptParams[2].push(MONTHS[m]);
-          cols[0] = cols[0].concat(colMonths[MONTHS[m]].slice(0, 2));
-          cols[1] = cols[1].concat(colMonths[MONTHS[m]].slice(2, 4));
-        }
-
-        let values = await devRegQuery(pool, 'dds_olga', receiptParams);
-
-        for (let c = 0; c < cols[0].length; c += 2) {
-
-          range = list + '!' + cols[0][c] + xArray[x] + ':' + cols[0][c + 1] + xArray[x];
-          value = [[values[c], values[c + 1]]];
-
-          console.log(value);
-
-          await crud.updateData(value, config.sid_2017.dev, range)
-            .then(async result => {console.log(result);})
-            .catch(console.err);
-
-          //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
-          await sleep(500);
-        }
-        console.log('Project: ' + x);
-      }
-      console.log(new Date());
-      console.log('* The receipt of money from customers (prepaid & finalLy) *');
+      // //------------------------------------------------------------------------
+      // // Build params & update receipt of money from customers (prepaid & finalLy)
+      // //------------------------------------------------------------------------
+      //
+      // list = encodeURIComponent('Разработка (реестр)');
+      // let receiptParams = [[], [[], [], []], [], [], []];
+      //
+      // try {
+      //
+      //   receiptParams[0] = 'Разработка сайта'; //direction
+      //   receiptParams[1][0] = 'Поступление от новых клиентов (продажа)'; //article
+      //   receiptParams[1][1] = 'Поступление денег от сущ.клиентов (предоплата)'; //article
+      //   receiptParams[1][2] = 'Поступление от сущ.клиентов (оконч. оплата)'; //article
+      //   receiptParams[2] = MONTHS;
+      //
+      //   for (let x = 0; x < xArray.length; x++) {
+      //     receiptParams[3].push(registry[xArray[x] - START][0]); //site
+      //     receiptParams[4].push(registry[xArray[x] - START][1]); //counterparty
+      //   }
+      //
+      // } catch (e) {
+      //   reject(e.stack)
+      // }
+      //
+      // let values = await devRegQuery(pool, 'dds_olga', receiptParams, CREW);
+      //
+      // let zipValues = [];
+      // let arrRange = [];
+      // let arrFuncions = [];
+      //
+      // //= Zip valuses =
+      // values.forEach(val => {
+      //   let arrArticles = [];
+      //   for (let a = 0; a < val.length; a++) {
+      //     arrArticles.push(val[a]);
+      //   }
+      //
+      //   // !! Hardcode 6 params, months (a half-year)
+      //   zipValues.push(_.zip(
+      //     arrArticles[0],
+      //     arrArticles[1],
+      //     arrArticles[2],
+      //     arrArticles[3],
+      //     arrArticles[4],
+      //     arrArticles[5]
+      //   ));
+      // });
+      //
+      // //= Prepare array of Range =
+      // for (let month in COL_MONTH){
+      //   arrRange.push(list + '!' + COL_MONTH[month][0] + START + ':' + COL_MONTH[month][2]);
+      // }
+      //
+      // //= Prepare array of Functions =
+      // zipValues.forEach((arrValues, i)=> {
+      //   arrFuncions.push(crud.updateData(arrValues, config.sid_2017.dev, arrRange[i]));
+      // });
+      //
+      // //= Update data =
+      // await Promise.all(arrFuncions)
+      //   .then(async (results) => {console.log(results);})
+      //   .catch(console.log);
+      //
+      // console.log(new Date());
+      // console.log('* The receipt of money from customers (prepaid & finally) *');
 
       // --------------------------------------------------------------------------
       // Build ratioParams for "Ratio" and "factHours"
       // --------------------------------------------------------------------------
 
-      // let ratioParams = [[], [], []];
-      //
-      // //= l.a.w.t - The list accounting work time =
-      // let lawt = {
-      //   name: [],
-      //   table: []
-      // };
-      //
-      // for (let x = 0; x < xArray.length; x++) {
-      //
-      //   ratioParams[0].push([]);
-      //   ratioParams[1].push([]);
-      //   ratioParams[2].push([]);
-      //
-      //   for (let i = (xArray[x] - START); i < (xArray[x] - START) + CREW; i++) {
-      //      if (registry[i][7]) {
-      //        ratioParams[0][x].push(registry[i][7]);
-      //
-      //        // = Get object lawt name[0] -> table[0] etc. =
-      //        if (!lawt.name.includes(registry[i][7])) {
-      //          lawt.name.push(registry[i][7]);
-      //          list = encodeURIComponent(registry[i][7]);
-      //          range = list + '!B10:L1000';
-      //          lawt.table.push(await crud.readData(config.sid_2017.lawt, range));
-      //        }
-      //     }
-      //   }
-      //
-      //   for (let m = 0; m < cutActionMonths[x].length; m++) {
-      //       ratioParams[1][x].push(cutActionMonths[x][m]);
-      //   }
-      //   ratioParams[2][x].push(registry[xArray[x] - START][0]);
-      //
-      // }
-      //
-      // list = encodeURIComponent('ФОТ (факт)');
-      // range = list + '!A6:ER77';
-      //
-      // let salary = await crud.readData(config.sid_2017.salary, range);
+      let ratioParams = [[], [], []];
+
+      //= l.a.w.t - The list accounting work time =
+      let lawt = {
+        name: [],
+        table: []
+      };
+
+      for (let x = 0; x < xArray.length; x++) {
+
+        ratioParams[0].push([]);
+        ratioParams[1].push([]);
+        ratioParams[2].push([]);
+
+        for (let i = (xArray[x] - START); i < (xArray[x] - START) + CREW; i++) {
+           if (registry[i][7]) {
+             ratioParams[0][x].push(registry[i][7]);
+
+             // = Get object lawt name[0] -> table[0] etc. =
+             if (!lawt.name.includes(registry[i][7])) {
+               lawt.name.push(registry[i][7]);
+               list = encodeURIComponent(registry[i][7]);
+               range = list + '!B10:L1000';
+               lawt.table.push(await crud.readData(config.sid_2017.lawt, range));
+             }
+          }
+        }
+
+        for (let m = 0; m < cutActionMonths[x].length; m++) {
+            ratioParams[1][x].push(cutActionMonths[x][m]);
+        }
+        ratioParams[2][x].push(registry[xArray[x] - START][0]);
+
+      }
+
+      list = encodeURIComponent('ФОТ (факт)');
+      range = list + '!A6:ER77';
+
+      let salary = await crud.readData(config.sid_2017.salary, range);
 
       //--------------------------------------------------------------------------
       // Get & Insert "Ratio & factHours"

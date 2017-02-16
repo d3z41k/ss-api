@@ -530,7 +530,7 @@ async function extraReg() {
 
       list = encodeURIComponent('Доп. работы (реестр)');
 
-      for (let x = 0; x < xArray.length; x++) {
+      for (let x = 63; x < xArray.length; x++) { //change this
         cols = [[], [], []];
 
         for (let m = 0; m < cutActionMonths[x].length; m++) {

@@ -693,7 +693,7 @@ async function amoReg() {
 
         list = encodeURIComponent('AMO (реестр)');
 
-        for (let x = 60; x < xArray.length; x++) { //This change!
+        for (let x = 0; x < xArray.length; x++) { //This change!
           cols = [[], [], []];
 
           for (let m = 0; m < cutActionMonths[x].length; m++) {
