@@ -438,83 +438,57 @@ async function devReg() {
         }
       });
 
-      //--------------------------------------------------------------------------
+      //------------------------------------------------------------------------
       // Get & Insert "Ratio & factHours"
-      //--------------------------------------------------------------------------
+      //------------------------------------------------------------------------
 
       let [ratio, factHours, warrentyHours] = await getRatioHours(salaryData, lawt, ratioParams, cutContractMonths, accruedIndex);
 
-      //list = encodeURIComponent('Разработка (реестр)');
-      //
-      // for (let x = 0; x < xArray.length; x++) {
-      //   cols = [[], [], []];
-      //
-      //   for (let m = 0; m < cutActionMonths[x].length; m++) {
-      //      cols[1] = cols[1].concat(colMonths[cutActionMonths[x][m]].slice(2, 4));
-      //   }
-      //
-      //   for (let c = 0; c < cols[1].length; c += 2) {
-      //
-      //     range = list + '!' + cols[1][c] + xArray[x] + ':' + cols[1][c + 1] + (xArray[x] + (CREW - 1));
-      //     let value = [];
-      //     if (!c) {
-      //       value = [];
-      //       for (let i = 0; i < CREW; i++) {
-      //         if (i < ratio[x][c].length){
-      //           value.push([ratio[x][c][i], factHours[x][c][i]]);
-      //         } else {
-      //           value.push([0, 0]);
-      //         }
-      //
-      //       }
-      //     } else {
-      //       value = [];
-      //       for (let i = 0; i < CREW; i++) {
-      //         if (i < ratio[x][c / 2].length) {
-      //           value.push([ratio[x][c / 2][i], factHours[x][c / 2][i]]);
-      //         } else {
-      //           value.push([0, 0]);
-      //         }
-      //
-      //       }
-      //     }
-      //
-      //     await crud.updateData(value, config.sid_2017.dev, range)
-      //       .then(async result => {console.log(result);})
-      //       .catch(console.err);
-      //
-      //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
-      //     await sleep(500);
-      //
-      //  }
-      //
-      //   let value = [];
-      //
-      //   for (let m = 0; m < cutActionMonths[x].length; m++) {
-      //      cols[2] = cols[2].concat(colMonths[cutActionMonths[x][m]].slice(4));
-      //   }
-      //
-      //   for (let c = 0; c < cols[2].length; c++) {
-      //     range = list + '!' + cols[2][c] + xArray[x] + ':' + cols[2][c] + (xArray[x] + (CREW - 1));
-      //     value = [];
-      //
-      //     for (let i = 0; i < CREW; i++) {
-      //       value.push([warrentyHours[x][c][i] ? warrentyHours[x][c][i] : 0]);
-      //     }
-      //
-      //     await crud.updateData(value, config.sid_2017.dev, range)
-      //       .then(async result => {console.log(result);})
-      //       .catch(console.err);
-      //
-      //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
-      //     await sleep(500);
-      //   }
-      //
-      // console.log('Project: ' + x);
-      //
+      list = encodeURIComponent('Разработка (реестр)');
+
+      // let arrFuncions = [];
+      // let arrRange = {
+      //   'ratio': [],
+      //   'factHours': [],
+      //   'warrentyHours': []
       // }
-      // console.log(new Date());
-      // console.log('* ratioParams for Ratio and factHours *');
+      //
+      // //= Prepare array of ratio range & functions =
+      // for (let month in COL_MONTH) {
+      //   let letter = COL_MONTH[month].slice(3, 4);
+      //   arrRange.ratio.push(list + '!' + letter + START + ':' + letter);
+      // }
+      //
+      // ratio.forEach((arrValues, i)=> {
+      //   arrFuncions.push(crud.updateData(arrValues, config.sid_2017.dev, arrRange.ratio[i]));
+      // });
+      //
+      // //= Prepare array of factHours range & functions =
+      // for (let month in COL_MONTH) {
+      //   let letter = COL_MONTH[month].slice(4, 5);
+      //   arrRange.factHours.push(list + '!' + letter + START + ':' + letter);
+      // }
+      //
+      // factHours.forEach((arrValues, i)=> {
+      //   arrFuncions.push(crud.updateData(arrValues, config.sid_2017.dev, arrRange.factHours[i]));
+      // });
+      //
+      // //= Prepare array of warrentyHours range & functions =
+      // for (let month in COL_MONTH) {
+      //   let letter = COL_MONTH[month].slice(5);
+      //   arrRange.warrentyHours.push(list + '!' + letter + START + ':' + letter);
+      // }
+      //
+      // warrentyHours.forEach((arrValues, i) => {
+      //   arrFuncions.push(crud.updateData(arrValues, config.sid_2017.dev, arrRange.warrentyHours[i]));
+      // });
+      //
+      // //= Update data =
+      // await Promise.all(arrFuncions)
+      //   .then(async (results) => {console.log(results);})
+      //   .catch(console.log);
+      //
+      //  console.log('* ratioParams for Ratio and factHours *');
 
       //------------------------------------------------------------------------
       // Build params for Margin
