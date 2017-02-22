@@ -389,62 +389,62 @@ async function devReg() {
       // Build ratioParams for "Ratio" and "factHours"
       // --------------------------------------------------------------------------
 
-      let ratioParams = [[], [], []];
-
-      //= l.a.w.t - The list accounting work time =
-      let lawt = {
-        name: [],
-        table: []
-      };
-
-      for (let i = (xArray[0] - START); i < (xArray[0] - START) + CREW; i++) {
-        ratioParams[0].push(registryData[i][7]); //staff
-        if (!lawt.name.includes(registryData[i][7])) {
-          lawt.name.push(registryData[i][7]); //lawt names
-          list = encodeURIComponent(registryData[i][7]);
-          range = list + '!B10:L1000';
-          lawt.table.push(await crud.readData(config.sid_2017.lawt, range)); //lawt tables
-        }
-      }
-
-      for (let x = 0; x < xArray.length; x++) {
-        ratioParams[1].push([]);
-        for (let m = 0; m < cutActionMonths[x].length; m++) {
-            ratioParams[1][x].push(cutActionMonths[x][m]); //action month
-        }
-        ratioParams[2].push(registryData[xArray[x] - START][0]); //sites
-      }
-
-      list = encodeURIComponent('ФОТ (факт)');
-      range = list + '!A6:ER77';
-
-      let salaryData = await crud.readData(config.sid_2017.salary, range);
-
-      let accruedMonth = config.accruedMonth_1;
-      let accruedIndex = {
-        '1': '',
-        '2': '',
-        '3': '',
-        '4': '',
-        '5': '',
-        '6': ''
-      };
-
-      abc.forEach((letter, l) => {
-        for (let month in accruedMonth) {
-          if (letter == accruedMonth[month]) {
-            accruedIndex[month] = l;
-          }
-        }
-      });
-
-      //------------------------------------------------------------------------
-      // Get & Insert "Ratio & factHours"
-      //------------------------------------------------------------------------
-
-      let [ratio, factHours, warrentyHours] = await getRatioHours(salaryData, lawt, ratioParams, cutContractMonths, accruedIndex);
-
-      list = encodeURIComponent('Разработка (реестр)');
+      // let ratioParams = [[], [], []];
+      //
+      // //= l.a.w.t - The list accounting work time =
+      // let lawt = {
+      //   name: [],
+      //   table: []
+      // };
+      //
+      // for (let i = (xArray[0] - START); i < (xArray[0] - START) + CREW; i++) {
+      //   ratioParams[0].push(registryData[i][7]); //staff
+      //   if (!lawt.name.includes(registryData[i][7])) {
+      //     lawt.name.push(registryData[i][7]); //lawt names
+      //     list = encodeURIComponent(registryData[i][7]);
+      //     range = list + '!B10:L1000';
+      //     lawt.table.push(await crud.readData(config.sid_2017.lawt, range)); //lawt tables
+      //   }
+      // }
+      //
+      // for (let x = 0; x < xArray.length; x++) {
+      //   ratioParams[1].push([]);
+      //   for (let m = 0; m < cutActionMonths[x].length; m++) {
+      //       ratioParams[1][x].push(cutActionMonths[x][m]); //action month
+      //   }
+      //   ratioParams[2].push(registryData[xArray[x] - START][0]); //sites
+      // }
+      //
+      // list = encodeURIComponent('ФОТ (факт)');
+      // range = list + '!A6:ER77';
+      //
+      // let salaryData = await crud.readData(config.sid_2017.salary, range);
+      //
+      // let accruedMonth = config.accruedMonth_1;
+      // let accruedIndex = {
+      //   '1': '',
+      //   '2': '',
+      //   '3': '',
+      //   '4': '',
+      //   '5': '',
+      //   '6': ''
+      // };
+      //
+      // abc.forEach((letter, l) => {
+      //   for (let month in accruedMonth) {
+      //     if (letter == accruedMonth[month]) {
+      //       accruedIndex[month] = l;
+      //     }
+      //   }
+      // });
+      //
+      // //------------------------------------------------------------------------
+      // // Get & Insert "Ratio & factHours"
+      // //------------------------------------------------------------------------
+      //
+      // let [ratio, factHours, warrentyHours] = await getRatioHours(salaryData, lawt, ratioParams, cutContractMonths, accruedIndex);
+      //
+      // list = encodeURIComponent('Разработка (реестр)');
 
       // let arrFuncions = [];
       // let arrRange = {
@@ -494,66 +494,112 @@ async function devReg() {
       // Build params for Margin
       //------------------------------------------------------------------------
 
-      // //= Build ABC for margin params =
-      // abc = abc.slice(2, 120);
-      // let colsMargin = config.colsMargin;
-      //
-      // const quantity = 4;
-      // let jArray = [];
-      //
-      // for (let x = 0; x < xArray.length; x++) {
-      //   let paramsMargin = [];
-      //
-      //   for (let i = 0; i < 32; i++) {
-      //     paramsMargin.push([]);
-      //   }
-      //
-      //   //= Push site in params =
-      //   paramsMargin[0].push(registryData[xArray[x] - START][0]);
-      //
-      //   //= Push debt "P" in params =
-      //   let col = abc.indexOf(colsMargin.debt);
-      //   registryData[xArray[x] - START][col] && Number(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //     ? paramsMargin[1].push(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //     : paramsMargin[1].push(0);
-      //
-      //   //= Push salaryData of CREW (x11) in params =
-      //   for (let i = xArray[x] - START; i < xArray[x] - START + CREW; i++) {
-      //     let count = 0;
-      //      for (let j = 2; j < (paramsMargin.length - 3); j += quantity) {
-      //       let sCol = abc.indexOf(colsMargin.salaryData[count]);
-      //       registryData[i][sCol] && Number(registryData[i][sCol].replace(/\s/g, '').replace(/,/g, '.'))
-      //           ? Number(paramsMargin[j].push(registryData[i][sCol].replace(/\s/g, '').replace(/,/g, '.')))
-      //           : paramsMargin[j].push(0);
-      //       jArray.push(j);
-      //
-      //       j++;
-      //
-      //       let wCol = abc.indexOf(colsMargin.warranty[count]);
-      //       registryData[i][wCol] && Number(registryData[i][wCol].replace(/\s/g, '').replace(/,/g, '.'))
-      //           ? Number(paramsMargin[j].push(registryData[i][wCol].replace(/\s/g, '').replace(/,/g, '.')))
-      //           : paramsMargin[j].push(0);
-      //
-      //       jArray.push(j);
-      //       count++;
-      //     }
-      //   }
-      //
-      //   //= Push other cost (common for project) in params =
-      //   let count = 0;
-      //
-      //   for (let n = 3; n < paramsMargin.length; n++) {
-      //     if (!jArray.includes(n)) {
-      //       let col = abc.indexOf(colsMargin.other[count]);
-      //       registryData[xArray[x] - START][col] && Number(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-      //         ? Number(paramsMargin[n].push(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.')))
-      //         : paramsMargin[n].push(0);
-      //       count++;
-      //     }
-      //   }
-      //
-      //   //console.log(paramsMargin);
-      //
+      //= Build ABC for margin params =
+      abc = abc.slice(2, 120);
+      let colsMargin = config.colsMargin_1;
+      let paramsMargin = [[], [], [], [], []];
+
+      // try {
+
+        for (let x = 0; x < xArray.length; x++) {
+
+          //paramsMargin = [];
+
+          //= Push site in params =
+          paramsMargin[0].push(registryData[xArray[x] - START][0]);
+
+          //= Push debt "P" in params =
+          let col = abc.indexOf(colsMargin.debt);
+          registryData[xArray[x] - START][col] && Number(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+            ? paramsMargin[1].push(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+            : paramsMargin[1].push(0);
+        }
+        //--------------------------------------------------------------------
+
+        //console.log(abc.indexOf(colsMargin.salary[0]));
+
+        for (var m = 0; m < MONTHS.length; m++) {
+          let sCol = abc.indexOf(colsMargin.salary[m]);
+          let wCol = abc.indexOf(colsMargin.warranty[m]);
+          let oCol = [];
+          for (let i = 0; i < colsMargin.other[m].length; i++) {
+            oCol.push(abc.indexOf(colsMargin.other[m][i]));
+          }
+          paramsMargin[2].push([]);
+          paramsMargin[3].push([]);
+          paramsMargin[4].push([]);
+
+          for (let x = 0; x < xArray.length; x++) {
+            paramsMargin[2][m].push([]);
+            paramsMargin[3][m].push([]);
+            paramsMargin[4][m].push([]);
+
+            for (let i = 0; i < colsMargin.other[m].length; i++) {
+              registryData[xArray[x] - START][oCol[i]] && Number(registryData[xArray[x] - START][oCol[i]].replace(/\s/g, '').replace(/,/g, '.'))
+                ? paramsMargin[4][m][x].push(Number(registryData[xArray[x] - START][oCol[i]].replace(/\s/g, '').replace(/,/g, '.')))
+                : paramsMargin[4][m][x].push(0);
+            }
+
+            for (let p = 0; p < registryData.length; p++) {
+              if (paramsMargin[0][x] == registryData[p][0]) {
+
+                registryData[x][sCol] && Number(registryData[p][sCol].replace(/\s/g, '').replace(/,/g, '.'))
+                  ? paramsMargin[2][m][x].push(Number(registryData[p][sCol].replace(/\s/g, '').replace(/,/g, '.')))
+                  : paramsMargin[2][m][x].push(0);
+
+                registryData[x][wCol] && Number(registryData[p][wCol].replace(/\s/g, '').replace(/,/g, '.'))
+                  ? paramsMargin[3][m][x].push(Number(registryData[p][wCol].replace(/\s/g, '').replace(/,/g, '.')))
+                  : paramsMargin[3][m][x].push(0);
+
+              }
+            }
+          }
+        }
+
+        console.log(require('util').inspect(paramsMargin[4], { depth: null }));
+
+        //= Push salaryData of CREW (x11) in params =
+        // for (let i = xArray[x] - START; i < xArray[x] - START + CREW; i++) {
+        //   let count = 0;
+        //    for (let j = 2; j < (paramsMargin.length - 3); j += quantity) {
+        //     let sCol = abc.indexOf(colsMargin.salaryData[count]);
+        //     registryData[i][sCol] && Number(registryData[i][sCol].replace(/\s/g, '').replace(/,/g, '.'))
+        //         ? Number(paramsMargin[j].push(registryData[i][sCol].replace(/\s/g, '').replace(/,/g, '.')))
+        //         : paramsMargin[j].push(0);
+        //     jArray.push(j);
+        //
+        //     j++;
+        //
+        //     let wCol = abc.indexOf(colsMargin.warranty[count]);
+        //     registryData[i][wCol] && Number(registryData[i][wCol].replace(/\s/g, '').replace(/,/g, '.'))
+        //         ? Number(paramsMargin[j].push(registryData[i][wCol].replace(/\s/g, '').replace(/,/g, '.')))
+        //         : paramsMargin[j].push(0);
+        //
+        //     jArray.push(j);
+        //     count++;
+        //   }
+        // }
+        //
+        //   //= Push other cost (common for project) in params =
+        //   let count = 0;
+        //
+        //   for (let n = 3; n < paramsMargin.length; n++) {
+        //     if (!jArray.includes(n)) {
+        //       let col = abc.indexOf(colsMargin.other[count]);
+        //       registryData[xArray[x] - START][col] && Number(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+        //         ? Number(paramsMargin[n].push(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.')))
+        //         : paramsMargin[n].push(0);
+        //       count++;
+        //     }
+        //   }
+
+
+
+      // } catch (e) {
+      //   reject(e.stack)
+      // }
+
+
       //   //= Get & Insert values of "Margin & Margins" =
       //   let margin = await getMargin(contractSum, paramsMargin);
       //   let margins = 0;
@@ -576,7 +622,7 @@ async function devReg() {
       //
       //     console.log([margin, margins]);
       //
-      // }
+
       // console.log(new Date());
       // console.log('* Update for Margin *');
 
