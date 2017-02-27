@@ -146,7 +146,7 @@ async function devReg() {
           row[0],
           row[9] && Number(row[9].replace(/\s/g, ''))
           ? Number(row[9].replace(/\s/g, '')) : 0
-        ]
+        ];
       });
 
       //------------------------------------------------------------------------
@@ -499,7 +499,7 @@ async function devReg() {
       let colsMargin = config.colsMargin_1;
       let paramsMargin = [[], [], [], [], []];
 
-      // try {
+      try {
 
         for (let x = 0; x < xArray.length; x++) {
 
@@ -556,75 +556,55 @@ async function devReg() {
           }
         }
 
-        console.log(require('util').inspect(paramsMargin[4], { depth: null }));
+      } catch (e) {
+        reject(e.stack);
+      }
 
-        //= Push salaryData of CREW (x11) in params =
-        // for (let i = xArray[x] - START; i < xArray[x] - START + CREW; i++) {
-        //   let count = 0;
-        //    for (let j = 2; j < (paramsMargin.length - 3); j += quantity) {
-        //     let sCol = abc.indexOf(colsMargin.salaryData[count]);
-        //     registryData[i][sCol] && Number(registryData[i][sCol].replace(/\s/g, '').replace(/,/g, '.'))
-        //         ? Number(paramsMargin[j].push(registryData[i][sCol].replace(/\s/g, '').replace(/,/g, '.')))
-        //         : paramsMargin[j].push(0);
-        //     jArray.push(j);
-        //
-        //     j++;
-        //
-        //     let wCol = abc.indexOf(colsMargin.warranty[count]);
-        //     registryData[i][wCol] && Number(registryData[i][wCol].replace(/\s/g, '').replace(/,/g, '.'))
-        //         ? Number(paramsMargin[j].push(registryData[i][wCol].replace(/\s/g, '').replace(/,/g, '.')))
-        //         : paramsMargin[j].push(0);
-        //
-        //     jArray.push(j);
-        //     count++;
-        //   }
-        // }
-        //
-        //   //= Push other cost (common for project) in params =
-        //   let count = 0;
-        //
-        //   for (let n = 3; n < paramsMargin.length; n++) {
-        //     if (!jArray.includes(n)) {
-        //       let col = abc.indexOf(colsMargin.other[count]);
-        //       registryData[xArray[x] - START][col] && Number(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-        //         ? Number(paramsMargin[n].push(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.')))
-        //         : paramsMargin[n].push(0);
-        //       count++;
-        //     }
-        //   }
+      //console.log(require('util').inspect(paramsMargin, { depth: null }));
 
 
+      //= Get & Insert values of "Margin & Margins" =
 
-      // } catch (e) {
-      //   reject(e.stack)
-      // }
+      let margin = await getMargin(contractSum, paramsMargin);
+      let margins = [];
+      let marginAll = [];
+      let marginsAll = [];
+
+      for (let p = 0; p < paramsMargin[0].length; p++) {
+        margins.push([]);
+        for (let c = 0; c < contractSum.length; c++) {
+          if(contractSum[c][0] == paramsMargin[0][p]) {
+            margins[p].push(margin[p][0] ? margin[p][0] / contractSum[c][1] : 0);
+
+            //= Cut to 2 number after poin =
+            margins[p][0] = margins[p][0].toFixed(2);
+          }
+        }
+      }
+
+      for (let p = 0; p < margin.length; p++) {
+        marginAll.push(margin[p]);
+        for (let c = 0; c < CREW; c++) {
+          marginAll.push([]);
+        }
+      }
+
+      console.log(marginAll);
 
 
-      //   //= Get & Insert values of "Margin & Margins" =
-      //   let margin = await getMargin(contractSum, paramsMargin);
-      //   let margins = 0;
-      //
-      //   for (let c = 0; c < contractSum.length; c++) {
-      //     if(contractSum[c][0] == paramsMargin[0]) {
-      //       margins = margin ? margin / contractSum[c][1] : 0;
-      //     }
-      //   }
-      //
-      //   //= Cut to 2 number after poin =
-      //   margins = margins.toFixed(2);
-      //
-      //   list = encodeURIComponent('Разработка (реестр)');
-      //   range = list + '!N' + xArray[x] + ':O' + xArray[x];
-      //
-      //   await crud.updateData([[margin, margins]], config.sid_2017.dev, range)
-      //     .then(async result => {console.log(result);})
-      //     .catch(console.err);
-      //
-      //     console.log([margin, margins]);
-      //
+      let colMargin = config.colsMargin_1.margin;
+      let colMargins = config.colsMargin_1.margins;
 
-      // console.log(new Date());
-      // console.log('* Update for Margin *');
+      list = encodeURIComponent('Разработка (реестр)');
+      let range1 = list + '!' + colMargin + START + ':' + colMargin;
+      let range2 = list + '!' + colMargins + START + ':' + colMargins;
+
+      // await Promise.all([
+      //   crud.updateData(margin, config.sid_2017.dev, range1),
+      //   crud.updateData(margins, config.sid_2017.dev, range2),
+      // ])
+      //   .then(async result => {console.log(result);})
+      //   .catch(console.err);
 
       //-------------------------------------------------------------
       // Update date-time in "Monitoring"

@@ -15,6 +15,7 @@ async function finState(nowMonths) {
     const formatDate = require('../libs/format-date');
     const dbRefresh = require('../models/db_refresh');
     const pool = require('../models/db_pool');
+    const sleep = require('../libs/sleep');
 
     //---------------------------------------------------------------
     // Main function
@@ -137,8 +138,14 @@ async function finState(nowMonths) {
               .then(async (result) => {console.log(result);})
               .catch(console.log);
 
+            await sleep(1000);
+
           }
+          await sleep(1000);
         }
+        await sleep(1000);
+
+        console.log(division);
 
       }
 

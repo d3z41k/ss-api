@@ -364,15 +364,15 @@ async function devReg() {
       // Build params for allHours
       //------------------------------------------------------------------------
 
-      // let paramsHours = [[], []];
-      //
-      // for (let x = 0; x < xArray.length; x++) {
-      //   paramsHours[0].push(registry[xArray[x] - START][4]);
-      //   paramsHours[1].push([]);
-      //   for (let c = (xArray[x] - START); c < (xArray[x] - START + CREW); c++) {
-      //       paramsHours[1][x].push(registry[c][6]);
-      //   }
-      // }
+      let paramsHours = [[], []];
+
+      for (let x = 0; x < xArray.length; x++) {
+        paramsHours[0].push(registry[xArray[x] - START][4]);
+        paramsHours[1].push([]);
+        for (let c = (xArray[x] - START); c < (xArray[x] - START + CREW); c++) {
+            paramsHours[1][x].push(registry[c][6]);
+        }
+      }
 
       //------------------------------------------------------------------------
       // Get data (hours and type) from 'normative'
