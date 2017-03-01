@@ -91,6 +91,12 @@ router
     ctx.body = await dds_mon();
 
   })
+  .get('/dds_mon-salary', async ctx => {
+
+    const dds_monSalary = require('./ss-scripts-2017-1/dds_mon-salary');
+    ctx.body = await dds_monSalary();
+
+  })
   .get('/profi_kz', async ctx => {
 
     const profi_kz = require('./ss-scripts-2017-1/profi_kz');

@@ -97,7 +97,7 @@ async function dds_mon() {
               sum2 = [];
               let mode = 1;
 
-              //= Get data from 'DDS_Jan' =
+              //= Get data from 'DDS_Mon' =
               list = encodeURIComponent(DIRECTIONS[d] + DEC);
               range = list + '!B1:C' + END;
               let monDDS = await crud.readData(SIDS[mon], range);
