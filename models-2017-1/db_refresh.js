@@ -25,7 +25,7 @@ async function dbRefresh(pool, tableName, srcRows) {
       if (srcRows[i][5]) {
         if (srcRows[i][5] && srcRows[i][5][0] == '(' && srcRows[i][5][srcRows[i][5].length - 1] == ')') {
           srcRows[i][5] = srcRows[i][5].slice(1).slice(0, -1);
-          srcRows[i][5] = '-' + srcRows[i][5]
+          srcRows[i][5] = '-' + srcRows[i][5];
         }
         srcRows[i][5] = Number(srcRows[i][5].replace(/\s/g, ''));
       }
@@ -42,7 +42,7 @@ async function dbRefresh(pool, tableName, srcRows) {
 
       await pool.query("INSERT INTO " + tableName + " VALUES (NULL, '" + srcRows[i].join('\', \'') + "')")
         .catch(err => {
-          reject(err)
+          reject(err);
         });
 
     }

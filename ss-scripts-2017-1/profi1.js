@@ -129,9 +129,9 @@ async function profi1(months) {
 
             for (let i = 0; i < dataKZ.length; i++) {
               let row = dataKZ[i];
-              row[0] ? paramsKZ[3].push(row[0]) : ''; //themes
-              row[1] ? paramsKZ[4].push(row[1]) : ''; //city
-              row[4] ? paramsKZ[5].push(row[4]) : ''; //counterparty
+              paramsKZ[3].push(row[0]); //themes
+              paramsKZ[4].push(row[1]); //city
+              paramsKZ[5].push(row[4]); //counterparty
             }
 
             //--------------------------------------------------------------
@@ -198,9 +198,9 @@ async function profi1(months) {
 
             for (let i = 0; i < dataProfi.length; i++) {
               let row = dataProfi[i];
-              row[0] ? paramsProfi[3].push(row[0]) : ''; //themes
-              row[1] ? paramsProfi[4].push(row[1]) : ''; //city
-              row[4] ? paramsProfi[5].push(row[4]) : ''; //counterparty
+              paramsProfi[3].push(row[0]); //themes
+              paramsProfi[4].push(row[1]); //city
+              paramsProfi[5].push(row[4]); //counterparty
             }
 
             //--------------------------------------------------------------

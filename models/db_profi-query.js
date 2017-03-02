@@ -6,13 +6,9 @@ async function profiQuery(pool, params) {
     try {
 
       for (let m = 0; m < params[2].length; m++) {
-
         sum.push([]);
-
         for (let a = 0; a < params[1].length; a++) {
-
           sum[m].push([]);
-
           for (let i = 0; i < params[3].length; i++) {
 
             await pool.execute('SELECT SUM(`Сумма итого руб`) FROM `dds_lera` WHERE ' +
