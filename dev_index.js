@@ -85,16 +85,25 @@ router
     ctx.body = await domain();
 
   })
-  .get('/dds_mon', async ctx => {
+  .get('/dds_mon/:mon', async ctx => {
 
     const dds_mon = require('./ss-scripts-2017-1/dds_mon');
-    ctx.body = await dds_mon();
+    let mon = [ctx.params.mon];
+    ctx.body = await dds_mon(mon);
 
   })
-  .get('/dds_mon-salary', async ctx => {
+  .get('/dds_mon-salary/:mon', async ctx => {
 
     const dds_monSalary = require('./ss-scripts-2017-1/dds_mon-salary');
-    ctx.body = await dds_monSalary();
+    let mon = [ctx.params.mon];
+    ctx.body = await dds_monSalary(mon);
+
+  })
+  .get('/dds_mon-indirect/:mon', async ctx => {
+
+    const dds_monIndirect = require('./ss-scripts-2017-1/dds_mon-indirect');
+    let mon = [ctx.params.mon];
+    ctx.body = await dds_monIndirect(mon);
 
   })
   .get('/profi_kz', async ctx => {

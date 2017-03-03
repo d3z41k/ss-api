@@ -3,7 +3,7 @@
 const config = require('config');
 
 async function dds_monSalary(mon) {
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async(resolve, reject) => {
 
     //-------------------------------------------------------------------------
     // Usres libs
@@ -13,11 +13,11 @@ async function dds_monSalary(mon) {
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
     const normalizeMinus = require('../libs/normalize-minus');
-    //const sleep = require('../libs/sleep');
+    const sleep = require('../libs/sleep');
     //const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models-2017-1/db_refresh');
     const pool = require('../models-2017-1/db_pool');
-    const dds_salaryQuery = require('../models/db_dds-salary-query');
+    const dds_indirectQuery = require('../models/db_dds-indirect-query');
 
     //-------------------------------------------------------------------------
     // Main function
@@ -26,7 +26,7 @@ async function dds_monSalary(mon) {
     async function start(auth) {
 
       const crud = new Crud(auth);
-      
+
       const SIDS = config.sid_2017.dds_mon;
       const START = 9;
       const MONTHS = config.months;
@@ -43,52 +43,15 @@ async function dds_monSalary(mon) {
         'olga': ''
       };
 
-      list = encodeURIComponent('Табель 2017');
-      range = list + '!B2:O80';
+      list = encodeURIComponent('Спр');
+      range = list + '!J2:J100';
 
-      let dataReport = await crud.readData(config.sid_2017.report, range);
-      let prepairDataReport = [];
+      let dataManDDS = await crud.readData(config.sid_2017.dds, range);
 
-      try {
-
-        for (let i = 0; i < dataReport.length; i++) {
-          dataReport[i].splice(1, 1);
-          dataReport[i].splice(2, 1);
-          dataReport[i].splice(4, 1);
-          dataReport[i].splice(5, 1);
-        }
-
-        for (let i = 0; i < dataReport.length; i++) {
-          prepairDataReport.push([]);
-          for (let j = 0; j < dataReport[0].length; j++) {
-            prepairDataReport[i].push([]);
-          }
-        }
-
-        // temp block - remake it!
-
-        for (let i = 0; i < dataReport.length; i++) {
-          dataReport[i][4] ? prepairDataReport[i][0] = dataReport[i][4] : prepairDataReport[i][0] = '';
-          dataReport[i][1] ? prepairDataReport[i][1] = dataReport[i][1] : prepairDataReport[i][1] = '';
-          dataReport[i][0] ? prepairDataReport[i][2] = dataReport[i][0] : prepairDataReport[i][2] = '';
-          dataReport[i][2] ? prepairDataReport[i][3] = dataReport[i][2] : prepairDataReport[i][3] = '';
-          dataReport[i][3] ? prepairDataReport[i][4] = dataReport[i][3] : prepairDataReport[i][4] = '';
-          dataReport[i][5] ? prepairDataReport[i][5] = dataReport[i][5] : prepairDataReport[i][5] = '';
-          dataReport[i][6] ? prepairDataReport[i][6] = dataReport[i][6] : prepairDataReport[i][6] = '';
-          dataReport[i][7] ? prepairDataReport[i][7] = dataReport[i][7] : prepairDataReport[i][7] = '';
-          dataReport[i][8] ? prepairDataReport[i][8] = dataReport[i][8] : prepairDataReport[i][8] = '';
-          dataReport[i][9] ? prepairDataReport[i][9] = dataReport[i][9] : prepairDataReport[i][9] = '';
-        }
-
-      } catch (e) {
-        reject(e.stack);
-      }
-
-      list = encodeURIComponent('ЗП(декада)');
-      range = list + '!B8:K';
+      range = list + '!A1:A';
 
       //= Update data =
-      await crud.updateData(prepairDataReport, SIDS[mon], range)
+      await crud.updateData(dataManDDS, SIDS[mon], range)
       //  .then(async results => {console.log(results);})
         .catch(console.log);
 
@@ -99,16 +62,16 @@ async function dds_monSalary(mon) {
       let dataPlan;
       let dataFact;
 
-      let plan_fact = config.dds_mon.src_salary[mon];
+      let plan_fact = config.dds_mon.src_indirect[mon];
 
       let colsPlan = {
-        'start': plan_fact.mts[0],
-        'end': plan_fact.kz[0],
+        'start': plan_fact.mts,
+        'end': plan_fact.kz,
       };
 
       let colsFact = {
-        'start': plan_fact.mts[1],
-        'end': plan_fact.kz[1],
+        'start': plan_fact.mts,
+        'end': plan_fact.kz,
       };
 
       let srcCheck = {
@@ -116,15 +79,15 @@ async function dds_monSalary(mon) {
         'fact': ''
       };
 
-      list = encodeURIComponent('ФОТ (план)');
+      list = encodeURIComponent('Косвенные (план)');
       range1 = list + '!' + colsPlan.start + '1:' + colsPlan.end;
 
-      list = encodeURIComponent('ФОТ (факт)');
+      list = encodeURIComponent('Косвенные (факт)');
       range2 = list + '!' + colsFact.start + '1:' + colsFact.end;
 
       await Promise.all([
         crud.readData(config.sid_2017.fin_model, range1),
-        crud.readData(config.sid_2017.salary, range2)
+        crud.readData(config.sid_2017.indirect, range2)
       ])
         .then(async ([plan, fact]) => {
            dataPlan = plan;
@@ -139,9 +102,7 @@ async function dds_monSalary(mon) {
       srcCheck.fact = srcCheck.fact[0];
       //= Remove useless element
       dataPlan.splice(0, 5);
-      dataFact.splice(0, 4);
-
-      // range = list + '!B8:K';
+      dataFact.splice(0, 5);
 
        for (let i = 0; i < dataPlan[0].length; i++) {
          dds_plan.push([]);
@@ -168,9 +129,9 @@ async function dds_monSalary(mon) {
        let arrCheck = [];
        let checkFuncions = [];
        let arrFuncions = [];
-       let colsPlanFact = config.dds_mon.salary
+       let colsPlanFact = config.dds_mon.indirect
 
-       list = encodeURIComponent('ЗП(декада)');
+       list = encodeURIComponent('Косвенные расходы(декада)');
 
        //= Prepare array of Range =
        for (let dir in colsPlanFact){
@@ -214,7 +175,7 @@ async function dds_monSalary(mon) {
         checkRange.push(list + '!' + colsPlanFact[dir][0] + '2:' + colsPlanFact[dir][1]);
       }
 
-      //console.log(dds_plan);
+      //console.log(dds_fact);
 
       //= Prepare array of Functions =
       dds_plan.forEach((arrValues, i) => {
@@ -234,9 +195,9 @@ async function dds_monSalary(mon) {
       //  .then(async (results) => {console.log(results);})
         .catch(console.log);
 
-      //= Check =
+      // //= Check =
       await Promise.all(checkFuncions)
-        .then(async (results) => {console.log(results);})
+      //  .then(async (results) => {console.log(results);})
         .catch(console.log);
 
       //-------------------------------------------------------------
@@ -274,77 +235,116 @@ async function dds_monSalary(mon) {
       // Build paramsSalaryDDS and get & update
       //--------------------------------------------------------------------
 
-      let paramsSalaryDDS  = [[], [], [], []];
-      let sum1;
-      let sum2;
+      let paramsIndirectDDS  = {
+        '2.1' : [[], [], [], [], []],
+        '2.2' : [[], [], [], [], []],
+        '2.3' : [[], [], [], [], []]
+      };
 
-      list = encodeURIComponent('ЗП(декада)');
+      for (let key in paramsIndirectDDS) {
+        paramsIndirectDDS[key][0].push(MONTHS[mon]); //current month
+        paramsIndirectDDS[key][3] = DIRECTIONS; //directions
+        paramsIndirectDDS[key][4] = DECS; //decade
+      }
+
+      list = encodeURIComponent('Косвенные расходы(декада)');
       range = list + '!B9:D';
+      let dataIndirectDDS = await crud.readData(SIDS[mon], range);
 
-      let dataSalaryDDS = await crud.readData(SIDS[mon], range);
-
-      //= Build params =
-      for (let i = 0; i < dataSalaryDDS.length; i++) {
-        if (dataSalaryDDS[i][0] && dataSalaryDDS[i][2]) {
-          paramsSalaryDDS[0].push(dataSalaryDDS[i][2].trim()); //name
-          paramsSalaryDDS[1].push(dataSalaryDDS[i][0].trim()); //departion
-        } else {
-          paramsSalaryDDS[0].push(' ');
-          paramsSalaryDDS[1].push(' ');
+      for (let i = 0; i < dataIndirectDDS.length; i++) {
+        for (let key in paramsIndirectDDS) {
+          paramsIndirectDDS[key][1].push(dataIndirectDDS[i][0]); //articles
         }
+        paramsIndirectDDS['2.2'][2].push(
+          dataIndirectDDS[i][2] ? dataIndirectDDS[i][2] : ' '
+        ); //transcript
+        paramsIndirectDDS['2.3'][2].push(
+          dataIndirectDDS[i][3] ? dataIndirectDDS[i][3] : ' '
+        ); //company
       }
 
-      paramsSalaryDDS[2] = MONTHS[mon]; //current month
-      paramsSalaryDDS[3] = DIRECTIONS; //directions
-      paramsSalaryDDS[4] = DECS; //decade
+      let sumDirectionsCommon = [];
 
-      await Promise.all([
-        dds_salaryQuery(pool, 'dds_lera', paramsSalaryDDS),
-        dds_salaryQuery(pool, 'dds_olga', paramsSalaryDDS)
-      ])
-        .then(async ([s1, s2]) => {
-          sum1 = s1;
-          sum2 = s2;
-        })
-        .catch(console.log);
+      //console.log(paramsIndirectDDS);
+      for (let mode in paramsIndirectDDS) {
 
-      let sumSalary = [];
+        let sum1;
+        let sum2;
+        let sumDirections = [];
+        let start = 0;
+        let end = 0;
 
-      for (let dec = 0; dec < sum1.length; dec++) {
-        sumSalary.push([]);
-        for (let i = 0; i < sum1[dec].length; i++) {
-          sumSalary[dec].push([]);
-          for (let j = 0; j < sum1[dec][i].length; j++) {
-            sumSalary[dec][i].push(
-              [Number(sum1[dec][i][j]) + Number(sum2[dec][i][j])]
-            );
+        await Promise.all([
+          dds_indirectQuery(pool, 'dds_lera', paramsIndirectDDS, mode),
+          dds_indirectQuery(pool, 'dds_olga', paramsIndirectDDS, mode)
+        ])
+          .then(async ([s1, s2]) => {
+            sum1 = s1;
+            sum2 = s2;
+          })
+          .catch(console.log);
+
+          for (let dec = 0; dec < sum1.length; dec++) {
+
+            sumDirections.push([]);
+            for (let d = 0; d < sum1[dec].length; d++) {
+              sumDirections[dec].push([]);
+              for (let i = 0; i < sum1[dec][d].length; i++) {
+                sumDirections[dec][d].push(Number(sum1[dec][d][i]) + Number(sum2[dec][d][i]));
+              }
+            }
           }
+
+          //= Concat types in Common sum
+
+          for (let dec = 0; dec < sumDirections.length; dec++) {
+            sumDirectionsCommon[dec] ? null : sumDirectionsCommon.push([]);
+            for (let d = 0; d < sumDirections[dec].length; d++) {
+              sumDirectionsCommon[dec][d] ? null : sumDirectionsCommon[dec].push([]);
+              for (let i = 0; i < sumDirections[dec][d].length; i++) {
+                if (sumDirectionsCommon[dec][d][i] || sumDirectionsCommon[dec][d][i] === 0) {
+                  sumDirectionsCommon[dec][d][i] += sumDirections[dec][d][i];
+                } else {
+                  sumDirectionsCommon[dec][d][i] = 0;
+                }
+              }
+            }
+          }
+
+      }
+
+      for (let dec = 0; dec < sumDirectionsCommon.length; dec++) {
+        for (let d = 0; d < sumDirectionsCommon[dec].length; d++) {
+            for (let i = 0; i < sumDirectionsCommon[dec][d].length; i++) {
+              sumDirectionsCommon[dec][d][i] = [sumDirectionsCommon[dec][d][i]];
+            }
         }
       }
 
-      //console.log(require('util').inspect(sumSalary, { depth: null }));
-      let colsDecSalary = config.dds_mon.salary;
+      let colsDecIndirect = config.dds_mon.indirect;
 
       arrRange1 = [];
       arrRange2 = [];
       arrRange3 = [];
       arrFuncions = [];
 
-      for (let dir in colsDecSalary) {
-        arrRange1.push(list + '!' + colsDecSalary[dir][2] + START + ':' + colsDecSalary[dir][2]);
-        arrRange2.push(list + '!' + colsDecSalary[dir][3] + START + ':' + colsDecSalary[dir][3]);
-        arrRange3.push(list + '!' + colsDecSalary[dir][4] + START + ':' + colsDecSalary[dir][4]);
+      list = encodeURIComponent('Косвенные расходы(декада)');
+
+      for (let dir in colsDecIndirect) {
+        arrRange1.push(list + '!' + colsDecIndirect[dir][2] + START + ':' + colsDecIndirect[dir][2]);
+        arrRange2.push(list + '!' + colsDecIndirect[dir][3] + START + ':' + colsDecIndirect[dir][3]);
+        arrRange3.push(list + '!' + colsDecIndirect[dir][4] + START + ':' + colsDecIndirect[dir][4]);
       }
 
-      sumSalary[0].forEach((arrValues, i) => {
+      sumDirectionsCommon[0].forEach((arrValues, i) => {
         arrFuncions.push(crud.updateData(arrValues, SIDS[mon], arrRange1[i]));
       });
 
-      sumSalary[1].forEach((arrValues, i) => {
+      sumDirectionsCommon[1].forEach((arrValues, i) => {
         arrFuncions.push(crud.updateData(arrValues, SIDS[mon], arrRange2[i]));
       });
 
-      sumSalary[2].forEach((arrValues, i) => {
+      sumDirectionsCommon[2].forEach((arrValues, i) => {
         arrFuncions.push(crud.updateData(arrValues, SIDS[mon], arrRange3[i]));
       });
 
@@ -357,14 +357,33 @@ async function dds_monSalary(mon) {
     // Update date-time in "Monitoring"
     //----------------------------------------------------------------------
 
-    // range = 'main!B9';
-    //
-    // let now = new Date();
-    // now = [[formatDate(now)]];
-    //
-    // await crud.updateData(now, config.sid_2017.monit, range);
+    switch (mon) {
+      case 'Jan':
+        range = 'main!B24';
+        break;
+      case 'Feb':
+        range = 'main!B25';
+        break;
+      case 'Mar':
+        range = 'main!B26';
+        break;
+      case 'Apr':
+        range = 'main!B27';
+        break;
+      case 'May':
+        range = 'main!B28';
+        break;
+      case 'Jun':
+        range = 'main!B29';
+        break;
+      default:
+        break;
+    }
 
+    let now = new Date();
+    now = [[formatDate(now)]];
 
+    await crud.updateData(now, config.sid_2017.monit, range);
 
     } // = End start function =
 
