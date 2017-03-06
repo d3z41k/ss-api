@@ -34,8 +34,8 @@ async function dds_monSalary(mon) {
       const DIRECTIONS = config.directions.common;
 
 
-      let list = '';
-      let range = '';
+      var list = '';
+      var range = '';
       let range1 = '';
       let range2 = '';
       let dataDDS = {
@@ -134,36 +134,54 @@ async function dds_monSalary(mon) {
        list = encodeURIComponent('Косвенные расходы(декада)');
 
        //= Prepare array of Range =
-       for (let dir in colsPlanFact){
-         arrRange1.push(list + '!' + colsPlanFact[dir][0] + START + ':' + colsPlanFact[dir][0]);
-         arrRange2.push(list + '!' + colsPlanFact[dir][1] + START + ':' + colsPlanFact[dir][1]);
-         checkRange.push(list + '!' + colsPlanFact[dir][0] + '3:' + colsPlanFact[dir][1] + '3');
-       }
+      for (let dir in colsPlanFact){
+        arrRange1.push(list + '!' + colsPlanFact[dir][0] + START + ':' + colsPlanFact[dir][0]);
+        arrRange2.push(list + '!' + colsPlanFact[dir][1] + START + ':' + colsPlanFact[dir][1]);
+        checkRange.push(list + '!' + colsPlanFact[dir][0] + '3:' + colsPlanFact[dir][1] + '3');
+      }
 
-       let dstCheck = {
-         'plan': [],
-         'fact': []
-       };
+      //= Prepare array of Functions =
+      dds_plan.forEach((arrValues, i) => {
+        arrFuncions.push(crud.updateData(arrValues, SIDS[mon], arrRange1[i]));
+      });
 
-       let resultCheck = {
-         'plan': [],
-         'fact': []
-       };
+      dds_fact.forEach((arrValues, i) => {
+        arrFuncions.push(crud.updateData(arrValues, SIDS[mon], arrRange2[i]));
+      });
 
-       for (let i = 0; i < checkRange.length; i++) {
-         let dataTemp = await crud.readData(SIDS[mon], checkRange[i]);
-         dstCheck.plan.push(dataTemp[0][0]);
-         dstCheck.fact.push(dataTemp[0][1]);
-       }
+      //= Update data =
+      await Promise.all(arrFuncions)
+      //  .then(async (results) => {console.log(results);})
+        .catch(console.log);
 
-       for (let val in srcCheck) {
-         for (let i = 0; i < srcCheck[val].length; i++) {
+      //------------------------------------------------------------------------
+      // Check Get & Update
+      //------------------------------------------------------------------------
+
+      let dstCheck = {
+        'plan': [],
+        'fact': []
+      };
+
+      let resultCheck = {
+        'plan': [],
+        'fact': []
+      };
+
+      for (let i = 0; i < checkRange.length; i++) {
+        let dataTemp = await crud.readData(SIDS[mon], checkRange[i]);
+        dstCheck.plan.push(dataTemp[0][0]);
+        dstCheck.fact.push(dataTemp[0][1]);
+      }
+
+      for (let val in srcCheck) {
+        for (let i = 0; i < srcCheck[val].length; i++) {
            srcCheck[val][i] = normalizeMinus(srcCheck[val][i]);
            dstCheck[val][i] = normalizeMinus(dstCheck[val][i]);
 
            resultCheck[val].push(srcCheck[val][i] - dstCheck[val][i]);
-         }
-       }
+        }
+      }
 
       for (let i = 0; i < resultCheck.plan.length; i++) {
         arrCheck.push([resultCheck.plan[i], resultCheck.fact[i]]);
@@ -175,27 +193,11 @@ async function dds_monSalary(mon) {
         checkRange.push(list + '!' + colsPlanFact[dir][0] + '2:' + colsPlanFact[dir][1]);
       }
 
-      //console.log(dds_fact);
-
-      //= Prepare array of Functions =
-      dds_plan.forEach((arrValues, i) => {
-        arrFuncions.push(crud.updateData(arrValues, SIDS[mon], arrRange1[i]));
-      });
-
-      dds_fact.forEach((arrValues, i) => {
-        arrFuncions.push(crud.updateData(arrValues, SIDS[mon], arrRange2[i]));
-      });
-
       arrCheck.forEach((arrValues, i) => {
         checkFuncions.push(crud.updateData([arrValues], SIDS[mon], checkRange[i]));
       });
 
-      //= Update data =
-      await Promise.all(arrFuncions)
-      //  .then(async (results) => {console.log(results);})
-        .catch(console.log);
-
-      // //= Check =
+      //= Check =
       await Promise.all(checkFuncions)
       //  .then(async (results) => {console.log(results);})
         .catch(console.log);
@@ -348,42 +350,42 @@ async function dds_monSalary(mon) {
         arrFuncions.push(crud.updateData(arrValues, SIDS[mon], arrRange3[i]));
       });
 
-      //= Update DDS Salary =
-      await Promise.all(arrFuncions)
-      //  .then(async (results) => {console.log(results);})
-        .catch(console.log);
+      // //= Update DDS Salary =
+      // await Promise.all(arrFuncions)
+      // //  .then(async (results) => {console.log(results);})
+      //   .catch(console.log);
 
     //----------------------------------------------------------------------
     // Update date-time in "Monitoring"
     //----------------------------------------------------------------------
 
-    switch (mon) {
+    let monRange;
+
+    switch (mon[0]) {
       case 'Jan':
-        range = 'main!B24';
+        monRange = 'main!B24';
         break;
       case 'Feb':
-        range = 'main!B25';
+        monRange = 'main!B25';
         break;
       case 'Mar':
-        range = 'main!B26';
+        monRange = 'main!B26';
         break;
       case 'Apr':
-        range = 'main!B27';
+        monRange = 'main!B27';
         break;
       case 'May':
-        range = 'main!B28';
+        monRange = 'main!B28';
         break;
       case 'Jun':
-        range = 'main!B29';
-        break;
-      default:
+        monRange = 'main!B29';
         break;
     }
 
     let now = new Date();
     now = [[formatDate(now)]];
 
-    await crud.updateData(now, config.sid_2017.monit, range);
+    await crud.updateData(now, config.sid_2017.monit, monRange);
 
     } // = End start function =
 

@@ -39,7 +39,7 @@ async function salary(months) {
       const crud = new Crud(auth);
       const START = 6;
       const MON_COLS = config.salary_colMonths;
-      const DIRECTIONS = config.directions.common
+      const DIRECTIONS = config.directions.common;
 
       let list = '';
       let range = '';
