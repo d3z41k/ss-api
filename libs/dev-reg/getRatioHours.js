@@ -31,7 +31,6 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
         }
       }
 
-
       //= Build divider =
       for (let n = 0; n < lawt.name.length; n++) {
         dividers.push([]);

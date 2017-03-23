@@ -75,8 +75,6 @@ async function devReg() {
       xArray.pop();
       xArray.unshift(START);
 
-      //console.log(xArray);
-
       //------------------------------------------------------------------------
       // Get data from 'registryData'
       //------------------------------------------------------------------------
@@ -422,6 +420,8 @@ async function devReg() {
       range = list.fot + '!A6:ER77';
 
       let salaryData = await crud.readData(config.sid_2017.salary, range);
+
+
 
       let accruedMonth = config.accruedMonth_1;
       let accruedIndex = {

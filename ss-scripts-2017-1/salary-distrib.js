@@ -49,6 +49,7 @@ async function salaryDistrib() {
           let paramsDistrib;
           let dataDistrib;
           let accruedSalary = [];
+          let accruedSalaryNum = [];
 
           let salaryDirection = {
             'Мульти сайт': [],
@@ -98,9 +99,17 @@ async function salaryDistrib() {
           range1 = list.distrib[d] + '!D' + START + ':D';
           range2 = list.fot + '!' + FOT_COLS[d + 1][0] + START + ':' + FOT_COLS[d + 1][0];
 
+          accruedSalary.forEach(val => {
+            if (val[0].replace(/\s/g, '') == '-') {
+              accruedSalaryNum.push([0]);
+            } else {
+              accruedSalaryNum.push([val[0].replace(/\s/g, '')]);
+            }
+          });
+
           await Promise.all([
-            crud.updateData(accruedSalary, config.sid_2017.salary, range1),
-            crud.updateData(accruedSalary, config.sid_2017.salary, range2)
+            crud.updateData(accruedSalaryNum, config.sid_2017.salary, range1),
+            crud.updateData(accruedSalaryNum, config.sid_2017.salary, range2)
           ])
             .then(async (results) => {console.log(results);})
             .catch(console.log);
@@ -163,7 +172,7 @@ async function salaryDistrib() {
                   if (dataDistrib[i][j] && dataDistrib[i][2]) {
                     salaryDistrib[i].push(
                       Number(dataDistrib[i][2].replace(/\s/g, ''))
-                      * Number(dataDistrib[0][j].replace(/%/g, '')) * 0.01
+                      * Number(dataDistrib[i][j].replace(/%/g, '')) * 0.01
                     );
                   } else {
                     salaryDistrib[i].push(0);
@@ -173,11 +182,15 @@ async function salaryDistrib() {
                 for (var key in salaryDirection) {
                   salaryDistrib[i].push(salaryDirection[key][i][0]);
                 }
+                salaryDistrib[i].push(0);
+                salaryDistrib[i].push(0);
               }
             }
 
             range1 = list.distrib[d] + '!K' + START + ':O';
             range2 = list.fot + '!' + FOT_COLS[d + 1][1] + START + ':' + FOT_COLS[d + 1][5];
+
+            //console.log(salaryDistrib);
 
             await Promise.all([
               crud.updateData(salaryDistrib, config.sid_2017.salary, range1),
@@ -188,6 +201,7 @@ async function salaryDistrib() {
           }
 
           await sleep(1000);
+          resolve('complite!');
         } // End distribution
 
         //----------------------------------------------------------------------
@@ -206,7 +220,7 @@ async function salaryDistrib() {
       now = [[formatDate(now)]];
       await crud.updateData(now, config.sid_2017.monit, range);
 
-      resolve('complite!');
+    //  resolve('complite!');
 
     } // = End start function =
 

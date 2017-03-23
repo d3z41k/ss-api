@@ -206,32 +206,32 @@ async function dds_monSalary(mon) {
       // Read data from dds_lera to RAM
       //-------------------------------------------------------------
 
-      list = encodeURIComponent('ДДС_Лера');
-      range1 = list + '!A6:V';
-
-      list = encodeURIComponent('ДДС_Ольга');
-      range2 = list + '!A6:AD';
-
-      await Promise.all([
-        crud.readData(config.sid_2017.dds, range1),
-        crud.readData(config.sid_2017.dds, range2)
-      ])
-       .then(async ([dds_lera, dds_olga]) => {
-          dataDDS.lera = dds_lera;
-          dataDDS.olga = dds_olga;
-        })
-        .catch(console.log);
-
-      //--------------------------------------------------------------------
-      // Refresh table
-      //--------------------------------------------------------------------
-
-      await Promise.all([
-        dbRefresh(pool, 'dds_lera', dataDDS.lera),
-        dbRefresh(pool, 'dds_olga', dataDDS.olga)
-      ])
-        //.then(async (results) => {console.log(results);})
-        .catch(console.log);
+      // list = encodeURIComponent('ДДС_Лера');
+      // range1 = list + '!A6:V';
+      //
+      // list = encodeURIComponent('ДДС_Ольга');
+      // range2 = list + '!A6:AD';
+      //
+      // await Promise.all([
+      //   crud.readData(config.sid_2017.dds, range1),
+      //   crud.readData(config.sid_2017.dds, range2)
+      // ])
+      //  .then(async ([dds_lera, dds_olga]) => {
+      //     dataDDS.lera = dds_lera;
+      //     dataDDS.olga = dds_olga;
+      //   })
+      //   .catch(console.log);
+      //
+      // //--------------------------------------------------------------------
+      // // Refresh table
+      // //--------------------------------------------------------------------
+      //
+      // await Promise.all([
+      //   dbRefresh(pool, 'dds_lera', dataDDS.lera),
+      //   dbRefresh(pool, 'dds_olga', dataDDS.olga)
+      // ])
+      //   //.then(async (results) => {console.log(results);})
+      //   .catch(console.log);
 
       //--------------------------------------------------------------------
       // Build paramsSalaryDDS and get & update
@@ -350,10 +350,10 @@ async function dds_monSalary(mon) {
         arrFuncions.push(crud.updateData(arrValues, SIDS[mon], arrRange3[i]));
       });
 
-      // //= Update DDS Salary =
-      // await Promise.all(arrFuncions)
-      // //  .then(async (results) => {console.log(results);})
-      //   .catch(console.log);
+      //= Update DDS Salary =
+      await Promise.all(arrFuncions)
+      //  .then(async (results) => {console.log(results);})
+        .catch(console.log);
 
     //----------------------------------------------------------------------
     // Update date-time in "Monitoring"

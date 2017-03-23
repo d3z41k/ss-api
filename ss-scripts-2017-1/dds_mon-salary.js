@@ -13,7 +13,7 @@ async function dds_monSalary(mon) {
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
     const normalizeMinus = require('../libs/normalize-minus');
-    //const sleep = require('../libs/sleep');
+    const sleep = require('../libs/sleep');
     //const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models-2017-1/db_refresh');
     const pool = require('../models-2017-1/db_pool');
@@ -43,19 +43,20 @@ async function dds_monSalary(mon) {
         'olga': ''
       };
 
-      list = encodeURIComponent('Табель 2017');
-      range = list + '!B2:O80';
+      list = encodeURIComponent('ФОТ (план)');
+      range = list + '!B6:N69';
 
-      let dataReport = await crud.readData(config.sid_2017.report, range);
+      let dataReport = await crud.readData(config.sid_2017.fin_model, range);
+
       let prepairDataReport = [];
 
       try {
 
         for (let i = 0; i < dataReport.length; i++) {
-          dataReport[i].splice(1, 1);
+          dataReport[i].splice(2, 1);
+          dataReport[i].splice(2, 1);
           dataReport[i].splice(2, 1);
           dataReport[i].splice(4, 1);
-          dataReport[i].splice(5, 1);
         }
 
         for (let i = 0; i < dataReport.length; i++) {
@@ -68,16 +69,16 @@ async function dds_monSalary(mon) {
         // temp block - remake it!
 
         for (let i = 0; i < dataReport.length; i++) {
-          dataReport[i][4] ? prepairDataReport[i][0] = dataReport[i][4] : prepairDataReport[i][0] = '';
-          dataReport[i][1] ? prepairDataReport[i][1] = dataReport[i][1] : prepairDataReport[i][1] = '';
+          dataReport[i][1] ? prepairDataReport[i][0] = dataReport[i][1] : prepairDataReport[i][0] = '';
+          prepairDataReport[i][1] = '';
           dataReport[i][0] ? prepairDataReport[i][2] = dataReport[i][0] : prepairDataReport[i][2] = '';
           dataReport[i][2] ? prepairDataReport[i][3] = dataReport[i][2] : prepairDataReport[i][3] = '';
           dataReport[i][3] ? prepairDataReport[i][4] = dataReport[i][3] : prepairDataReport[i][4] = '';
-          dataReport[i][5] ? prepairDataReport[i][5] = dataReport[i][5] : prepairDataReport[i][5] = '';
-          dataReport[i][6] ? prepairDataReport[i][6] = dataReport[i][6] : prepairDataReport[i][6] = '';
-          dataReport[i][7] ? prepairDataReport[i][7] = dataReport[i][7] : prepairDataReport[i][7] = '';
-          dataReport[i][8] ? prepairDataReport[i][8] = dataReport[i][8] : prepairDataReport[i][8] = '';
-          dataReport[i][9] ? prepairDataReport[i][9] = dataReport[i][9] : prepairDataReport[i][9] = '';
+          dataReport[i][4] ? prepairDataReport[i][5] = dataReport[i][4] : prepairDataReport[i][5] = '';
+          dataReport[i][5] ? prepairDataReport[i][6] = dataReport[i][5] : prepairDataReport[i][6] = '';
+          dataReport[i][6] ? prepairDataReport[i][7] = dataReport[i][6] : prepairDataReport[i][7] = '';
+          dataReport[i][7] ? prepairDataReport[i][8] = dataReport[i][7] : prepairDataReport[i][8] = '';
+          dataReport[i][8] ? prepairDataReport[i][9] = dataReport[i][8] : prepairDataReport[i][9] = '';
         }
 
       } catch (e) {
@@ -245,32 +246,32 @@ async function dds_monSalary(mon) {
       // Read data from dds_lera to RAM
       //-------------------------------------------------------------
 
-      list = encodeURIComponent('ДДС_Лера');
-      range1 = list + '!A6:V';
-
-      list = encodeURIComponent('ДДС_Ольга');
-      range2 = list + '!A6:AD';
-
-      await Promise.all([
-        crud.readData(config.sid_2017.dds, range1),
-        crud.readData(config.sid_2017.dds, range2)
-      ])
-       .then(async ([dds_lera, dds_olga]) => {
-          dataDDS.lera = dds_lera;
-          dataDDS.olga = dds_olga;
-        })
-        .catch(console.log);
-
-      //--------------------------------------------------------------------
-      // Refresh table
-      //--------------------------------------------------------------------
-
-      await Promise.all([
-        dbRefresh(pool, 'dds_lera', dataDDS.lera),
-        dbRefresh(pool, 'dds_olga', dataDDS.olga)
-      ])
-        //.then(async (results) => {console.log(results);})
-        .catch(console.log);
+      // list = encodeURIComponent('ДДС_Лера');
+      // range1 = list + '!A6:V';
+      //
+      // list = encodeURIComponent('ДДС_Ольга');
+      // range2 = list + '!A6:AD';
+      //
+      // await Promise.all([
+      //   crud.readData(config.sid_2017.dds, range1),
+      //   crud.readData(config.sid_2017.dds, range2)
+      // ])
+      //  .then(async ([dds_lera, dds_olga]) => {
+      //     dataDDS.lera = dds_lera;
+      //     dataDDS.olga = dds_olga;
+      //   })
+      //   .catch(console.log);
+      //
+      // //--------------------------------------------------------------------
+      // // Refresh table
+      // //--------------------------------------------------------------------
+      //
+      // await Promise.all([
+      //   dbRefresh(pool, 'dds_lera', dataDDS.lera),
+      //   dbRefresh(pool, 'dds_olga', dataDDS.olga)
+      // ])
+      //   //.then(async (results) => {console.log(results);})
+      //   .catch(console.log);
 
       //--------------------------------------------------------------------
       // Build paramsSalaryDDS and get & update
@@ -324,7 +325,6 @@ async function dds_monSalary(mon) {
         }
       }
 
-      //console.log(require('util').inspect(sumSalary, { depth: null }));
       let colsDecSalary = config.dds_mon.salary;
 
       arrRange1 = [];
@@ -359,14 +359,12 @@ async function dds_monSalary(mon) {
     // Update date-time in "Monitoring"
     //----------------------------------------------------------------------
 
-    // range = 'main!B9';
-    //
-    // let now = new Date();
-    // now = [[formatDate(now)]];
-    //
-    // await crud.updateData(now, config.sid_2017.monit, range);
+    range = 'main!B9';
 
+    let now = new Date();
+    now = [[formatDate(now)]];
 
+    await crud.updateData(now, config.sid_2017.monit, range);
 
     } // = End start function =
 

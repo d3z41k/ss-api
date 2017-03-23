@@ -81,13 +81,15 @@ async function sales() {
         //= Get values =
         let values = await salesQuery(pool, 'dds_olga', paramsSalesCients);
 
+        // console.log(values);
+
         //= Update data =
         let sellPayRange = list + '!L' + START + ':M' + (values.length + START);
 
         await crud.updateData(values, config.sid_2017.sales, sellPayRange)
           //.then(async results => {console.log(results);})
           .catch(console.log);
-          
+
       } catch (e) {
         reject(e.stack);
       }

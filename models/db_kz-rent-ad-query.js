@@ -1,4 +1,4 @@
-async function profi_rent_adQuery(pool, params, months_name) {
+async function kz_rent_adQuery(pool, params, months_name) {
   return new Promise(async (resolve, reject) => {
 
     let sum = [];
@@ -19,7 +19,7 @@ async function profi_rent_adQuery(pool, params, months_name) {
                 '`Направление деятельноcти` = ? ' +
                 'AND `Статья движения денег` = ? ' +
                 'AND `За какой месяц оплата поступление` = ? ' +
-                'AND `Тематика Профи` = ? ' +
+                'AND `Тематика КЗ` = ? ' +
                 'AND `Город Профи и КЗ` = ? ' +
                 'AND `Контрагент Профи и КЗ` = ?',
               [
@@ -54,4 +54,4 @@ async function profi_rent_adQuery(pool, params, months_name) {
 
 }
 
-module.exports = profi_rent_adQuery;
+module.exports = kz_rent_adQuery;
