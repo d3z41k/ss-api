@@ -4,9 +4,9 @@ const config = require('config');
 const _ = require('lodash/array');
 
 
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Main function
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 async function devReg() {
   return new Promise(async (resolve, reject) => {
@@ -333,7 +333,7 @@ async function devReg() {
         receiptParams[1][0] = 'Поступление от новых клиентов (продажа)'; //article
         receiptParams[1][1] = 'Поступление денег от сущ.клиентов (предоплата)'; //article
         receiptParams[1][2] = 'Поступление от сущ.клиентов (оконч. оплата)'; //article
-        receiptParams[2] = MONTHS;
+        receiptParams[2] = [1, 2, 3, 4, 5, 6];
 
         for (let x = 0; x < xArray.length; x++) {
           receiptParams[3].push(registryData[xArray[x] - START][0]); //site
@@ -416,12 +416,9 @@ async function devReg() {
         ratioParams[2].push(registryData[xArray[x] - START][0]); //sites
       }
 
-
       range = list.fot + '!A6:ER77';
 
       let salaryData = await crud.readData(config.sid_2017.salary, range);
-
-
 
       let accruedMonth = config.accruedMonth_1;
       let accruedIndex = {

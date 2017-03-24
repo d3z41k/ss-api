@@ -1,4 +1,4 @@
-'use strict';
+ 'use strict';
 
 const config = require('config');
 const _ = require('lodash/array');
@@ -18,7 +18,9 @@ async function profi1(months) {
     const dbRefresh = require('../models-2017-1/db_refresh');
     const pool = require('../models-2017-1/db_pool');
     const profiQuery = require('../models/db_profi-query');
+    const profiRentQuery = require('../models/db_profi_rent-ad-query');
     const kzQuery = require('../models/db_kz-query');
+    const kzRentQuery = require('../models/db_kz-rent-ad-query');
 
     //-------------------------------------------------------------
     // Fetch months
@@ -79,6 +81,7 @@ async function profi1(months) {
         let namesMonths = [];
         let listKZ = '';
         let rangeKZ = '';
+        let months_name = config.months_name;
 
         list = encodeURIComponent(directions[0]);
         listKZ = encodeURIComponent('КЗ');
@@ -135,10 +138,12 @@ async function profi1(months) {
             }
 
             //--------------------------------------------------------------
-            // Get result of The kzQuery
+            // Get result of The kzQuery & kzRentQuery
             //--------------------------------------------------------------
 
             let values = await kzQuery(pool, paramsKZ);
+            let values2 = await kzRentQuery(pool, paramsKZ, months_name);
+            let values3 = [];
 
             //--------------------------------------------------------------
             // To zip result in stack, prepair array of function and update
@@ -169,7 +174,7 @@ async function profi1(months) {
             }
 
             //= Prepare array of Functions =
-            zipValues.forEach((arrValues, i)=> {
+            zipValues.forEach((arrValues, i) => {
               arrFuncions.push(crud.updateData(arrValues, config.sid_2017.profi1, arrRange[i]));
             });
 
@@ -178,8 +183,52 @@ async function profi1(months) {
               //.then(async (results) => {console.log(results);})
               .catch(console.log);
 
-            await sleep(800);
-            //console.log(directions[d]);
+            await sleep(1000);
+
+            //--------------------------------------------------------------
+            // To zip result, rend and ad in stack, prepair array of
+            // function and update
+            //--------------------------------------------------------------
+
+            for (let m = 0; m < values2.length; m++) {
+              values3.push([[], []]);
+              for (let i = 0; i < values2[m][0].length; i++) {
+                values3[m][0].push(Number(values2[m][0][i]) + Number(values2[m][1][i]) + Number(values2[m][2][i]));
+              }
+              values3[m][1] = values2[m][3];
+            }
+
+            let zipValues3 = [];
+            let arrRange3 = [];
+            let arrFuncions3 = [];
+
+            //= Zip valuses =
+            values3.forEach(val => {
+              let arrArticles = [];
+              for (let a = 0; a < val.length; a++) {
+                arrArticles.push(val[a]);
+              }
+              // !! Hardcode 2 params, in future possible more than that
+              zipValues3.push(_.zip(
+                arrArticles[0],
+                arrArticles[1]
+              ));
+            });
+
+            for (let month in colMonths){
+              arrRange3.push(list + '!' + colMonths[month][1][4] + START + ':' + colMonths[month][1][5]);
+            }
+
+            zipValues3.forEach((arrValues, i)=> {
+              arrFuncions3.push(crud.updateData(arrValues, config.sid_2017.profi1, arrRange3[i]));
+            });
+
+            //= Update data =
+            await Promise.all(arrFuncions3)
+              //.then(async (results) => {console.log(results);})
+              .catch(console.log);
+
+            await sleep(1000);
 
           } else {
 
@@ -204,10 +253,12 @@ async function profi1(months) {
             }
 
             //--------------------------------------------------------------
-            // Get result of The profiQuery
+            // Get result of The profiQuery & profiRentQuery
             //--------------------------------------------------------------
 
             let values = await profiQuery(pool, paramsProfi);
+            let values2 = await profiRentQuery(pool, paramsProfi, months_name);
+            let values3 = [];
 
             //--------------------------------------------------------------
             // To zip result in stack, prepair array of function and update
@@ -247,10 +298,56 @@ async function profi1(months) {
               //.then(async (results) => {console.log(results);})
               .catch(console.log);
 
-            await sleep(800);
-            //console.log(directions[d]);
+            await sleep(1000);
+
+            //--------------------------------------------------------------
+            // To zip result, rend and ad in stack, prepair array of
+            // function and update
+            //--------------------------------------------------------------
+
+            for (let m = 0; m < values2.length; m++) {
+              values3.push([[], []]);
+              for (let i = 0; i < values2[m][0].length; i++) {
+                values3[m][0].push(Number(values2[m][0][i]) + Number(values2[m][1][i]) + Number(values2[m][2][i]));
+              }
+              values3[m][1] = values2[m][3];
+            }
+
+            let zipValues3 = [];
+            let arrRange3 = [];
+            let arrFuncions3 = [];
+
+            //= Zip valuses =
+            values3.forEach(val => {
+              let arrArticles = [];
+              for (let a = 0; a < val.length; a++) {
+                arrArticles.push(val[a]);
+              }
+              // !! Hardcode 2 params, in future possible more than that
+              zipValues3.push(_.zip(
+                arrArticles[0],
+                arrArticles[1]
+              ));
+            });
+
+            for (let month in colMonths){
+              arrRange3.push(list + '!' + colMonths[month][1][4] + START + ':' + colMonths[month][1][5]);
+            }
+
+            zipValues3.forEach((arrValues, i) => {
+              arrFuncions3.push(crud.updateData(arrValues, config.sid_2017.profi1, arrRange3[i]));
+            });
+
+            //= Update data =
+            await Promise.all(arrFuncions3)
+              //.then(async (results) => {console.log(results);})
+              .catch(console.log);
+
+            await sleep(1000);
 
           }
+          resolve('complite!');
+          await sleep(2000);
         } //= End directions =
 
       } catch (e) {
@@ -271,7 +368,7 @@ async function profi1(months) {
 
       await crud.updateData(now, config.sid_2017.monit, range);
 
-      resolve('complite!');
+      //resolve('complite!');
 
     } //= End start function =
 
