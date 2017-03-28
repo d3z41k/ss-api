@@ -53,7 +53,7 @@ async function devReg() {
       let range1 = '';
       let range2 = '';
 
-      // //= Get months cols for develope registryData =
+      //= Get months cols for develope registryData =
       const COL_MONTH = config.reg_colMonths_1;
       let cols = '';
 
@@ -142,11 +142,10 @@ async function devReg() {
       // Get and normalize "Contract Sum"
       //------------------------------------------------------------------------
 
-      range = list.clients + '!A6:U300';
-
+      range = list.clients + '!A6:U';
       let clientData = await crud.readData(config.sid_2017.dev, range);
 
-      let contractSum = clientData.map((row) => {
+      let contractSum = clientData.map(row => {
         return [
           row[0],
           row[9] && Number(row[9].replace(/\s/g, ''))
@@ -273,13 +272,33 @@ async function devReg() {
 
       let monthPrepaid = clientData.map((row) => {
         return [
-          row[0], row[12] ? row[12] : 0,
-          row[11] && Number(row[11].replace(/\s/g, ''))
-          ? Number(row[11].replace(/\s/g, '')) : 0
+          row[0], row[16] ? row[16] : 0,
+          row[15] && Number(row[15].replace(/\s/g, ''))
+          ? Number(row[15].replace(/\s/g, '')) : 0
         ];
       });
 
+      range = list.development + '!A6:CX';
 
+      let clientData2016 = await crud.readData(config.ssId.dev, range);
+
+      let debtData2016raw = clientData2016.map((row) => {
+        if (row[101] && Number(row[101].replace(/\s/g, ''))) {
+          return [
+            row[2], Number(row[101].replace(/\s/g, ''))
+          ];
+        } else {
+          return [];
+        }
+      });
+
+      let debtData2016 = debtData2016raw.filter(val => {
+        if (val[0]) {
+          return val;
+        }
+      });
+
+      //console.log(debtData2016);
 
       let colDebt = config.colDebt_1.debt;
 
@@ -288,7 +307,7 @@ async function devReg() {
       for (let x = 0; x < xArray.length; x++) {
 
         for (let i = 0; i < monthPrepaid.length; i++) {
-          if (registryData[xArray[x] - START][0]  == monthPrepaid[i][0]) {
+          if (registryData[xArray[x] - START][0] == monthPrepaid[i][0]) {
             if (!monthPrepaid[i][1] && monthPrepaid[i][2]) {
 
               range = list.development + '!' + colDebt + xArray[x];
@@ -297,11 +316,24 @@ async function devReg() {
                 .then(async result => {console.log(result);})
                 .catch(console.err);
             }
-
           }
         }
+
+        for (let j = 0; j < debtData2016.length; j++) {
+          if (registryData[xArray[x] - START][0] == debtData2016[j][0]) {
+
+            range = list.development + '!' + colDebt + xArray[x];
+
+            await crud.updateData([[debtData2016[j][1]]], config.sid_2017.dev, range)
+              .then(async result => {console.log(result);})
+              .catch(console.err);
+          }
+        }
+
         console.log('Project: ' + x);
+        await sleep(500);
       }
+
       console.log(new Date());
       console.log('* Get & Insert Debt / Prepaid *');
 
