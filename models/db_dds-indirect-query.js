@@ -1,4 +1,4 @@
-async function dds_indirectQuery(pool, tableName, params, mode) {
+async function dds_indirectQuery(pool, tableName, params, mode, taxes) {
   return new Promise(async (resolve, reject) => {
 
     let sum = [];
@@ -46,27 +46,32 @@ async function dds_indirectQuery(pool, tableName, params, mode) {
             for (let d = 0; d < params[mode][3].length; d++) {
               sum[dec].push([]);
               for (let i = 0; i < params[mode][1].length; i++) {
-                await pool.execute('SELECT SUM(`Сумма итого руб`) FROM ' + tableName + ' WHERE ' +
-                  '`Месяц` = ? ' +
-                  'AND `Статья движения денег` = ? ' +
-                  'AND `Прочие выплата расшифровка` = ? ' +
-                  'AND `Направление группа` = ? ' +
-                  'AND `Декада` = ? ',
-                  [
-                    params[mode][0],
-                    params[mode][1][i],
-                    params[mode][2][i],
-                    params[mode][3][d],
-                    params[mode][4][dec]
-                  ])
-                .then(([col, feilds]) => {
-                  for (let key in col[0]) {
-                    sum[dec][d].push(col[0][key] ? col[0][key] : 0);
-                  }
-                })
-                .catch(err => {
-                  console.log(err);
-                });
+                if (!taxes.includes(params[mode][1][i])) {
+                  await pool.execute('SELECT SUM(`Сумма итого руб`) FROM ' + tableName + ' WHERE ' +
+                    '`Месяц` = ? ' +
+                    'AND `Статья движения денег` = ? ' +
+                    'AND `Прочие выплата расшифровка` = ? ' +
+                    'AND `Направление группа` = ? ' +
+                    'AND `Декада` = ? ',
+                    [
+                      params[mode][0],
+                      params[mode][1][i],
+                      params[mode][2][i],
+                      params[mode][3][d],
+                      params[mode][4][dec]
+                    ])
+                  .then(([col, feilds]) => {
+                    for (let key in col[0]) {
+                      sum[dec][d].push(col[0][key] ? col[0][key] : 0);
+                    }
+                  })
+                  .catch(err => {
+                    console.log(err);
+                  });
+                } else {
+                  sum[dec][d].push(0);
+                }
+
               }
             }
           }

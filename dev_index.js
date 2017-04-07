@@ -55,6 +55,12 @@ router
     ctx.body = await devReg();
 
   })
+  .get('/dev-result', async ctx => {
+
+    const devRes = require('./ss-scripts-2017-1/dev-result');
+    ctx.body = await devRes();
+
+  })
   .get('/extra', async ctx => {
 
     const extra = require('./ss-scripts-2017-1/extra');
@@ -63,7 +69,7 @@ router
   })
   .get('/extra-reg', async ctx => {
 
-    const extraReg = require('./ss-scripts/extra-reg');
+    const extraReg = require('./ss-scripts-2017-1/extra-reg');
     ctx.body = await extraReg();
 
   })

@@ -261,13 +261,15 @@ async function dds_monSalary(mon) {
           dataIndirectDDS[i][2] ? dataIndirectDDS[i][2] : ' '
         ); //transcript
         paramsIndirectDDS['2.3'][2].push(
-          dataIndirectDDS[i][3] ? dataIndirectDDS[i][3] : ' '
+          dataIndirectDDS[i][1] ? dataIndirectDDS[i][1] : ' '
         ); //company
       }
 
       let sumDirectionsCommon = [];
 
-      //console.log(paramsIndirectDDS);
+      // Crutch !!!
+      let taxes = ['НДФЛ', 'Взносы за сотрудников', 'Взносы ИП', 'УСН', 'Транспортный налог'];
+
       for (let mode in paramsIndirectDDS) {
 
         let sum1;
@@ -277,8 +279,8 @@ async function dds_monSalary(mon) {
         let end = 0;
 
         await Promise.all([
-          dds_indirectQuery(pool, 'dds_lera', paramsIndirectDDS, mode),
-          dds_indirectQuery(pool, 'dds_olga', paramsIndirectDDS, mode)
+          dds_indirectQuery(pool, 'dds_lera', paramsIndirectDDS, mode, taxes),
+          dds_indirectQuery(pool, 'dds_olga', paramsIndirectDDS, mode, taxes)
         ])
           .then(async ([s1, s2]) => {
             sum1 = s1;
@@ -313,7 +315,7 @@ async function dds_monSalary(mon) {
             }
           }
 
-      }
+      } // End mode
 
       for (let dec = 0; dec < sumDirectionsCommon.length; dec++) {
         for (let d = 0; d < sumDirectionsCommon[dec].length; d++) {
@@ -350,9 +352,9 @@ async function dds_monSalary(mon) {
         arrFuncions.push(crud.updateData(arrValues, SIDS[mon], arrRange3[i]));
       });
 
-      //= Update DDS Salary =
+      // = Update DDS Indirect =
       await Promise.all(arrFuncions)
-      //  .then(async (results) => {console.log(results);})
+        //.then(async (results) => {console.log(results);})
         .catch(console.log);
 
     //----------------------------------------------------------------------

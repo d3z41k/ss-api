@@ -1,4 +1,4 @@
-async function devRegQuery(pool, tableName, params, CREW) {
+async function extraRegQuery(pool, tableName, params, CREW) {
   return new Promise(async (resolve, reject) => {
 
   let values = [];
@@ -14,8 +14,8 @@ async function devRegQuery(pool, tableName, params, CREW) {
               '`Направление деятельноcти` = ? ' +
               'AND `Статья движения денег` = ? ' +
               'AND `Месяц` = ? ' +
-              'AND `Проекты разработка` = ? ' +
-              'AND `Контрагент Разработка` = ?', [
+              'AND `Проекты Доп работы` = ? ' +
+              'AND `Контрагент Доп работы` = ?', [
                 params[0],
                 params[1][a],
                 params[2][m],
@@ -44,4 +44,4 @@ async function devRegQuery(pool, tableName, params, CREW) {
   });
 }
 
-module.exports = devRegQuery;
+module.exports = extraRegQuery;
