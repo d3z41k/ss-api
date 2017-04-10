@@ -23,6 +23,10 @@ async function dev() {
       const START = 6;
 
       let range = '';
+      let range1 = '';
+      let range2 = '';
+      let range3 = '';
+
       let list = {
         'registry': encodeURIComponent('Разработка (реестр)'),
         'clients': encodeURIComponent('Клиенты (разработка)'),
@@ -50,6 +54,14 @@ async function dev() {
       range = list.result + '!B4:H';
       let devResultData = await crud.readData(config.sid_2017.dev_result, range);
 
+      let projects = [];
+      let sumContract = [];
+      let endMonth = [];
+      let crewProject = {};
+      let hoursProject = {};
+      let factHours = [];
+      let factHoursPrep = [];
+
       try {
 
         let clientsInfo = clientsData.map(row => {
@@ -72,30 +84,81 @@ async function dev() {
           ]
         });
 
-        let projects = [];
-        let sumCintract = [];
-
-        devResultInfo.forEach((project, p) => {
-          console.log(devResultInfo[p][1]);
+        devResultInfo.forEach(project => {
           if (project[0] && !projects.includes(project[0])) {
             projects.push(project[0]);
           }
         });
 
-        projects.forEach((project, i) => {
-          if (clientsInfo[i][0] == project) {
-            sumCintract.push([clientsInfo[i][1]]);
-            for (let j = 0; j < 8; j++) {
-              sumCintract.push([]);
+        projects.forEach(project => {
+          crewProject[project] = [];
+          hoursProject[project] = [];
+
+          for (let i = 0; i < devResultInfo.length; i++) {
+            if (devResultInfo[i][0] == project) {
+              crewProject[project].push(devResultInfo[i][1]);
+            }
+          }
+
+          for (let j = 0; j < registryInfo.length; j++) {
+            if (registryInfo[j][0] == project) {
+              hoursProject[project].push([registryInfo[j][2], registryInfo[j][3]]);
             }
           }
         });
 
-        //console.log(sumCintract);
-        // range = list.result + '!E4:E';
-        // await crud.updateData(sumCintract, config.sid_2017.dev_result, range)
-        //   .then(async results => {console.log(results);})
-        //   .catch(console.log);
+        projects.forEach((project, p) => {
+          factHours.push([]);
+          crewProject[project].forEach(employee => {
+            if (!employee) {
+                factHours[p].push([0]);
+            }
+            hoursProject[project].forEach(hours => {
+              if (employee == hours[0]) {
+                factHours[p].push([hours[1]]);
+              }
+            });
+          });
+        });
+
+        factHours.forEach(project => {
+          project.push([]);
+          factHoursPrep = factHoursPrep.concat(project);
+        });
+
+        projects.forEach(project => {
+          for (let i = 0; i < clientsInfo.length; i++) {
+            if (clientsInfo[i][0] == project) {
+              sumContract.push([clientsInfo[i][1]]);
+              for (let j = 0; j < 8; j++) {
+                sumContract.push([]);
+              }
+            }
+          }
+          let new_project = true;
+          for (let n = 0; n < registryInfo.length; n++) {
+            if (registryInfo[n][0] == project && new_project) {
+              endMonth.push([registryInfo[n][1]]);
+              for (let m = 0; m < 8; m++) {
+                endMonth.push([]);
+              }
+              new_project = false;
+            }
+          }
+
+        });
+
+        range1 = list.result + '!E4:E';
+        range2 = list.result + '!L4:L';
+        range3 = list.result + '!G4:G';
+
+        await Promise.all([
+            crud.updateData(sumContract, config.sid_2017.dev_result, range1),
+            crud.updateData(factHoursPrep, config.sid_2017.dev_result, range2),
+            crud.updateData(endMonth, config.sid_2017.dev_result, range3)
+        ])
+          .then(async results => {console.log(results);})
+          .catch(console.log);
 
       } catch (e) {
         reject(e.stack);
