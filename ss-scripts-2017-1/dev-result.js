@@ -13,14 +13,16 @@ async function dev() {
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
 
-    //---------------------------------------------------------------
+    //-------------------------------------------------------------------------
     // Main function
-    //---------------------------------------------------------------
+    //-------------------------------------------------------------------------
 
     async function start(auth) {
 
       const crud = new Crud(auth);
       const START = 6;
+      const START_RESULT = 4;
+      const CREW = 8;
 
       let range = '';
       let range1 = '';
@@ -30,7 +32,7 @@ async function dev() {
       let list = {
         'registry': encodeURIComponent('Разработка (реестр)'),
         'clients': encodeURIComponent('Клиенты (разработка)'),
-        'result': encodeURIComponent('(Юра) итог2')
+        'result': encodeURIComponent('Себестоимость проектов')
       };
 
       //------------------------------------------------------------------------
@@ -51,19 +53,24 @@ async function dev() {
       // Get data from 'registryData'
       //------------------------------------------------------------------------
 
-      range = list.result + '!B4:H';
-      let devResultData = await crud.readData(config.sid_2017.dev_result, range);
+      range = list.result + '!B' + START_RESULT + ':H';
+      let devResultData = await crud.readData(config.sid_2017.dev, range);
+
+      //------------------------------------------------------------------------
+      // Main module
+      //------------------------------------------------------------------------
 
       let projects = [];
       let sumContract = [];
       let endMonth = [];
       let crewProject = {};
       let hoursProject = {};
-      let factHours = [];
-      let factHoursPrep = [];
+      let normaFactHours = [];
+      let normaFactHoursPrep = [];
 
       try {
 
+        // = Prepair Info from a spreadsheets =
         let clientsInfo = clientsData.map(row => {
           return [
             row[0],
@@ -74,7 +81,7 @@ async function dev() {
 
         let registryInfo = registryData.map(row => {
           return [
-            row[0], row[5], row[7], row[9]
+            row[0], row[5], row[7], row[8], row[9]
           ]
         });
 
@@ -84,6 +91,7 @@ async function dev() {
           ]
         });
 
+        // = Fetch data =
         devResultInfo.forEach(project => {
           if (project[0] && !projects.includes(project[0])) {
             projects.push(project[0]);
@@ -93,7 +101,6 @@ async function dev() {
         projects.forEach(project => {
           crewProject[project] = [];
           hoursProject[project] = [];
-
           for (let i = 0; i < devResultInfo.length; i++) {
             if (devResultInfo[i][0] == project) {
               crewProject[project].push(devResultInfo[i][1]);
@@ -102,35 +109,35 @@ async function dev() {
 
           for (let j = 0; j < registryInfo.length; j++) {
             if (registryInfo[j][0] == project) {
-              hoursProject[project].push([registryInfo[j][2], registryInfo[j][3]]);
+              hoursProject[project].push([registryInfo[j][2], registryInfo[j][3], registryInfo[j][4]]);
             }
           }
         });
 
         projects.forEach((project, p) => {
-          factHours.push([]);
+          normaFactHours.push([]);
           crewProject[project].forEach(employee => {
             if (!employee) {
-                factHours[p].push([0]);
+                normaFactHours[p].push([0, 0]);
             }
             hoursProject[project].forEach(hours => {
               if (employee == hours[0]) {
-                factHours[p].push([hours[1]]);
+                normaFactHours[p].push([hours[1], hours[2]]);
               }
             });
           });
         });
 
-        factHours.forEach(project => {
+        normaFactHours.forEach(project => {
           project.push([]);
-          factHoursPrep = factHoursPrep.concat(project);
+          normaFactHoursPrep = normaFactHoursPrep.concat(project);
         });
 
         projects.forEach(project => {
           for (let i = 0; i < clientsInfo.length; i++) {
             if (clientsInfo[i][0] == project) {
               sumContract.push([clientsInfo[i][1]]);
-              for (let j = 0; j < 8; j++) {
+              for (let j = 0; j < CREW; j++) {
                 sumContract.push([]);
               }
             }
@@ -139,7 +146,7 @@ async function dev() {
           for (let n = 0; n < registryInfo.length; n++) {
             if (registryInfo[n][0] == project && new_project) {
               endMonth.push([registryInfo[n][1]]);
-              for (let m = 0; m < 8; m++) {
+              for (let m = 0; m < CREW; m++) {
                 endMonth.push([]);
               }
               new_project = false;
@@ -148,64 +155,22 @@ async function dev() {
 
         });
 
-        range1 = list.result + '!E4:E';
-        range2 = list.result + '!L4:L';
-        range3 = list.result + '!G4:G';
+        // = Update data =
+        range1 = list.result + '!E' + START_RESULT + ':E';
+        range2 = list.result + '!L' + START_RESULT + ':M';
+        range3 = list.result + '!G' + START_RESULT + ':G';
 
         await Promise.all([
-            crud.updateData(sumContract, config.sid_2017.dev_result, range1),
-            crud.updateData(factHoursPrep, config.sid_2017.dev_result, range2),
-            crud.updateData(endMonth, config.sid_2017.dev_result, range3)
+            crud.updateData(sumContract, config.sid_2017.dev, range1),
+            crud.updateData(normaFactHoursPrep, config.sid_2017.dev, range2),
+            crud.updateData(endMonth, config.sid_2017.dev, range3)
         ])
-          .then(async results => {console.log(results);})
+        //  .then(async results => {console.log(results);})
           .catch(console.log);
 
       } catch (e) {
         reject(e.stack);
       }
-
-      // //------------------------------------------------------------------------
-      // // Build paramsDevCients and get & update Pay & date in develop clients
-      // //------------------------------------------------------------------------
-      //
-      // let paramsDevCients = [[], [], [], []];
-      //
-      // try {
-      //
-      //   //= Build params =
-      //   for (let a = (START - 1); a < devClients.length; a++) {
-      //     if (devClients[a][0] && devClients[a][1]) {
-      //       paramsDevCients[0].push(devClients[a][0]);
-      //       paramsDevCients[1].push(devClients[a][1]);
-      //
-      //     } else {
-      //       paramsDevCients[0].push(' ');
-      //       paramsDevCients[1].push(' ');
-      //     }
-      //   }
-      //
-      //   paramsDevCients[2].push(devClients[0][11].trim());
-      //   paramsDevCients[3].push(devClients[1][11].trim(), devClients[1][15].trim(), devClients[1][19].trim());
-      //
-      //   //= Get values =
-      //   let values = await devQuery(pool, 'dds_olga', paramsDevCients);
-      //
-      //   //= Update data =
-      //   let sellPayRange = list + '!L' + START + ':M' + (values[0].length + START);
-      //   let prePayRange = list + '!P' + START + ':Q' + (values[0].length + START);
-      //   let finalPayRange = list + '!T' + START + ':U' + (values[0].length + START);
-      //
-      //   await Promise.all([
-      //     crud.updateData(values[0], config.sid_2017.dev, sellPayRange),
-      //     crud.updateData(values[1], config.sid_2017.dev, prePayRange),
-      //     crud.updateData(values[2], config.sid_2017.dev, finalPayRange)
-      //   ])
-      //     //.then(async results => {console.log(results);})
-      //     .catch(console.log);
-      //
-      // } catch (e) {
-      //   reject(e.stack);
-      // }
 
       //------------------------------------------------------------------------
       // Update date-time in "Monitoring"

@@ -122,8 +122,7 @@ async function salaryDistrib() {
           range = list.distrib[d] + '!AE5:AN';
           let dataDistribDir = await crud.readData(config.sid_2017.salary, range);
 
-
-          //= If existant danta =
+          //= If existant data =
 
           if (dataDistribDir.length > 2) {
 
