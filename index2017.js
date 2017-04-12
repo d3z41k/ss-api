@@ -193,6 +193,12 @@ router
 
     const finState = require('./ss-scripts-2017-1/fin-state');
     ctx.body = await finState(months);
+  })
+  .get('/fin-model-balance', async ctx => {
+
+    const finModelBalance = require('./ss-scripts-2017-1/fin-model-balance');
+    ctx.body = await finModelBalance();
+
 });
 
 app.use(router.routes());
