@@ -96,6 +96,8 @@ async function salaryDistrib() {
             }
           }
 
+          console.log(accruedSalary);
+
           range1 = list.distrib[d] + '!D' + START + ':D';
           range2 = list.fot + '!' + FOT_COLS[d + 1][0] + START + ':' + FOT_COLS[d + 1][0];
 

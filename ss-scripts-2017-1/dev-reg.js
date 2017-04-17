@@ -17,8 +17,6 @@ async function devReg() {
 
     require('../libs/auth')(start);
 
-    console.log('Start: ' + new Date());
-
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
     const normLength = require('../libs/normalize-length');
@@ -55,7 +53,7 @@ async function devReg() {
 
       //= Get months cols for develope registryData =
       const COL_MONTH = config.reg_colMonths_1;
-      let cols = '';
+
 
       //------------------------------------------------------------------------
       // Get Project length (Build xArray)
@@ -146,11 +144,11 @@ async function devReg() {
       let clientData = await crud.readData(config.sid_2017.dev, range);
 
       let contractSum = clientData.map(row => {
-        return [
-          row[0],
-          row[9] && Number(row[9].replace(/\s/g, ''))
-          ? Number(row[9].replace(/\s/g, '')) : 0
-        ];
+          return [
+            row[0],
+            row[9] && Number(row[9].replace(/\s/g, ''))
+            ? Number(row[9].replace(/\s/g, '')) : 0
+          ];
       });
 
       //------------------------------------------------------------------------
@@ -172,20 +170,20 @@ async function devReg() {
 
                //= Push start month =
                if (clientData[i][6]
-                 && clientData[i][6].slice(3,5) < 7
+                 && clientData[i][6].slice(3, 5) < 7
                  && clientData[i][6].slice(6) == '2016') {
                  actionMonth[x].push(1);
                } else {
-                 actionMonth[x].push(clientData[i][6] && clientData[i][6].slice(3,5) < 7
-                   ? Number(clientData[i][6].slice(3,5)) : 1);
+                 actionMonth[x].push(clientData[i][6] && clientData[i][6].slice(3, 5) < 7
+                   ? Number(clientData[i][6].slice(3, 5)) : 1);
                }
                //= Push end month =
                if (clientData[i][10]
                  && clientData[i][10].slice(6) == '2016') {
                  actionMonth[x].push(1);
                } else {
-                 actionMonth[x].push(clientData[i][10] && clientData[i][10].slice(3,5) < 7
-                    ? Number(clientData[i][10].slice(3,5)) : 6);
+                 actionMonth[x].push(clientData[i][10] && clientData[i][10].slice(3, 5) < 7
+                    ? Number(clientData[i][10].slice(3, 5)) : 6);
                }
              }
            }
@@ -435,7 +433,7 @@ async function devReg() {
         if (!lawt.name.includes(registryData[i][7])) {
           lawt.name.push(registryData[i][7]); //lawt names
           list.name = encodeURIComponent(registryData[i][7]);
-          range = list.name + '!B10:L1000';
+          range = list.name + '!A10:F1000';
           lawt.table.push(await crud.readData(config.sid_2017.lawt, range)); //lawt tables
         }
       }
@@ -637,6 +635,7 @@ async function devReg() {
         .then(async result => {console.log(result);})
         .catch(console.err);
 
+
       console.log('* update Margin and Margins *');
 
       //-------------------------------------------------------------
@@ -653,8 +652,6 @@ async function devReg() {
       await crud.updateData(now, config.sid_2017.monit, range)
         //.then(async (result) => {console.log(result);})
         .catch(console.err);
-
-      console.log('End: ' + new Date());
 
     } //= End start function =
 

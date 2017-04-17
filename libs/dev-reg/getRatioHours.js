@@ -5,7 +5,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
     const DIRECTION = 'Разработка сайта';
     const CTO = 'Заводов Павел';
     const MANAGER = 'Сребняк Кирилл';
-    
+
     let sal = 0;
     let div = 0;
     let sum = [];
@@ -46,9 +46,9 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
           for (let t = 0; t < lawt.table[n].length; t++) {
             if (lawt.table[n][t][0]
               && Number(lawt.table[n][t][0].substr(3,2)) == months[m]
-              && lawt.table[n][t][5] != '-'
-              && lawt.table[n][t][5]) {
-               divider += Number(lawt.table[n][t][5].replace(/,/g, '.'));
+              && lawt.table[n][t][2] != '-'
+              && lawt.table[n][t][2]) {
+               divider += Number(lawt.table[n][t][2].replace(/,/g, '.'));
             }
           }
           dividers[n][1].push(Math.round(divider * 10000) / 10000);
@@ -68,12 +68,12 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
         for (let t = 0; t < lawt.table[n].length; t++) {
 
           if (lawt.name[n].trim() == MANAGER
-            && lawt.table[n][t][5]) {
-             worksHours.manager = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+            && lawt.table[n][t][2]) {
+             worksHours.manager = Number(lawt.table[n][t][2].replace(/,/g, '.'));
           } else if (lawt.name[n].trim() == CTO
             && lawt.table[n][t][1].trim() == DIRECTION
-            && lawt.table[n][t][5]) {
-             worksHours.cto = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+            && lawt.table[n][t][2]) {
+             worksHours.cto = Number(lawt.table[n][t][2].replace(/,/g, '.'));
           }
         }
       }
@@ -148,11 +148,11 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
                       for (let t = 0; t < lawt.table[n].length; t++) {
                         if (lawt.table[n][t][0]
                           && Number(lawt.table[n][t][0].substr(3,2)) == params[1][p][m]
-                          && lawt.table[n][t][2] == params[2][p]
-                          && lawt.table[n][t][5].trim() != '-'
+                          && lawt.table[n][t][5] == params[2][p]
+                          && lawt.table[n][t][2].trim() != '-'
                           && lawt.table[n][t][1].trim() == DIRECTION
-                          && lawt.table[n][t][5]) {
-                            factHour += Number(lawt.table[n][t][5].replace(/,/g, '.'));
+                          && lawt.table[n][t][2]) {
+                            factHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
                         }
                       }
                     }
@@ -162,11 +162,11 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
                     for (let t = 0; t < lawt.table[n].length; t++) {
                       if (lawt.table[n][t][0]
                         && Number(lawt.table[n][t][0].substr(3,2)) == params[1][p][m]
-                        && lawt.table[n][t][2] == params[2][p]
-                        && lawt.table[n][t][5].trim() != '-'
+                        && lawt.table[n][t][5] == params[2][p]
+                        && lawt.table[n][t][2].trim() != '-'
                         && lawt.table[n][t][1].trim() == DIRECTION
-                        && lawt.table[n][t][5]) {
-                          warrentyHour += Number(lawt.table[n][t][5].replace(/,/g, '.'));
+                        && lawt.table[n][t][2]) {
+                          warrentyHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
                       }
                     }
                   }

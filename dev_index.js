@@ -81,7 +81,7 @@ router
   })
   .get('/amo-reg', async ctx => {
 
-    const amoReg = require('./ss-scripts/amo-reg');
+    const amoReg = require('./ss-scripts-2017-1/amo-reg');
     ctx.body = await amoReg();
 
   })

@@ -1,365 +1,7 @@
 'use strict';
 
 const config = require('config');
-
-async function getRatio(salary, lawt, params, cutContractMonths) {
-  return new Promise(async(resolve, reject) => {
-
-    if (!salary || !lawt || !params) {
-      reject('Empty arguments!');
-    }
-
-    const CREW = 7;
-    let sal = 0;
-    let div = 0;
-    let sum = [];
-    let divider = 0;
-    let dividers = [];
-    let ratio = [];
-    let factHours = [];
-    let warrentyHours = [];
-    let months = [7, 8, 9, 10, 11, 12];
-
-    //console.log(params[2][1][1]);
-
-    //= The Numbers of cols in Salary
-    let ratioMonth = config.ratioMonth;
-
-    //= Build the salary sum for each month =
-
-    for (let p = 0; p < params[0].length; p++) {
-      sum.push([]);
-      for (let m = 0; m < params[1][p].length; m++) {
-        sum[p].push([]);
-        for (let i = 0; i < params[0][p].length; i++) {
-          for (let s = 0; s < salary.length; s++) {
-            if (salary[s][3] == params[0][p][i]) {
-              sum[p][m].push(Number(salary[s][ratioMonth[params[1][p][m]]].replace(/\s/g, '')) ?
-                Number(salary[s][ratioMonth[params[1][p][m]]].replace(/\s/g, '')) : 0);
-            }
-          }
-        }
-      }
-    }
-
-    //= Build divider =
-
-    for (let n = 0; n < lawt.name.length; n++) {
-      dividers.push([]);
-      dividers[n].push(lawt.name[n]);
-      dividers[n].push([]);
-
-      for (let m = 0; m < months.length; m++) {
-        divider = 0;
-        for (let t = 0; t < lawt.table[n].length; t++) {
-          if (lawt.table[n][t][0]
-            && Number(lawt.table[n][t][0].substr(3,2)) == months[m]
-            && lawt.table[n][t][5]) {
-             divider += Number(lawt.table[n][t][5].replace(/,/g, '.'));
-          }
-        }
-        dividers[n][1].push(Math.round(divider * 10000) / 10000);
-      }
-    }
-
-    //= Build work hours of manager and tecnical director per month=
-
-    let worksHours = {
-      'manager': {
-        'Интеграция (AMO)': 0,
-        'Обслуживание (AMO)': 0,
-        'Виджеты разработка (AMO)': 0,
-        'Виджеты готовые (AMO)': 0,
-        'Доп. работы (АМО)': 0
-      },
-      'tecDirector': 0
-    };
-
-
-    for (let n = 0; n < lawt.name.length; n++) {
-        for (let t = 0; t < lawt.table[n].length; t++) {
-
-          if (lawt.name[n].trim() == 'Драниченко Максим'
-            && lawt.table[n][t][5]) {
-
-              switch(lawt.table[n][t][1].trim()) {
-                case 'Интеграция (AMO)':
-                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][5].replace(/,/g, '.'));
-                  break;
-                case 'Обслуживание (AMO)':
-                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][5].replace(/,/g, '.'));
-                  break;
-                case 'Виджеты разработка (AMO)':
-                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][5].replace(/,/g, '.'));
-                  break;
-                case 'Виджеты готовые (AMO)':
-                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][5].replace(/,/g, '.'));
-                  break;
-                case 'Доп. работы (АМО)':
-                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][5].replace(/,/g, '.'));
-                  break;
-                default: break;
-              }
-
-          } else if (lawt.name[n].trim() == 'Заводов Павел'
-            && lawt.table[n][t][1].trim() == 'Виджеты разработка (AMO)'
-            && lawt.table[n][t][5]) {
-             worksHours.tecDirector = Number(lawt.table[n][t][5].replace(/,/g, '.'));
-          }
-        }
-    }
-
-    //console.log(worksHours);
-
-    //= Build ratio =
-    for (let p = 0; p < params[0].length ; p++) {
-      ratio.push([]);
-      for (let m = 0; m < params[1][p].length; m++) {
-        ratio[p].push([]);
-        for (let c = 0; c < CREW; c++) {
-          for (let d = 0; d < dividers.length; d++) {
-            if (dividers[d][0] == params[0][p][c]) {
-
-              div = dividers[d][1][params[1][p][m] - 7];
-              sal = sum[p][params[1][p][m] - params[1][p][0]][c] ? sum[p][params[1][p][m] - params[1][p][0]][c] : 0;
-
-              ratio[p][m].push(div ? Math.round(sal / div * 10000) / 10000 : 0);
-
-            }
-          }
-        }
-      }
-    }
-
-    //console.log(ratio);
-
-    //= Build quantinty of a projects =
-    let quantityProjects = {
-      'manager': {
-        '7': {
-          'Интеграция (AMO)': [],
-          'Обслуживание (AMO)': [],
-          'Виджеты разработка (AMO)': [],
-          'Виджеты готовые (AMO)': [],
-          'Доп. работы (АМО)': []
-        },
-
-        '8': {
-          'Интеграция (AMO)': [],
-          'Обслуживание (AMO)': [],
-          'Виджеты разработка (AMO)': [],
-          'Виджеты готовые (AMO)': [],
-          'Доп. работы (АМО)': []
-        },
-
-        '9': {
-          'Интеграция (AMO)': [],
-          'Обслуживание (AMO)': [],
-          'Виджеты разработка (AMO)': [],
-          'Виджеты готовые (AMO)': [],
-          'Доп. работы (АМО)': []
-        },
-
-        '10': {
-          'Интеграция (AMO)': [],
-          'Обслуживание (AMO)': [],
-          'Виджеты разработка (AMO)': [],
-          'Виджеты готовые (AMO)': [],
-          'Доп. работы (АМО)': []
-        },
-
-        '11': {
-          'Интеграция (AMO)': [],
-          'Обслуживание (AMO)': [],
-          'Виджеты разработка (AMO)': [],
-          'Виджеты готовые (AMO)': [],
-          'Доп. работы (АМО)': []
-        },
-
-        '12': {
-          'Интеграция (AMO)': [],
-          'Обслуживание (AMO)': [],
-          'Виджеты разработка (AMO)': [],
-          'Виджеты готовые (AMO)': [],
-          'Доп. работы (АМО)': []
-
-        }
-      },
-
-      'tecDirector': {
-        '7': [],
-        '8': [],
-        '9': [],
-        '10': [],
-        '11': [],
-        '12': []
-      }
-    };
-
-    let types = [
-      'Интеграция (AMO)',
-      'Обслуживание (AMO)',
-      'Виджеты разработка (AMO)',
-      'Виджеты готовые (AMO)',
-      'Доп. работы (АМО)',
-    ];
-
-    for (let p = 0; p < cutContractMonths.length; p++) {
-      for (let i = 0; i < cutContractMonths[p].length; i++) {
-        //= Filter 'Лицензии (AMO)'
-        if (types.includes(params[2][p][1])) {
-          quantityProjects.tecDirector[cutContractMonths[p][i]].push(cutContractMonths[p][i]);
-        }
-      }
-    }
-
-    for (let key in quantityProjects.tecDirector) {
-      quantityProjects.tecDirector[key] = quantityProjects.tecDirector[key].length;
-    }
-
-    //console.log(Object.getOwnPropertyNames(quantityProjects.manager[7])[0]);
-
-    for (let p = 0; p < cutContractMonths.length; p++) {
-      for (let i = 0; i < cutContractMonths[p].length; i++) {
-        for (let t = 0; t < types.length; t++) {
-          if (Object.getOwnPropertyNames(quantityProjects.manager[cutContractMonths[p][i]])[t]
-            == params[2][p][1]) {
-            quantityProjects.manager[cutContractMonths[p][i]][types[t]].push(cutContractMonths[p][i]);
-          }
-        }
-      }
-    }
-
-    for (let key1 in quantityProjects.manager) {
-      for (let key2 in quantityProjects.manager[key1]) {
-        quantityProjects.manager[key1][key2] = quantityProjects.manager[key1][key2].length;
-      }
-    }
-
-    //console.log(quantityProjects);
-
-    //= Build factHours and warrentyHours =
-
-    for (let p = 0; p < params[0].length ; p++) {
-      factHours.push([]);
-      warrentyHours.push([]);
-      for (let m = 0; m < params[1][p].length; m++) {
-        factHours[p].push([]);
-        warrentyHours[p].push([]);
-        for (let c = 0; c < CREW; c++) {
-          let factHour = 0;
-          let warrentyHour = 0;
-          for (let n = 0; n < lawt.name.length; n++) {
-
-            if (lawt.name[n] == params[0][p][c]) {
-
-              //= Build factHours for manager =
-              if (lawt.name[n].trim() == 'Драниченко Максим') {
-                if (cutContractMonths[p][m]) {
-                  let currMonth = cutContractMonths[p][m];
-
-                  //= Danger!!! may div by zero=
-
-                    switch(params[2][p][1]) {
-                      case 'Интеграция (AMO)':
-                        factHour += Math.round(worksHours.manager[params[2][p][1]]
-                        / quantityProjects.manager[currMonth][params[2][p][1]] * 10000) / 10000;
-                        break;
-                      case 'Обслуживание (AMO)':
-                        factHour += Math.round(worksHours.manager[params[2][p][1]]
-                        / quantityProjects.manager[currMonth][params[2][p][1]] * 10000) / 10000;
-                        break;
-                      case 'Виджеты разработка (AMO)':
-                        factHour += Math.round(worksHours.manager[params[2][p][1]]
-                        / quantityProjects.manager[currMonth][params[2][p][1]] * 10000) / 10000;
-                        break;
-                      case 'Виджеты готовые (AMO)':
-                        factHour += Math.round(worksHours.manager[params[2][p][1]]
-                        / quantityProjects.manager[currMonth][params[2][p][1]] * 10000) / 10000;
-                        break;
-                      case 'Доп. работы (АМО)':
-                        factHour += Math.round(worksHours.manager[params[2][p][1]]
-                        / quantityProjects.manager[currMonth][params[2][p][1]] * 10000) / 10000;
-                        break;
-                      default: break;
-
-                  }
-                }
-              } else if (lawt.name[n].trim() == 'Заводов Павел') {
-                if (cutContractMonths[p][m]
-                  && types.includes(params[2][p][1])) {
-                  let currMonth = cutContractMonths[p][m];
-                    factHour += Math.round(worksHours.tecDirector / quantityProjects.tecDirector[currMonth] * 10000) / 10000;
-                 }
-              } else {
-                //= Another employee
-                if (cutContractMonths[p][m]) {
-                  for (let t = 0; t < lawt.table[n].length; t++) {
-                    if (lawt.table[n][t][0]
-                      && Number(lawt.table[n][t][0].substr(3,2)) == params[1][p][m]
-                      && lawt.table[n][t][4] == params[2][p][0]
-                      && lawt.table[n][t][5].trim() != '-'
-                      //&& lawt.table[n][t][1].trim() == 'Разработка сайта'
-                      && lawt.table[n][t][5]) {
-                        factHour += Number(lawt.table[n][t][5].replace(/,/g, '.'));
-                    }
-
-                  }
-                } else {
-                  for (let t = 0; t < lawt.table[n].length; t++) {
-                    if (lawt.table[n][t][0]
-                      && Number(lawt.table[n][t][0].substr(3,2)) == params[1][p][m]
-                      && lawt.table[n][t][4] == params[2][p][0]
-                      && lawt.table[n][t][5].trim() != '-'
-                      //&& lawt.table[n][t][1].trim() == 'Разработка сайта'
-                      && lawt.table[n][t][5]) {
-                        warrentyHour += Number(lawt.table[n][t][5].replace(/,/g, '.'));
-                    }
-                  }
-
-                }
-              }
-            }
-          }
-           factHours[p][m].push(Math.round(factHour * 10000) / 10000);
-           warrentyHours[p][m].push(Math.round(warrentyHour * 10000) / 10000);
-        }
-      }
-    }
-
-   //console.log(warrentyHours);
-
-   resolve([ratio, factHours, warrentyHours]);
-
-  });
-}
-
-async function getMargin(contractSum, params) {
-  return new Promise(async (resolve, reject) => {
-
-    let margin = 0;
-    let sub = 0;
-
-    // =Add to sub P (debt) =
-    sub += Number(params[1]);
-
-    // = Add to sub salary and other cost =
-    for (let i = 2; i < params.length; i++) {
-      params[i].forEach((value) => {
-        sub += Number(value);
-      })
-    }
-
-    for (var c = 0; c < contractSum.length; c++) {
-      if(contractSum[c][0] == params[0]) {
-        margin = contractSum[c][1] - sub;
-      }
-    }
-
-    resolve(margin);
-  });
-
-}
+const _ = require('lodash/array');
 
 //--------------------------------------------------------------------------
 // Main function
@@ -367,8 +9,6 @@ async function getMargin(contractSum, params) {
 
 async function amoReg() {
   return new Promise(async (resolve, reject) => {
-
-    console.log('START: ' + new Date());
 
     //--------------------------------------------------------------------------
     // Usres libs
@@ -381,8 +21,10 @@ async function amoReg() {
     const normLength = require('../libs/normalize-length');
     const sleep = require('../libs/sleep');
     const dbRefresh = require('../models/db_refresh');
-    const pool = require('../models/db_pool');
-    const amoRegQuery = require('../models/db_amo-reg-query');
+    const pool = require('../models-2017-1/db_pool');
+    const amoRegQuery = require('../models-2017-1/db_amo-reg-query');
+    const getRatioHours = require('../libs/amo-reg/getRatioHours');
+    const getMargin = require('../libs/amo-reg/getMargin');
     let abc = require('../libs/abc')();
 
     async function start(auth) {
@@ -392,55 +34,57 @@ async function amoReg() {
       const CREW = 7;
       const START = 11;
       const YEAR = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-      let list = '';
-      let range = '';
+      const MONTHS = YEAR.slice(0, 6); // change half-year
 
-      // //= Get months cols for develope registry =
-      const colMonths = config.reg_colMonths;
-      let cols = '';
+      let list = {
+        'amo': encodeURIComponent('AMO (реестр)'),
+        'clients': encodeURIComponent('Клиенты (AMO)'),
+        'fot': encodeURIComponent('ФОТ (факт)'),
+        'dds_lera': encodeURIComponent('ДДС_Лера'),
+        'name': ''
+      };
+
+      let range = '';
+      let range1 = '';
+      let range2 = '';
+
+      //= Get months cols for develope registryData =
+      const COL_MONTH = config.reg_colMonths_1;
 
       //------------------------------------------------------------------------
       // Get Project length (Build xArray)
       //------------------------------------------------------------------------
 
-      list = encodeURIComponent('AMO (реестр)');
-      range = list + '!A1:A';
-      let xLable = await crud.readData(config.ssId.amo, range);
+      range = list.amo + '!A1:A';
+      let xLable = await crud.readData(config.sid_2017.amo, range);
+
       let xArray = [];
 
-     try {
+      xLable.forEach((value, x) => {
+        if (value == 'x') {
+          xArray.push(x + 2);
+        }
+      });
 
-        xLable.forEach((value, x) => {
-          if (value == 'x') {
-            xArray.push(x + 2);
-          }
-        });
-
-        xArray.pop();
-        xArray.unshift(START);
-
-      } catch (e) {
-        console.log(e.stack);
-      }
+      xArray.pop();
+      xArray.unshift(START);
 
       //------------------------------------------------------------------------
-      // Get data from 'Registry'
+      // Get data from 'registryData'
       //------------------------------------------------------------------------
 
-      range = list + '!C11:DI';
+      range = list.amo + '!C11:DI' + xLable.length;
 
-      let registry = await crud.readData(config.ssId.amo, range);
+      let registryData = await crud.readData(config.sid_2017.amo, range);
 
       //------------------------------------------------------------------------
       // Get and normalize "Contract Sum"
       //------------------------------------------------------------------------
 
-      list = encodeURIComponent('Клиенты (AMO)');
-      range = list + '!B5:U';
+      range = list.clients + '!B12:U';
+      let clientData = await crud.readData(config.sid_2017.amo, range);
 
-      let clientInfo = await crud.readData(config.ssId.amo, range);
-
-      let contractSum = clientInfo.map((row) => {
+      let contractSum = clientData.map((row) => {
         return [
           row[0],
           row[10] && Number(row[10].replace(/\s/g, ''))
@@ -448,67 +92,76 @@ async function amoReg() {
         ]
       });
 
-      //console.log(contractSum);
-
       //------------------------------------------------------------------------
-      // Get "Action months"
+      // Get "Action months & Contract months"
       //------------------------------------------------------------------------
 
       let actionMonth = [];
-
-      for (let x = 0; x < xArray.length; x++) {
-        actionMonth.push([]);
-        for (let i = 0; i < clientInfo.length; i++) {
-          if (registry[xArray[x] - START][0]  == clientInfo[i][0]) {
-            actionMonth[x].push(clientInfo[i][7] ? Number(clientInfo[i][7].slice(3,5)) : 6);
-            actionMonth[x].push(clientInfo[i][11] ? Number(clientInfo[i][11].slice(3,5)) : 12);
-          }
-        }
-        actionMonth[x].length = 2;
-      }
-
-      //console.log(actionMonth);
-
-      //---------------------------------------------------------------
-      // Get Actual months for a projects
-      //---------------------------------------------------------------
-
       let actionMonths = [];
       let contractMonths = [];
-
-      actionMonth.forEach((months) => {
-          actionMonths.push(YEAR.slice(months[0]));
-          contractMonths.push(YEAR.slice(months[0], months[1] + 1));
-      });
-
       let cutActionMonths = [];
       let cutContractMonths = [];
 
-      actionMonths.forEach((months) => {
-        let line = months.filter((month) => {
-          return month >= 7;
-        });
-        cutActionMonths.push(line);
-      });
+      try {
 
-      contractMonths.forEach((months) => {
-        let line = months.filter((month) => {
-          return month >= 7;
-        });
-        cutContractMonths.push(line);
-      });
+        for (let x = 0; x < xArray.length; x++) {
+          actionMonth.push([]);
+          for (let i = 0; i < clientData.length; i++) {
+            if (registryData[xArray[x] - START][0] == clientData[i][0]) {
 
-      cutContractMonths.forEach((value, i) => {
-        if (!value[0]) {
-            cutContractMonths[i] = [7];
-        }
-      });
+              //= Push start month =
+              if (clientData[i][7]
+                && clientData[i][7].slice(3, 5) < 7
+                && clientData[i][7].slice(6) == '2016') {
+                actionMonth[x].push(1);
+              } else {
+                actionMonth[x].push(clientData[i][7] && clientData[i][6].slice(3, 5) < 7
+                  ? Number(clientData[i][7].slice(3, 5)) : 1);
+              }
+              //= Push end month =
+              if (clientData[i][11]
+                && clientData[i][11].slice(6) == '2016') {
+                actionMonth[x].push(1);
+              } else {
+                actionMonth[x].push(clientData[i][11] && clientData[i][11].slice(3, 5) < 7
+                   ? Number(clientData[i][11].slice(3, 5)) : 6);
+              }
+            }
+          }
+           actionMonth[x].length = 2;
+         }
+
+         //= Get Actual months for a projects =
+         actionMonth.forEach((months) => {
+             actionMonths.push(YEAR.slice(months[0]));
+             contractMonths.push(YEAR.slice(months[0], months[1] + 1));
+         });
+
+         //= Сut Action months for a projects =
+         actionMonths.forEach((months) => {
+           let line = months.filter((month) => {
+             return month < 7;
+           });
+           cutActionMonths.push(line);
+         });
+
+         //= Get Contract months for a projects =
+         contractMonths.forEach((months) => {
+           let line = months.filter((month) => {
+             return month < 7;
+           });
+           cutContractMonths.push(line);
+         });
+
+      } catch (e) {
+        reject(e.stack);
+      }
 
       //--------------------------------------------------------------------------
       // Get & Insert mounth and amount of the act
       //--------------------------------------------------------------------------
 
-      // let monthAct = clientInfo.map((row) => {
+      // let monthAct = clientData.map((row) => {
       //   return [
       //     row[0],
       //     row[11] ? row[11] : 0,
@@ -517,59 +170,132 @@ async function amoReg() {
       //   ];
       // });
       //
-      // let colsAct = config.reg_colsAct;
+      // let colsAct = config.reg_colsAct_1;
+      // let months = [];
+      //
       //
       // for (let x = 0; x < xArray.length; x++) {
       //
       //   let month = 0;
       //
       //   for (let i = 0; i < monthAct.length; i++) {
-      //     if (registry[xArray[x] - START][0]  == monthAct[i][0]) {
-      //       if (monthAct[i][1]) {
-      //         month = Number(monthAct[i][1].substr(3, 2)) > 6 ? Number(monthAct[i][1].substr(3, 2)) : 7;
+      //     if (registryData[xArray[x] - START][0]  == monthAct[i][0]) {
+      //       if (monthAct[i][1]
+      //         && monthAct[i][1].slice(6) == '2016') {
+      //         month = 1;
       //       } else {
-      //         month = '';
+      //         month = monthAct[i][1] ? Number(monthAct[i][1].substr(3, 2)) : '';
       //       }
-      //
-      //       list = encodeURIComponent('AMO (реестр)');
-      //       range = list + '!H' + xArray[x];
-      //
-      //       await crud.updateData([[month]], config.ssId.amo, range)
-      //         .then(async result => {console.log(result);})
-      //         .catch(console.err);
       //
       //       if (colsAct[month]) {
-      //         range = list + '!' + colsAct[month] + xArray[x];
+      //         range = list.amo + '!' + colsAct[month] + xArray[x];
       //
-      //         await crud.updateData([[monthAct[i][2]]], config.ssId.amo, range)
+      //         await crud.updateData([[monthAct[i][2]]], config.sid_2017.amo, range)
       //           .then(async result => {console.log(result);})
       //           .catch(console.err);
-      //         await sleep(500);
       //       }
+      //
+      //       sleep(100)
       //
       //     }
       //   }
       //
-      //   console.log('Project: ' + x);
-      //
+      //   months.push([month]);
+      //   for (let c = 0; c < CREW; c++) {
+      //     months.push([]);
+      //   }
       // }
+      //
+      // range = list.amo + '!H' + START + ':H';
+
+      // await crud.updateData(months, config.sid_2017.amo, range)
+      //   .then(async result => {console.log(result);})
+      //   .catch(console.err);
+      //
       // console.log(new Date());
       // console.log('* Get & Insert mounth and amount of the act *');
 
-      //------------------------------------------------------------------------
-      // The receipt of money from customers (prepaid & finally)
-      //------------------------------------------------------------------------
+      // -----------------------------------------------------------------------
+      // Build params & update Debt/Prepaid of customers
+      // -----------------------------------------------------------------------
 
-      // let srcRows = [];
+      // let monthPrepaid = clientData.map((row) => {
+      //   return [
+      //     row[0], row[15] ? row[15] : 0,
+      //     row[14] && Number(row[14].replace(/\s/g, ''))
+      //     ? Number(row[14].replace(/\s/g, '')) : 0
+      //   ];
+      // });
+      //
+      // range = list.amo + '!A6:CX';
+      //
+      // let clientData2016 = await crud.readData(config.ssId.amo, range);
+      //
+      // let debtData2016raw = clientData2016.map((row) => {
+      //   if (row[101] && Number(row[101].replace(/\s/g, ''))) {
+      //     return [
+      //       row[2], Number(row[101].replace(/\s/g, ''))
+      //     ];
+      //   } else {
+      //     return [];
+      //   }
+      // });
+      //
+      // let debtData2016 = debtData2016raw.filter(val => {
+      //   if (val[0]) {
+      //     return val;
+      //   }
+      // });
+      //
+      // let colDebt = config.colDebt_1.debt;
+      //
+      // //console.log(monthPrepaid);
+      //
+      // for (let x = 0; x < xArray.length; x++) {
+      //
+      //   for (let i = 0; i < monthPrepaid.length; i++) {
+      //     if (registryData[xArray[x] - START][0] == monthPrepaid[i][0]) {
+      //       if (!monthPrepaid[i][1] && monthPrepaid[i][2]) {
+      //
+      //         range = list.development + '!' + colDebt + xArray[x];
+      //
+      //         await crud.updateData([[-(monthPrepaid[i][2])]], config.sid_2017.amo, range)
+      //           .then(async result => {console.log(result);})
+      //           .catch(console.err);
+      //       }
+      //     }
+      //   }
+      //
+      //   for (let j = 0; j < debtData2016.length; j++) {
+      //     if (registryData[xArray[x] - START][0] == debtData2016[j][0]) {
+      //
+      //       range = list.amo + '!' + colDebt + xArray[x];
+      //
+      //       await crud.updateData([[debtData2016[j][1]]], config.sid_2017.amo, range)
+      //         .then(async result => {console.log(result);})
+      //         .catch(console.err);
+      //     }
+      //   }
+      //
+      // }
+      //
+      // console.log(new Date());
+      // console.log('* Get & Insert Debt / Prepaid *');
+
+      // -----------------------------------------------------------------------
+      // Refresh DDS (Lera)
+      // -----------------------------------------------------------------------
+
+      // let ddsData = [];
       // list = encodeURIComponent('ДДС_Лера');
       // range = list + '!A6:AC';
       //
-      // srcRows = await crud.readData(config.ssId.dds, range);
+      // ddsData = await crud.readData(config.ssId.dds, range);
       //
-      // // = Normalizing of length "srcRows" =
-      // normLength(srcRows);
+      // // = Normalizing of length "ddsData" =
+      // normLength(ddsData);
       //
-      // await dbRefresh(pool, 'dds_lera', srcRows)
+      // await dbRefresh(pool, 'dds_lera', ddsData)
       //   .then(async (results) => {console.log(results);})
       //   .catch(console.err);
 
@@ -577,51 +303,77 @@ async function amoReg() {
       // Build receiptParams The receipt of money from customers (prepaid & finalLy)
       //---------------------------------------------------------------
 
-      // list = encodeURIComponent('AMO (реестр)');
-      // let receiptParams = [[], [[],[]], [], [], []];
-      // let value = [];
-      //
-      // receiptParams[1][0] = 'Поступление денег от клиентов (предоплата)';
-      // receiptParams[1][1] = 'Поступление от клиентов (оконч. оплата)';
-      //
-      // for (let x = 0; x < xArray.length; x++) {
-      //
-      //   receiptParams[0] = [];
-      //   receiptParams[2] = [];
-      //   receiptParams[3] = [];
-      //   receiptParams[4] = [];
-      //   cols = [[], []];
-      //
-      //   receiptParams[0].push(registry[xArray[x] - START][4]);
-      //   receiptParams[3].push(registry[xArray[x] - START][0]);
-      //   receiptParams[4].push(registry[xArray[x] - START][1]);
-      //
-      //   for (let m = 0; m < cutActionMonths[x].length; m++) {
-      //     receiptParams[2].push(cutActionMonths[x][m]);
-      //     cols[0] = cols[0].concat(colMonths[cutActionMonths[x][m]].slice(0, 2));
-      //     cols[1] = cols[1].concat(colMonths[cutActionMonths[x][m]].slice(2, 4));
-      //   }
-      //
-      //   let values = await amoRegQuery(pool, 'dds_lera', receiptParams);
-      //
-      //   for (let c = 0; c < cols[0].length; c += 2) {
-      //
-      //     range = list + '!' + cols[0][c] + xArray[x] + ':' + cols[0][c + 1] + xArray[x];
-      //     value = [[values[c], values[c + 1]]];
-      //
-      //     await crud.updateData(value, config.ssId.amo, range)
-      //       .then(async result => {console.log(result);})
-      //       .catch(console.err);
-      //
-      //     //= The sleep for avoid of limit quota ("Write requests per 100 seconds per user") =
-      //     await sleep(1000);
-      //   }
-      //
-      //   console.log('Project: ' + x);
-      //
-      // }
-      // console.log(new Date());
-      // console.log('* The receipt of money from customers (prepaid & finalLy) *');
+      let receiptParams = [[], [[], [], []], [], [], []];
+
+      try {
+
+        receiptParams[0] = [
+          'Интеграция (AMO)',
+          'Обслуживание (AMO)',
+          'Виджеты разработка (AMO)',
+          'Виджеты готовые (AMO)',
+          'Доп. работы (АМО)',
+          'Лицензия АМО'
+        ]; //direction
+        receiptParams[1][0] = 'Поступление от новых клиентов (продажа)'; //article
+        receiptParams[1][1] = 'Поступление денег от сущ.клиентов (предоплата)'; //article
+        receiptParams[1][2] = 'Поступление от сущ.клиентов (оконч. оплата)'; //article
+        receiptParams[2] = [1, 2, 3, 4, 5, 6];
+
+        for (let x = 0; x < xArray.length; x++) {
+          receiptParams[3].push(registryData[xArray[x] - START][0]); //site
+          receiptParams[4].push(registryData[xArray[x] - START][1]); //counterparty
+        }
+
+      } catch (e) {
+        reject(e.stack)
+      }
+
+      //console.log(receiptParams);
+
+      let values = await amoRegQuery(pool, 'dds_lera', receiptParams, CREW);
+
+      let zipValues = [];
+      let arrRange = [];
+      let arrFuncions = [];
+
+      //= Zip valuses =
+      values.forEach(val => {
+        let arrArticles = [];
+        for (let a = 0; a < val.length; a++) {
+          arrArticles.push(val[a]);
+        }
+
+        // !! Hardcode 6 params, months (a half-year)
+        zipValues.push(_.zip(
+          arrArticles[0],
+          arrArticles[1],
+          arrArticles[2],
+          arrArticles[3],
+          arrArticles[4],
+          arrArticles[5]
+        ));
+      });
+
+      console.log(zipValues);
+
+      //= Prepare array of Range =
+      for (let month in COL_MONTH){
+        arrRange.push(list.amo + '!' + COL_MONTH[month][0] + START + ':' + COL_MONTH[month][2]);
+      }
+
+      //= Prepare array of Functions =
+      zipValues.forEach((arrValues, i)=> {
+        arrFuncions.push(crud.updateData(arrValues, config.sid_2017.amo, arrRange[i]));
+      });
+
+      //= Update data =
+      await Promise.all(arrFuncions)
+        .then(async (results) => {console.log(results);})
+        .catch(console.log);
+
+      console.log(new Date());
+      console.log('* The receipt of money from customers (prepaid & finally) *');
 
       //--------------------------------------------------------------------------
       // Build ratioParams for "Ratio" and "factHours"
@@ -642,13 +394,13 @@ async function amoReg() {
       //   ratioParams[2].push([]);
       //
       //   for (let i = (xArray[x] - START); i < (xArray[x] - START) + CREW; i++) {
-      //      if (registry[i][7]) {
-      //        ratioParams[0][x].push(registry[i][7]);
+      //      if (registryData[i][7]) {
+      //        ratioParams[0][x].push(registryData[i][7]);
       //
       //        // = Get object lawt name[0] -> table[0] etc. =
-      //        if (!lawt.name.includes(registry[i][7])) {
-      //          lawt.name.push(registry[i][7]);
-      //          list = encodeURIComponent(registry[i][7]);
+      //        if (!lawt.name.includes(registryData[i][7])) {
+      //          lawt.name.push(registryData[i][7]);
+      //          list = encodeURIComponent(registryData[i][7]);
       //          range = list + '!B10:L1000';
       //          lawt.table.push(await crud.readData(config.ssId.lawt, range));
       //        }
@@ -658,8 +410,8 @@ async function amoReg() {
       //   for (var m = 0; m < cutActionMonths[x].length; m++) {
       //       ratioParams[1][x].push(cutActionMonths[x][m]);
       //   }
-      //   ratioParams[2][x].push(registry[xArray[x] - START][0]);
-      //   ratioParams[2][x].push(registry[xArray[x] - START][4]);
+      //   ratioParams[2][x].push(registryData[xArray[x] - START][0]);
+      //   ratioParams[2][x].push(registryData[xArray[x] - START][4]);
       //
       // }
       //
@@ -752,100 +504,100 @@ async function amoReg() {
       // Build params for Margin
       //------------------------------------------------------------------------
 
-      //= Build ABC for margin params =
-      abc = abc.slice(2, 120);
-      let colsMargin = config.colsMargin;
-
-      const quantity = 4;
-      let jArray = [];
-
-      for (let x = 0; x < xArray.length; x++) {
-        let paramsMargin = [];
-
-        for (let i = 0; i < 26; i++) {
-          paramsMargin.push([]);
-        }
-
-        //= Push site in params =
-        paramsMargin[0].push(registry[xArray[x] - START][0]);
-
-        //= Push debt "P" in params =
-        let col = abc.indexOf(colsMargin.debt);
-        registry[xArray[x] - START][col] && Number(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-          ? paramsMargin[1].push(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-          : paramsMargin[1].push(0);
-
-        //= Push salary of CREW (x7) in params =
-        for (let i = xArray[x] - START; i < xArray[x] - START + CREW; i++) {
-          let count = 0;
-          for (let j = 2; j < (paramsMargin.length - 3); j += quantity) {
-            let col = abc.indexOf(colsMargin.salary[count]);
-            registry[i][col] && Number(registry[i][col].replace(/\s/g, '').replace(/,/g, '.'))
-                ? paramsMargin[j].push(registry[i][col].replace(/\s/g, '').replace(/,/g, '.'))
-                : paramsMargin[j].push(0);
-
-            jArray.push(j);
-            count++;
-          }
-        }
-
-        //= Push other cost (common for project) in params =
-        let count = 0;
-
-        for (let n = 3; n < paramsMargin.length; n++) {
-          if (!jArray.includes(n)) {
-            let col = abc.indexOf(colsMargin.other[count]);
-            registry[xArray[x] - START][col] && Number(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-              ? paramsMargin[n].push(registry[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-              : paramsMargin[n].push(0);
-            count++;
-          }
-        }
-
-        //console.log(paramsMargin);
-
-        //= Get & Insert values of "Margin & Margins" =
-        let margin = await getMargin(contractSum, paramsMargin);
-        let margins = 0;
-
-        for (var c = 0; c < contractSum.length; c++) {
-          if(contractSum[c][0] == paramsMargin[0]) {
-            margins = margin ? margin / contractSum[c][1] : 0;
-          }
-        }
-
-        //= Cut to 2 number after poin =
-        margins = margins.toFixed(2);
-
-        list = encodeURIComponent('AMO (реестр)');
-        range = list + '!N' + xArray[x] + ':O' + xArray[x];
-
-        await crud.updateData([[margin, margins]], config.ssId.amo, range)
-          .then(async result => {console.log(result);})
-          .catch(console.err);
-
-        console.log([margin, margins]);
-
-        }
-        console.log(new Date());
-        console.log('* Update for Margin *');
+      // //= Build ABC for margin params =
+      // abc = abc.slice(2, 120);
+      // let colsMargin = config.colsMargin;
+      //
+      // const quantity = 4;
+      // let jArray = [];
+      //
+      // for (let x = 0; x < xArray.length; x++) {
+      //   let paramsMargin = [];
+      //
+      //   for (let i = 0; i < 26; i++) {
+      //     paramsMargin.push([]);
+      //   }
+      //
+      //   //= Push site in params =
+      //   paramsMargin[0].push(registryData[xArray[x] - START][0]);
+      //
+      //   //= Push debt "P" in params =
+      //   let col = abc.indexOf(colsMargin.debt);
+      //   registryData[xArray[x] - START][col] && Number(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //     ? paramsMargin[1].push(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //     : paramsMargin[1].push(0);
+      //
+      //   //= Push salary of CREW (x7) in params =
+      //   for (let i = xArray[x] - START; i < xArray[x] - START + CREW; i++) {
+      //     let count = 0;
+      //     for (let j = 2; j < (paramsMargin.length - 3); j += quantity) {
+      //       let col = abc.indexOf(colsMargin.salary[count]);
+      //       registryData[i][col] && Number(registryData[i][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //           ? paramsMargin[j].push(registryData[i][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //           : paramsMargin[j].push(0);
+      //
+      //       jArray.push(j);
+      //       count++;
+      //     }
+      //   }
+      //
+      //   //= Push other cost (common for project) in params =
+      //   let count = 0;
+      //
+      //   for (let n = 3; n < paramsMargin.length; n++) {
+      //     if (!jArray.includes(n)) {
+      //       let col = abc.indexOf(colsMargin.other[count]);
+      //       registryData[xArray[x] - START][col] && Number(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //         ? paramsMargin[n].push(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //         : paramsMargin[n].push(0);
+      //       count++;
+      //     }
+      //   }
+      //
+      //   //console.log(paramsMargin);
+      //
+      //   //= Get & Insert values of "Margin & Margins" =
+      //   let margin = await getMargin(contractSum, paramsMargin);
+      //   let margins = 0;
+      //
+      //   for (var c = 0; c < contractSum.length; c++) {
+      //     if(contractSum[c][0] == paramsMargin[0]) {
+      //       margins = margin ? margin / contractSum[c][1] : 0;
+      //     }
+      //   }
+      //
+      //   //= Cut to 2 number after poin =
+      //   margins = margins.toFixed(2);
+      //
+      //   list = encodeURIComponent('AMO (реестр)');
+      //   range = list + '!N' + xArray[x] + ':O' + xArray[x];
+      //
+      //   await crud.updateData([[margin, margins]], config.ssId.amo, range)
+      //     .then(async result => {console.log(result);})
+      //     .catch(console.err);
+      //
+      //   console.log([margin, margins]);
+      //
+      //   }
+      //   console.log(new Date());
+      //   console.log('* Update for Margin *');
 
       //-------------------------------------------------------------
       // Update date-time in "Monitoring"
       //-------------------------------------------------------------
 
-      range = 'sheet1!B4';
-
-      let now = new Date();
-      now = [
-        [formatDate(now)]
-      ];
-
-      await crud.updateData(now, config.ssId.monit, range)
-        //.then(async (result) => {console.log(result);})
-        .catch(console.err);
-
-      console.log('End: ' + new Date());
+      // range = 'sheet1!B4';
+      //
+      // let now = new Date();
+      // now = [
+      //   [formatDate(now)]
+      // ];
+      //
+      // await crud.updateData(now, config.ssId.monit, range)
+      //   //.then(async (result) => {console.log(result);})
+      //   .catch(console.err);
+      //
+      // console.log('End: ' + new Date());
 
     } // = End start function =
 

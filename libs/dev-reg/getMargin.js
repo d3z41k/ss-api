@@ -33,7 +33,7 @@ async function getMargin(contractSum, params) {
 
         for (let c = 0; c < contractSum.length; c++) {
           if(contractSum[c][0] == params[0][p]) {
-            margin[p].push(contractSum[c][1] - sub[p]);
+            margin[p].push(Number(contractSum[c][1]) - Number(sub[p]));
           }
         }
 

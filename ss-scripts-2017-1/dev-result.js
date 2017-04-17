@@ -3,7 +3,7 @@
 const config = require('config');
 
 async function dev() {
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async(resolve, reject) => {
 
     //-------------------------------------------------------------------------
     // Usres libs
@@ -114,6 +114,8 @@ async function dev() {
           }
         });
 
+        console.log(hoursProject);
+
         projects.forEach((project, p) => {
           normaFactHours.push([]);
           crewProject[project].forEach(employee => {
@@ -132,6 +134,8 @@ async function dev() {
           project.push([]);
           normaFactHoursPrep = normaFactHoursPrep.concat(project);
         });
+
+        //console.log(normaFactHoursPrep);
 
         projects.forEach(project => {
           for (let i = 0; i < clientsInfo.length; i++) {
@@ -160,13 +164,15 @@ async function dev() {
         range2 = list.result + '!L' + START_RESULT + ':M';
         range3 = list.result + '!G' + START_RESULT + ':G';
 
+        //console.log(normaFactHoursPrep);
+
         await Promise.all([
             crud.updateData(sumContract, config.sid_2017.dev, range1),
             crud.updateData(normaFactHoursPrep, config.sid_2017.dev, range2),
             crud.updateData(endMonth, config.sid_2017.dev, range3)
         ])
-        //  .then(async results => {console.log(results);})
-          .catch(console.log);
+         .then(async results => {console.log(results);})
+         .catch(console.log);
 
       } catch (e) {
         reject(e.stack);
