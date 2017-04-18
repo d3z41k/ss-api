@@ -3,7 +3,6 @@
 const config = require('config');
 const _ = require('lodash/array');
 
-
 //------------------------------------------------------------------------------
 // Main function
 //------------------------------------------------------------------------------
@@ -433,7 +432,7 @@ async function devReg() {
         if (!lawt.name.includes(registryData[i][7])) {
           lawt.name.push(registryData[i][7]); //lawt names
           list.name = encodeURIComponent(registryData[i][7]);
-          range = list.name + '!A10:F1000';
+          range = list.name + '!A10:F1500';
           lawt.table.push(await crud.readData(config.sid_2017.lawt, range)); //lawt tables
         }
       }

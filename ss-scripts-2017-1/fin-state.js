@@ -13,8 +13,25 @@ async function finState(nowMonths) {
     const getCols = require('../libs/get-cols');
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
-    const dbRefresh = require('../models/db_refresh');
-    const pool = require('../models/db_pool');
+    const dbRefresh = require('../models-2017-1/db_refresh');
+    const pool = require('../models-2017-1/db_pool');
+    const sleep = require('../libs/sleep');
+    const factQuery = require('../models-2017-1/db_fact-query');
+
+    let indexMonths = {
+      'Jan': 1,
+      'Feb': 2,
+      'Mar': 3,
+      'Apr': 4,
+      'May': 5,
+      'Jun': 6
+    };
+
+    if (arguments.length) {
+      var months = [indexMonths[nowMonths]];
+    } else {
+      months = [1, 2, 3, 4, 5, 6];
+    }
 
     //---------------------------------------------------------------
     // Main function
@@ -23,140 +40,133 @@ async function finState(nowMonths) {
     async function start(auth) {
 
       const crud = new Crud(auth);
+      const START = 8;
+      const END = 98;
 
-      //-------------------------------------------------------------
-      // Read data from DDS to RAM
-      //-------------------------------------------------------------
-
+      let range = '';
+      let list = {
+        'dds_lera': encodeURIComponent('ДДС_Лера'),
+        'dds_olga': encodeURIComponent('ДДС_Ольга'),
+        'mts': encodeURIComponent('МТС')
+      };
       let srcRows = {
         lera: '',
         olga: ''
       };
 
-      //-------------------------------------------------------------
-      // Read data from dds_lera to RAM
-      //-------------------------------------------------------------
-
-      let list = encodeURIComponent('ДДС_Лера');
-      let range = list + '!A6:AC';
-
-      srcRows.lera = await crud.readData(config.ssId.dds, range);
-      srcRows.lera.length = normLength(srcRows.lera);
 
       //-------------------------------------------------------------
-      // Read data from dds_olga to RAM
+      // Refresh DDS table
       //-------------------------------------------------------------
 
-      list = encodeURIComponent('ДДС_Ольга');
-      range = list + '!A6:AK';
-
-      srcRows.olga = await crud.readData(config.ssId.dds, range);
-      srcRows.olga.length = normLength(srcRows.olga);
-
-      //---------------------------------------------------------------
-      // Normalizing of length "srcRows"
-      //---------------------------------------------------------------
-
-      function normLength(srcRows){
-        for (let i = 0; i < srcRows.length; i++) {
-          if (srcRows[i][0] == '' &&
-            srcRows[i + 1][0] == '' &&
-            srcRows[i + 2][0] == '') {
-            return srcRows.length = i;
-          }
-        }
-      }
-
-      //---------------------------------------------------------------
-      // Refresh table
-      //---------------------------------------------------------------
-
-      await Promise.all([
-        dbRefresh(pool, 'dds_lera', srcRows.lera),
-        dbRefresh(pool, 'dds_olga', srcRows.olga)
-      ])
-      //.then(async (results) => {console.log(results);})
-        .catch(console.log);
-
-      //await pool.end();
-
-      //-------------------------------------------------------------
+      // range = list.dds_lera + '!A6:AC';
+      // srcRows.lera = await crud.readData(config.ssId.dds, range);
       //
-      //-------------------------------------------------------------
+      // range = list.dds_olga + '!A6:AK';
+      // srcRows.olga = await crud.readData(config.ssId.dds, range);
+      //
+      // await Promise.all([
+      //   dbRefresh(pool, 'dds_lera', srcRows.lera),
+      //   dbRefresh(pool, 'dds_olga', srcRows.olga)
+      // ])
+      //   .then(async (results) => {console.log(results);})
+      //   .catch(console.log);
 
-      let divisions = config.divisions;
+      //------------------------------------------------------------------------
+      // Build params
+      //------------------------------------------------------------------------
+
+      let divisions = config.divisions_2017;
       let params = [[], [], []];
-      list = encodeURIComponent('МТС');
-      range = list + '!B8:B98';
-      params[1] = await crud.readData(config.ssId.fin_state, range);
-      const factQuery = require('../models/db_fact-query');
+      range = list.mts + '!B' + START + ':B' + END;
 
-      let months = nowMonths;
-      let mode = false;
+      params[0] = months; //months
+      params[1] = await crud.readData(config.sid_2017.fin_state, range); //articles
 
-      if (months.length <= 2) {
-        mode = true;
+      // params[1] = params[1].map(val => {
+      //   return val.trim();
+      // });
+
+      if (months.length <= 1) {
+        let mode = true;
+      } else {
+        let mode = false;
       }
 
       for (let division in divisions) {
+        params[2].push(Object.keys(divisions[division]));
+      } //end divisions
 
-        let cols = await getCols(auth, division, divisions[division].length, months);
+      //console.log(params);
+      let sum = [];
+      let sum1;
+      let sum2;
 
-        for (let m = 0; m < months.length; m++) {
-          params[0][0] = [];
-          params[0][0] = months[m];
+      await Promise.all([
+        factQuery(pool, 'dds_lera', params),
+        factQuery(pool, 'dds_olga', params)
+      ])
+        .then(async ([s1, s2]) => {
+          sum1 = s1;
+          sum2 = s2;
+        })
+        .catch(console.log);
 
-          for (let p = 0; p < divisions[division].length; p++) {
-            params[2] = [];
-            params[2].push(divisions[division][p]);
-
-            //make Promise.all!!!
-            let sum1 = await factQuery(pool, 'dds_lera', params);
-            let sum2 = await factQuery(pool, 'dds_olga', params);
-            let sum = [];
-
-            for (let i = 0; i < sum1.length; i++) {
-              sum.push([Number(sum1[i][0]) + Number(sum2[i][0])]);
+      for (let m = 0; m < sum1.length; m++) {
+        sum.push([]);
+        for (let d = 0; d < sum1[m].length; d++) {
+          sum[m].push([]);
+          for (let sd = 0; sd < sum1[m][d].length; sd++) {
+            sum[m][d].push([]);
+            for (let i = 0; i < sum1[m][d][sd].length; i++) {
+              sum[m][d][sd].push(Number(sum1[m][d][sd][i]) + Number(sum2[m][d][sd][i]));
             }
-
-            list = encodeURIComponent(division);
-            range = list + '!' + cols[m].fact[p] + '8:' + cols[m].fact[p] + '98';
-
-            await crud.updateData(sum, config.ssId.fin_state, range)
-            //.then(async (result) => {console.log(result);})
-              .catch(console.log);
-
-            resolve('complite!');
-
           }
         }
-
       }
 
-      //await pool.end();
+      console.log(require('util').inspect(sum, { depth: null }));
+
+
+  //
+  //  list = encodeURIComponent(division);
+  //  range = list + '!' + cols[m].fact[p] + '8:' + cols[m].fact[p] + '98';
+  //
+  //  await crud.updateData(sum, config.ssId.fin_state, range)
+  //    .then(async (result) => {console.log(result);})
+  //    .catch(console.log);
+  //
+  //  await sleep(1000);
+  //
+  //}
+  //await sleep(1000);
+
+      //console.log(division);
+
+
 
       //-------------------------------------------------------------
       // Update date-time in "Monitoring"
       //-------------------------------------------------------------
 
-      if (mode) {
-        range = 'sheet1!C15';
-      } else {
-        range = 'sheet1!B15';
-      }
+      // if (mode) {
+      //   range = 'sheet1!C15';
+      // } else {
+      //   range = 'sheet1!B15';
+      // }
+      //
+      // let now = new Date();
+      // now = [
+      //   [formatDate(now)]
+      // ];
+      //
+      // await crud.updateData(now, config.ssId.monit, range)
+      // //.then(async (result) => {console.log(result);})
+      //   .catch(console.log);
 
-      let now = new Date();
-      now = [
-        [formatDate(now)]
-      ];
+    } // = End start function =
 
-      await crud.updateData(now, config.ssId.monit, range)
-      //.then(async (result) => {console.log(result);})
-        .catch(console.log);
-
-      //resolve('complite!');
-
-    }// = End start function =
+    resolve('complite!');
   });
 }
 

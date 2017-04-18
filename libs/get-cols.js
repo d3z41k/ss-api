@@ -14,8 +14,6 @@ async function getCols(auth, products, quantity, months) {
     let iRows = [];
     let monthCols = [];
 
-
-
     let mon = {
       'Jul': 7,
       'Aug': 8,
@@ -24,7 +22,6 @@ async function getCols(auth, products, quantity, months) {
       'Nov': 11,
       'Dec': 12
     };
-
 
       row[0].forEach((value, i) => {
         months.forEach((month) => {

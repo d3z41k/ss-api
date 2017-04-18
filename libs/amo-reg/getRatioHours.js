@@ -1,327 +1,357 @@
-async function getRatioHours(salary, lawt, params, cutContractMonths) {
+async function getRatioHours(salaryData, lawt, params, cutContractMonths, accruedIndex) {
   return new Promise(async (resolve, reject) => {
 
     const CREW = 7;
+    const CTO = 'Заводов Павел';
+    const MANAGER = 'Драниченко Максим';
+
     let sal = 0;
     let div = 0;
     let sum = [];
     let divider = 0;
     let dividers = [];
     let ratio = [];
+    let ratioAll = [];
     let factHours = [];
+    let factHoursAll = [];
     let warrentyHours = [];
-    let months = [7, 8, 9, 10, 11, 12];
+    let warrentyHoursAll = [];
+    let months = [1, 2, 3, 4, 5, 6];
 
-    //console.log(params[2][1][1]);
+    //= Build the salaryData sum for each month =
 
-    //= The Numbers of cols in Salary
-    let ratioMonth = config.ratioMonth;
+    try {
 
-    //= Build the salary sum for each month =
-
-    for (let p = 0; p < params[0].length; p++) {
-      sum.push([]);
-      for (let m = 0; m < params[1][p].length; m++) {
-        sum[p].push([]);
-        for (let i = 0; i < params[0][p].length; i++) {
-          for (let s = 0; s < salary.length; s++) {
-            if (salary[s][3] == params[0][p][i]) {
-              sum[p][m].push(Number(salary[s][ratioMonth[params[1][p][m]]].replace(/\s/g, '')) ?
-                Number(salary[s][ratioMonth[params[1][p][m]]].replace(/\s/g, '')) : 0);
+      for (let m = 0; m < months.length; m++) {
+        sum.push([]);
+        for (let i = 0; i < params[0].length; i++) {
+          for (let s = 0; s < salaryData.length; s++) {
+            if (params[0][i] && salaryData[s][1] == params[0][i]) {
+              sum[m].push(Number(salaryData[s][accruedIndex[months[m]]].replace(/\s/g, '')) ?
+                Number(salaryData[s][accruedIndex[months[m]]].replace(/\s/g, '')) : 0);
             }
           }
         }
       }
-    }
 
-    //= Build divider =
+      //= Build divider =
+      for (let n = 0; n < lawt.name.length; n++) {
+        dividers.push([]);
+        dividers[n].push(lawt.name[n]);
+        dividers[n].push([]);
 
-    for (let n = 0; n < lawt.name.length; n++) {
-      dividers.push([]);
-      dividers[n].push(lawt.name[n]);
-      dividers[n].push([]);
-
-      for (let m = 0; m < months.length; m++) {
-        divider = 0;
-        for (let t = 0; t < lawt.table[n].length; t++) {
-          if (lawt.table[n][t][0]
-            && Number(lawt.table[n][t][0].substr(3,2)) == months[m]
-            && lawt.table[n][t][5]) {
-             divider += Number(lawt.table[n][t][5].replace(/,/g, '.'));
+        for (let m = 0; m < months.length; m++) {
+          divider = 0;
+          for (let t = 0; t < lawt.table[n].length; t++) {
+            if (lawt.table[n][t][0]
+              && Number(lawt.table[n][t][0].substr(3,2)) == months[m]
+              && lawt.table[n][t][2] != '-'
+              && lawt.table[n][t][2]) {
+               divider += Number(lawt.table[n][t][2].replace(/,/g, '.'));
+            }
           }
+          dividers[n][1].push(Math.round(divider * 10000) / 10000);
         }
-        dividers[n][1].push(Math.round(divider * 10000) / 10000);
       }
-    }
 
-    //= Build work hours of manager and tecnical director per month=
+      //console.log(dividers);
 
-    let worksHours = {
-      'manager': {
-        'Интеграция (AMO)': 0,
-        'Обслуживание (AMO)': 0,
-        'Виджеты разработка (AMO)': 0,
-        'Виджеты готовые (AMO)': 0,
-        'Доп. работы (АМО)': 0
-      },
-      'tecDirector': 0
-    };
+      //= Build work hours of manager and tecnical director per month=
 
+      let worksHours = {
+        'manager': {
+            'Интеграция (AMO)': 0,
+            'Обслуживание (AMO)': 0,
+            'Виджеты разработка (AMO)': 0,
+            'Виджеты готовые (AMO)': 0,
+            'Доп. работы (АМО)': 0
+          },
+        'cto': 0
+      };
 
-    for (let n = 0; n < lawt.name.length; n++) {
+      for (let n = 0; n < lawt.name.length; n++) {
         for (let t = 0; t < lawt.table[n].length; t++) {
 
-          if (lawt.name[n].trim() == 'Драниченко Максим'
-            && lawt.table[n][t][5]) {
+          if (lawt.name[n].trim() == MANAGER
+            && lawt.table[n][t][2]) {
 
               switch(lawt.table[n][t][1].trim()) {
                 case 'Интеграция (AMO)':
-                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][2].replace(/,/g, '.'));
                   break;
                 case 'Обслуживание (AMO)':
-                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][2].replace(/,/g, '.'));
                   break;
                 case 'Виджеты разработка (AMO)':
-                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][2].replace(/,/g, '.'));
                   break;
                 case 'Виджеты готовые (AMO)':
-                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][2].replace(/,/g, '.'));
                   break;
                 case 'Доп. работы (АМО)':
-                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+                  worksHours.manager[lawt.table[n][t][1]] = Number(lawt.table[n][t][2].replace(/,/g, '.'));
                   break;
                 default: break;
               }
 
-          } else if (lawt.name[n].trim() == 'Заводов Павел'
+
+          } else if (lawt.name[n].trim() == CTO
             && lawt.table[n][t][1].trim() == 'Виджеты разработка (AMO)'
-            && lawt.table[n][t][5]) {
-             worksHours.tecDirector = Number(lawt.table[n][t][5].replace(/,/g, '.'));
+            && lawt.table[n][t][2]) {
+             worksHours.cto = Number(lawt.table[n][t][2].replace(/,/g, '.'));
           }
         }
-    }
+      }
 
-    //console.log(worksHours);
+      //console.log(worksHours);
 
-    //= Build ratio =
-    for (let p = 0; p < params[0].length ; p++) {
-      ratio.push([]);
-      for (let m = 0; m < params[1][p].length; m++) {
-        ratio[p].push([]);
-        for (let c = 0; c < CREW; c++) {
+      //= Build ratio =
+      for (let m = 0; m < months.length; m++) {
+        ratio.push([]);
           for (let d = 0; d < dividers.length; d++) {
-            if (dividers[d][0] == params[0][p][c]) {
+            div = dividers[d][1][months[m] - 1];
+            sal = sum[m][d];
+            ratio[m].push(div ? Math.round(sal / div * 10000) / 10000 : 0);
+          }
+      }
 
-              div = dividers[d][1][params[1][p][m] - 7];
-              sal = sum[p][params[1][p][m] - params[1][p][0]][c] ? sum[p][params[1][p][m] - params[1][p][0]][c] : 0;
+      //= Build quantinty of a projects =
+      let quantityProjects = {
+        'manager': {
+          '1': {
+            'Интеграция (AMO)': [],
+            'Обслуживание (AMO)': [],
+            'Виджеты разработка (AMO)': [],
+            'Виджеты готовые (AMO)': [],
+            'Доп. работы (АМО)': []
+          },
 
-              ratio[p][m].push(div ? Math.round(sal / div * 10000) / 10000 : 0);
+          '2': {
+            'Интеграция (AMO)': [],
+            'Обслуживание (AMO)': [],
+            'Виджеты разработка (AMO)': [],
+            'Виджеты готовые (AMO)': [],
+            'Доп. работы (АМО)': []
+          },
 
+          '3': {
+            'Интеграция (AMO)': [],
+            'Обслуживание (AMO)': [],
+            'Виджеты разработка (AMO)': [],
+            'Виджеты готовые (AMO)': [],
+            'Доп. работы (АМО)': []
+          },
+
+          '4': {
+            'Интеграция (AMO)': [],
+            'Обслуживание (AMO)': [],
+            'Виджеты разработка (AMO)': [],
+            'Виджеты готовые (AMO)': [],
+            'Доп. работы (АМО)': []
+          },
+
+          '5': {
+            'Интеграция (AMO)': [],
+            'Обслуживание (AMO)': [],
+            'Виджеты разработка (AMO)': [],
+            'Виджеты готовые (AMO)': [],
+            'Доп. работы (АМО)': []
+          },
+
+          '6': {
+            'Интеграция (AMO)': [],
+            'Обслуживание (AMO)': [],
+            'Виджеты разработка (AMO)': [],
+            'Виджеты готовые (AMO)': [],
+            'Доп. работы (АМО)': []
+
+          }
+        },
+        'cto': {
+          '1': [],
+          '2': [],
+          '3': [],
+          '4': [],
+          '5': [],
+          '6': []
+        }
+      };
+
+      let types = [
+        'Интеграция (AMO)',
+        'Обслуживание (AMO)',
+        'Виджеты разработка (AMO)',
+        'Виджеты готовые (AMO)',
+        'Доп. работы (АМО)',
+      ];
+
+      for (let p = 0; p < cutContractMonths.length; p++) {
+        for (let i = 0; i < cutContractMonths[p].length; i++) {
+          //= Filter 'Лицензии (AMO)'
+          if (types.includes(params[3][p])) {
+            quantityProjects.cto[cutContractMonths[p][i]].push(cutContractMonths[p][i]);
+          }
+        }
+      }
+
+      for (let key in quantityProjects.cto) {
+        quantityProjects.cto[key] = quantityProjects.cto[key].length;
+      }
+
+      for (let p = 0; p < cutContractMonths.length; p++) {
+        for (let i = 0; i < cutContractMonths[p].length; i++) {
+          for (let t = 0; t < types.length; t++) {
+            if (Object.getOwnPropertyNames(quantityProjects.manager[cutContractMonths[p][i]])[t]
+              == params[3][p]) {
+              quantityProjects.manager[cutContractMonths[p][i]][types[t]].push(cutContractMonths[p][i]);
             }
           }
         }
       }
-    }
 
-    //console.log(ratio);
-
-    //= Build quantinty of a projects =
-    let quantityProjects = {
-      'manager': {
-        '7': {
-          'Интеграция (AMO)': [],
-          'Обслуживание (AMO)': [],
-          'Виджеты разработка (AMO)': [],
-          'Виджеты готовые (AMO)': [],
-          'Доп. работы (АМО)': []
-        },
-
-        '8': {
-          'Интеграция (AMO)': [],
-          'Обслуживание (AMO)': [],
-          'Виджеты разработка (AMO)': [],
-          'Виджеты готовые (AMO)': [],
-          'Доп. работы (АМО)': []
-        },
-
-        '9': {
-          'Интеграция (AMO)': [],
-          'Обслуживание (AMO)': [],
-          'Виджеты разработка (AMO)': [],
-          'Виджеты готовые (AMO)': [],
-          'Доп. работы (АМО)': []
-        },
-
-        '10': {
-          'Интеграция (AMO)': [],
-          'Обслуживание (AMO)': [],
-          'Виджеты разработка (AMO)': [],
-          'Виджеты готовые (AMO)': [],
-          'Доп. работы (АМО)': []
-        },
-
-        '11': {
-          'Интеграция (AMO)': [],
-          'Обслуживание (AMO)': [],
-          'Виджеты разработка (AMO)': [],
-          'Виджеты готовые (AMO)': [],
-          'Доп. работы (АМО)': []
-        },
-
-        '12': {
-          'Интеграция (AMO)': [],
-          'Обслуживание (AMO)': [],
-          'Виджеты разработка (AMO)': [],
-          'Виджеты готовые (AMO)': [],
-          'Доп. работы (АМО)': []
-
-        }
-      },
-
-      'tecDirector': {
-        '7': [],
-        '8': [],
-        '9': [],
-        '10': [],
-        '11': [],
-        '12': []
-      }
-    };
-
-    let types = [
-      'Интеграция (AMO)',
-      'Обслуживание (AMO)',
-      'Виджеты разработка (AMO)',
-      'Виджеты готовые (AMO)',
-      'Доп. работы (АМО)',
-    ];
-
-    for (let p = 0; p < cutContractMonths.length; p++) {
-      for (let i = 0; i < cutContractMonths[p].length; i++) {
-        //= Filter 'Лицензии (AMO)'
-        if (types.includes(params[2][p][1])) {
-          quantityProjects.tecDirector[cutContractMonths[p][i]].push(cutContractMonths[p][i]);
+      for (let key1 in quantityProjects.manager) {
+        for (let key2 in quantityProjects.manager[key1]) {
+          quantityProjects.manager[key1][key2] = quantityProjects.manager[key1][key2].length;
         }
       }
-    }
 
-    for (let key in quantityProjects.tecDirector) {
-      quantityProjects.tecDirector[key] = quantityProjects.tecDirector[key].length;
-    }
+      //console.log(quantityProjects);
 
-    //console.log(Object.getOwnPropertyNames(quantityProjects.manager[7])[0]);
+      //console.log(worksHours.manager);
+      //console.log(quantityProjects.manager);
 
-    for (let p = 0; p < cutContractMonths.length; p++) {
-      for (let i = 0; i < cutContractMonths[p].length; i++) {
-        for (let t = 0; t < types.length; t++) {
-          if (Object.getOwnPropertyNames(quantityProjects.manager[cutContractMonths[p][i]])[t]
-            == params[2][p][1]) {
-            quantityProjects.manager[cutContractMonths[p][i]][types[t]].push(cutContractMonths[p][i]);
-          }
-        }
-      }
-    }
+      //= Build factHours and warrentyHours =
+      for (let m = 0; m < months.length ; m++) {
+        factHours.push([]);
+        warrentyHours.push([]);
 
-    for (let key1 in quantityProjects.manager) {
-      for (let key2 in quantityProjects.manager[key1]) {
-        quantityProjects.manager[key1][key2] = quantityProjects.manager[key1][key2].length;
-      }
-    }
+        for (let p = 0; p < params[1].length; p++) {
+          factHours[m].push([]);
+          warrentyHours[m].push([]);
 
-    //console.log(quantityProjects);
+          for (let c = 0; c < CREW; c++) {
 
-    //= Build factHours and warrentyHours =
+            factHours[m][p].push([]);
+            warrentyHours[m][p].push([]);
 
-    for (let p = 0; p < params[0].length ; p++) {
-      factHours.push([]);
-      warrentyHours.push([]);
-      for (let m = 0; m < params[1][p].length; m++) {
-        factHours[p].push([]);
-        warrentyHours[p].push([]);
-        for (let c = 0; c < CREW; c++) {
-          let factHour = 0;
-          let warrentyHour = 0;
-          for (let n = 0; n < lawt.name.length; n++) {
+              let factHour = 0;
+              let warrentyHour = 0;
 
-            if (lawt.name[n] == params[0][p][c]) {
+              for (let n = 0; n < lawt.name.length; n++) {
 
-              //= Build factHours for manager =
-              if (lawt.name[n].trim() == 'Драниченко Максим') {
-                if (cutContractMonths[p][m]) {
-                  let currMonth = cutContractMonths[p][m];
+                if (params[0][c] && lawt.name[n] == params[0][c]) {
 
-                  //= Danger!!! may div by zero=
+                  if (cutContractMonths[p][m] && cutContractMonths[p][m] == months[m]) {
 
-                    switch(params[2][p][1]) {
-                      case 'Интеграция (AMO)':
-                        factHour += Math.round(worksHours.manager[params[2][p][1]]
-                        / quantityProjects.manager[currMonth][params[2][p][1]] * 10000) / 10000;
-                        break;
-                      case 'Обслуживание (AMO)':
-                        factHour += Math.round(worksHours.manager[params[2][p][1]]
-                        / quantityProjects.manager[currMonth][params[2][p][1]] * 10000) / 10000;
-                        break;
-                      case 'Виджеты разработка (AMO)':
-                        factHour += Math.round(worksHours.manager[params[2][p][1]]
-                        / quantityProjects.manager[currMonth][params[2][p][1]] * 10000) / 10000;
-                        break;
-                      case 'Виджеты готовые (AMO)':
-                        factHour += Math.round(worksHours.manager[params[2][p][1]]
-                        / quantityProjects.manager[currMonth][params[2][p][1]] * 10000) / 10000;
-                        break;
-                      case 'Доп. работы (АМО)':
-                        factHour += Math.round(worksHours.manager[params[2][p][1]]
-                        / quantityProjects.manager[currMonth][params[2][p][1]] * 10000) / 10000;
-                        break;
-                      default: break;
+                    //= Build factHours for manager and cto =
+                    if (lawt.name[n].trim() == MANAGER) {
+                      let currMonth = cutContractMonths[p][m];
 
-                  }
-                }
-              } else if (lawt.name[n].trim() == 'Заводов Павел') {
-                if (cutContractMonths[p][m]
-                  && types.includes(params[2][p][1])) {
-                  let currMonth = cutContractMonths[p][m];
-                    factHour += Math.round(worksHours.tecDirector / quantityProjects.tecDirector[currMonth] * 10000) / 10000;
-                 }
-              } else {
-                //= Another employee
-                if (cutContractMonths[p][m]) {
-                  for (let t = 0; t < lawt.table[n].length; t++) {
-                    if (lawt.table[n][t][0]
-                      && Number(lawt.table[n][t][0].substr(3,2)) == params[1][p][m]
-                      && lawt.table[n][t][4] == params[2][p][0]
-                      && lawt.table[n][t][5].trim() != '-'
-                      //&& lawt.table[n][t][1].trim() == 'Разработка сайта'
-                      && lawt.table[n][t][5]) {
-                        factHour += Number(lawt.table[n][t][5].replace(/,/g, '.'));
+                      //= Danger!!! may div by zero=
+
+                      switch(params[3][p]) {
+                        case 'Интеграция (AMO)':
+                          factHour += Math.round(worksHours.manager[params[3][p]]
+                          / quantityProjects.manager[currMonth][params[3][p]] * 10000) / 10000;
+                          break;
+                        case 'Обслуживание (AMO)':
+                          factHour += Math.round(worksHours.manager[params[3][p]]
+                          / quantityProjects.manager[currMonth][params[3][p]] * 10000) / 10000;
+                          break;
+                        case 'Виджеты разработка (AMO)':
+                          factHour += Math.round(worksHours.manager[params[3][p]]
+                          / quantityProjects.manager[currMonth][params[3][p]] * 10000) / 10000;
+                          break;
+                        case 'Виджеты готовые (AMO)':
+                          factHour += Math.round(worksHours.manager[params[3][p]]
+                          / quantityProjects.manager[currMonth][params[3][p]] * 10000) / 10000;
+                          break;
+                        case 'Доп. работы (АМО)':
+                          factHour += Math.round(worksHours.manager[params[3][p]]
+                          / quantityProjects.manager[currMonth][params[3][p]] * 10000) / 10000;
+                          break;
+                        default: break;
+
+                        }
+
+                    } else if (lawt.name[n].trim() == CTO) {
+                      if (types.includes(params[3][p])) {
+                        let currMonth = cutContractMonths[p][m];
+                          factHour += Math.round(worksHours.cto / quantityProjects.cto[currMonth] * 10000) / 10000;
+                       }
+                    } else {
+
+                      //= Another employee
+                      for (let t = 0; t < lawt.table[n].length; t++) {
+                        if (lawt.table[n][t][0]
+                          && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][m]
+                          && lawt.table[n][t][10] == params[2][p]
+                          && lawt.table[n][t][2].trim() != '-'
+                          && lawt.table[n][t][2]) {
+                            factHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
+                        }
+                      }
                     }
 
-                  }
-                } else {
-                  for (let t = 0; t < lawt.table[n].length; t++) {
-                    if (lawt.table[n][t][0]
-                      && Number(lawt.table[n][t][0].substr(3,2)) == params[1][p][m]
-                      && lawt.table[n][t][4] == params[2][p][0]
-                      && lawt.table[n][t][5].trim() != '-'
-                      //&& lawt.table[n][t][1].trim() == 'Разработка сайта'
-                      && lawt.table[n][t][5]) {
-                        warrentyHour += Number(lawt.table[n][t][5].replace(/,/g, '.'));
+                  } else {
+
+                    for (let t = 0; t < lawt.table[n].length; t++) {
+                      if (lawt.table[n][t][0]
+                        && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][m]
+                        && lawt.table[n][t][10] == params[2][p]
+                        && lawt.table[n][t][2].trim() != '-'
+                        && lawt.table[n][t][2]) {
+                          warrentyHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
+                      }
                     }
                   }
-
                 }
               }
-            }
+
+              factHours[m][p][c].push(Math.round(factHour * 10000) / 10000);
+              warrentyHours[m][p][c].push(Math.round(warrentyHour * 10000) / 10000);
+
           }
-           factHours[p][m].push(Math.round(factHour * 10000) / 10000);
-           warrentyHours[p][m].push(Math.round(warrentyHour * 10000) / 10000);
         }
       }
+
+      //console.log(require('util').inspect(warrentyHours, { depth: null }));
+
+      ratio.forEach((crew, m) => {
+        ratioAll.push([]);
+        for (let p = 0; p < params[1].length; p++) {
+          crew.forEach(ratio => {
+            ratioAll[m].push([ratio]);
+          });
+          ratioAll[m].push([]);
+        }
+      });
+
+      factHours.forEach((monthFactHours, m) => {
+        factHoursAll.push([]);
+        monthFactHours.forEach(crewFactHours => {
+          crewFactHours.forEach(FactHours => {
+            factHoursAll[m].push(FactHours);
+          });
+          factHoursAll[m].push([]);
+        });
+      });
+
+      warrentyHours.forEach((monthWarrentyHours, m) => {
+        warrentyHoursAll.push([]);
+        monthWarrentyHours.forEach(crewWarrentyHours => {
+          crewWarrentyHours.forEach(warrentyHours => {
+            warrentyHoursAll[m].push(warrentyHours);
+          });
+          warrentyHoursAll[m].push([]);
+        });
+      });
+
+    } catch (e) {
+      reject(e.stack);
     }
 
-   //console.log(warrentyHours);
-
-   resolve([ratio, factHours, warrentyHours]);
+   resolve([ratioAll, factHoursAll, warrentyHoursAll]);
 
   });
 }
