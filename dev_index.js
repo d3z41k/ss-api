@@ -175,7 +175,7 @@ router.get('/sales', async ctx => {
   ctx.body = await finState(months);
 }).get('/fin-state-loan', async ctx => {
 
-  const finStateLoan = require('./ss-scripts/fin-state-loan');
+  const finStateLoan = require('./ss-scripts-2017-1/fin-state-loan');
   ctx.body = await finStateLoan();
 
 }).get('/fin-model-balance', async ctx => {

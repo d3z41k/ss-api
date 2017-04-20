@@ -14,193 +14,167 @@ handlers.forEach(handler => require('./handlers/' + handler).init(app));
 // can be split into files too
 const Router = require('koa-router');
 
-const router = new Router({
-  prefix: '/api'
-});
+const router = new Router({prefix: '/api'});
 
-router
-  .get('/sales', async ctx => {
+router.get('/sales', async ctx => {
 
-    const sales = require('./ss-scripts-2017-1/sales');
-    ctx.body = await sales();
+  const sales = require('./ss-scripts-2017-1/sales');
+  ctx.body = await sales();
 
-  })
-  .get('/serv', async ctx => {
+}).get('/serv', async ctx => {
 
-    const serv = require('./ss-scripts-2017-1/serv');
-    ctx.body = await serv();
+  const serv = require('./ss-scripts-2017-1/serv');
+  ctx.body = await serv();
 
-  })
-  .get('/context', async ctx => {
+}).get('/context', async ctx => {
 
-    const context = require('./ss-scripts-2017-1/context');
-    ctx.body = await context();
+  const context = require('./ss-scripts-2017-1/context');
+  ctx.body = await context();
 
-  })
-  .get('/seo', async ctx => {
+}).get('/seo', async ctx => {
 
-    const seo = require('./ss-scripts-2017-1/seo');
-    ctx.body = await seo();
+  const seo = require('./ss-scripts-2017-1/seo');
+  ctx.body = await seo();
 
-  })
-  .get('/dev', async ctx => {
+}).get('/dev', async ctx => {
 
-    const dev = require('./ss-scripts-2017-1/dev');
-    ctx.body = await dev();
+  const dev = require('./ss-scripts-2017-1/dev');
+  ctx.body = await dev();
 
-  })
-  .get('/dev-reg', async ctx => {
+}).get('/dev-reg', async ctx => {
 
-    const devReg = require('./ss-scripts-2017-1/dev-reg');
-    ctx.body = await devReg();
+  const devReg = require('./ss-scripts-2017-1/dev-reg');
+  ctx.body = await devReg();
 
-  })
-  .get('/dev-result', async ctx => {
+}).get('/dev-result', async ctx => {
 
-    const devRes = require('./ss-scripts-2017-1/dev-result');
-    ctx.body = await devRes();
+  const devRes = require('./ss-scripts-2017-1/dev-result');
+  ctx.body = await devRes();
 
-  })
-  .get('/extra', async ctx => {
+}).get('/extra', async ctx => {
 
-    const extra = require('./ss-scripts-2017-1/extra');
-    ctx.body = await extra();
+  const extra = require('./ss-scripts-2017-1/extra');
+  ctx.body = await extra();
 
-  })
-  .get('/extra-reg', async ctx => {
+}).get('/extra-reg', async ctx => {
 
-    const extraReg = require('./ss-scripts-2017-1/extra-reg');
-    ctx.body = await extraReg();
+  const extraReg = require('./ss-scripts-2017-1/extra-reg');
+  ctx.body = await extraReg();
 
-  })
-  .get('/amo', async ctx => {
+}).get('/amo', async ctx => {
 
-    const amo = require('./ss-scripts-2017-1/amo');
-    ctx.body = await amo();
+  const amo = require('./ss-scripts-2017-1/amo');
+  ctx.body = await amo();
 
-  })
-  .get('/amo-reg', async ctx => {
+}).get('/amo-reg', async ctx => {
 
-    const amoReg = require('./ss-scripts-2017-1/amo-reg');
-    ctx.body = await amoReg();
+  const amoReg = require('./ss-scripts-2017-1/amo-reg');
+  ctx.body = await amoReg();
 
-  })
-  .get('/domain', async ctx => {
+}).get('/domain', async ctx => {
 
-    const domain = require('./ss-scripts-2017-1/domain');
-    ctx.body = await domain();
+  const domain = require('./ss-scripts-2017-1/domain');
+  ctx.body = await domain();
 
-  })
-  .get('/profi_kz', async ctx => {
+}).get('/profi_kz', async ctx => {
 
-    const profi_kz = require('./ss-scripts-2017-1/profi_kz');
-    ctx.body = await profi_kz();
+  const profi_kz = require('./ss-scripts-2017-1/profi_kz');
+  ctx.body = await profi_kz();
 
-  })
-  .get('/profi1', async ctx => {
+}).get('/profi1', async ctx => {
 
-    const profi1 = require('./ss-scripts-2017-1/profi1');
-    ctx.body = await profi1();
+  const profi1 = require('./ss-scripts-2017-1/profi1');
+  ctx.body = await profi1();
 
-  })
-  .get('/profi1/:pre_month/:curr_month', async ctx => {
+}).get('/profi1/:pre_month/:curr_month', async ctx => {
 
-    let months = [ctx.params.pre_month, ctx.params.curr_month];
+  let months = [ctx.params.pre_month, ctx.params.curr_month];
 
-    const profi1 = require('./ss-scripts-2017-1/profi1');
-    ctx.body = await profi1(months);
+  const profi1 = require('./ss-scripts-2017-1/profi1');
+  ctx.body = await profi1(months);
 
-  })
-  .get('/profi2', async ctx => {
+}).get('/profi2', async ctx => {
 
-    const profi2 = require('./ss-scripts-2017-1/profi2');
-    ctx.body = await profi2();
+  const profi2 = require('./ss-scripts-2017-1/profi2');
+  ctx.body = await profi2();
 
-  })
-  .get('/profi2/:pre_month/:curr_month', async ctx => {
+}).get('/profi2/:pre_month/:curr_month', async ctx => {
 
-    let months = [ctx.params.pre_month, ctx.params.curr_month];
+  let months = [ctx.params.pre_month, ctx.params.curr_month];
 
-    const profi2 = require('./ss-scripts-2017-1/profi2');
-    ctx.body = await profi2(months);
-  })
-  .get('/inflow/:month', async ctx => {
+  const profi2 = require('./ss-scripts-2017-1/profi2');
+  ctx.body = await profi2(months);
+}).get('/inflow/:month', async ctx => {
 
-    const inflow = require('./ss-scripts-2017-1/inflow');
-    ctx.body = await inflow(ctx.params.month);
+  const inflow = require('./ss-scripts-2017-1/inflow');
+  ctx.body = await inflow(ctx.params.month);
 
-  })
-  .get('/salary', async ctx => {
-    const salary = require('./ss-scripts-2017-1/salary');
-    ctx.body = await salary();
+}).get('/salary', async ctx => {
+  const salary = require('./ss-scripts-2017-1/salary');
+  ctx.body = await salary();
 
-  })
-  .get('/salary/:month', async ctx => {
+}).get('/salary/:month', async ctx => {
 
-    const salary = require('./ss-scripts-2017-1/salary');
-    ctx.body = await salary([ctx.params.month]);
+  const salary = require('./ss-scripts-2017-1/salary');
+  ctx.body = await salary([ctx.params.month]);
 
-  })
-  .get('/salary-distrib', async ctx => {
-    const salaryDistrib = require('./ss-scripts-2017-1/salary-distrib');
-    ctx.body = await salaryDistrib();
+}).get('/salary-distrib', async ctx => {
+  const salaryDistrib = require('./ss-scripts-2017-1/salary-distrib');
+  ctx.body = await salaryDistrib();
 
-  })
-  .get('/indirect', async ctx => {
+}).get('/indirect', async ctx => {
 
-    const indirect = require('./ss-scripts-2017-1/indirect');
-    ctx.body = await indirect();
+  const indirect = require('./ss-scripts-2017-1/indirect');
+  ctx.body = await indirect();
 
-  })
-  .get('/indirect/:month', async ctx => {
+}).get('/indirect/:month', async ctx => {
 
-    const indirect = require('./ss-scripts-2017-1/indirect');
-    ctx.body = await indirect([ctx.params.month]);
+  const indirect = require('./ss-scripts-2017-1/indirect');
+  ctx.body = await indirect([ctx.params.month]);
 
-  })
-  .get('/dds_mon/:mon', async ctx => {
+}).get('/dds_mon/:mon', async ctx => {
 
-    const dds_mon = require('./ss-scripts-2017-1/dds_mon');
-    let mon = [ctx.params.mon];
-    ctx.body = await dds_mon(mon);
+  const dds_mon = require('./ss-scripts-2017-1/dds_mon');
+  let mon = [ctx.params.mon];
+  ctx.body = await dds_mon(mon);
 
-  })
-  .get('/dds_mon-salary/:mon', async ctx => {
+}).get('/dds_mon-salary/:mon', async ctx => {
 
-    const dds_monSalary = require('./ss-scripts-2017-1/dds_mon-salary');
-    let mon = [ctx.params.mon];
-    ctx.body = await dds_monSalary(mon);
+  const dds_monSalary = require('./ss-scripts-2017-1/dds_mon-salary');
+  let mon = [ctx.params.mon];
+  ctx.body = await dds_monSalary(mon);
 
-  })
-  .get('/dds_mon-indirect/:mon', async ctx => {
+}).get('/dds_mon-indirect/:mon', async ctx => {
 
-    const dds_monIndirect = require('./ss-scripts-2017-1/dds_mon-indirect');
-    let mon = [ctx.params.mon];
-    ctx.body = await dds_monIndirect(mon);
+  const dds_monIndirect = require('./ss-scripts-2017-1/dds_mon-indirect');
+  let mon = [ctx.params.mon];
+  ctx.body = await dds_monIndirect(mon);
 
-  })
-  .get('/fin-state', async ctx => {
+}).get('/fin-state/', async ctx => {
 
-    let months = [7, 8, 9, 10, 11, 12];
+  const finState = require('./ss-scripts-2017-1/fin-state');
+  ctx.body = await finState();
 
-    const finState = require('./ss-scripts-2017-1/fin-state');
-    ctx.body = await finState(months);
+}).get('/fin-state/:curr_month', async ctx => {
 
-  })
-  .get('/fin-state/:pre_month/:curr_month', async ctx => {
+  let months = ctx.params.curr_month;
 
-    let months = [ctx.params.pre_month, ctx.params.curr_month];
+  const finState = require('./ss-scripts-2017-1/fin-state');
+  ctx.body = await finState(months);
+}).get('/fin-state-loan', async ctx => {
 
-    const finState = require('./ss-scripts-2017-1/fin-state');
-    ctx.body = await finState(months);
-  })
-  .get('/fin-model-balance', async ctx => {
+  const finStateLoan = require('./ss-scripts-2017-1/fin-state-loan');
+  ctx.body = await finStateLoan();
 
-    const finModelBalance = require('./ss-scripts-2017-1/fin-model-balance');
-    ctx.body = await finModelBalance();
+}).get('/fin-model-balance', async ctx => {
+
+  const finModelBalance = require('./ss-scripts-2017-1/fin-model-balance');
+  ctx.body = await finModelBalance();
 
 });
 
 app.use(router.routes());
 
-app.listen({ port: 3017 }, () => {console.log('Server 2017 start on port 3017...');});
+app.listen({port: 3017}, () => {
+  console.log('Server 2017 start on port 3017...');
+});
