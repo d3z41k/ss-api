@@ -36,6 +36,11 @@ router.get('/sales', async ctx => {
   const seo = require('./ss-scripts-2017-1/seo');
   ctx.body = await seo();
 
+}).get('/seo-luvr', async ctx => {
+
+  const seoLuvr = require('./ss-scripts-2017-1/seo-luvr');
+  ctx.body = await seoLuvr();
+
 }).get('/dev', async ctx => {
 
   const dev = require('./ss-scripts-2017-1/dev');
