@@ -2,7 +2,7 @@
 
 const config = require('config');
 
-async function seoLuvr() {
+async function seoLawt() {
   return new Promise(async (resolve, reject) => {
 
     //-------------------------------------------------------------------------
@@ -12,10 +12,6 @@ async function seoLuvr() {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
-    //const normLength = require('../libs/normalize-length');
-    const dbRefresh = require('../models-2017-1/db_refresh');
-    const pool = require('../models-2017-1/db_pool');
-    const seoQuery = require('../models/db_seo-query');
 
     //---------------------------------------------------------------
     // Main function
@@ -25,95 +21,127 @@ async function seoLuvr() {
 
       const crud = new Crud(auth);
 
-      let list = '';
       let range = '';
-      const START = 9;
-      const MONTHS = [1, 2, 3, 4, 5, 6];
-      const colMonths = config.seo_colMonths_2017;
+      const ACTIVITIES = {
+        'seo': 'SEO ',
+        'admin': 'Административные задачи'
+      };
+      const START = {
+        'row': 8,
+        'col': 5
+      };
+      const DIRECTION = {
+        'mts': 'МТС',
+        'profi': 'Профи'
+      };
 
-      //-----------------------------------------------------------------------
-      // Read data from DDS and refresh DB
-      //-----------------------------------------------------------------------
+      const colLawtDirections = config.colLawtDirections;
 
-      list = encodeURIComponent('ДДС_Ольга');
-      range = list + '!A6:AD';
+      let list = {
+        'manual': encodeURIComponent('Справочник'),
+        'listName': function(name) {
+          return encodeURIComponent(name);
+        }
+      };
 
-      let dataDDS = await crud.readData(config.sid_2017.dds, range);
+      function convertData(date) {
+        const YEAR = 2017;
+        if (date[0].length == 1) {
+          date[0] = '0' + date[0];
+        }
+        if (date[1].length == 1) {
+          date[1] = '0' + date[1];
+        }
+        return date[0] + '.' + date[1] + '.' + YEAR;
+      }
 
-      //= Normalizing of length "dataDDS" (not actual) =
-      //normLength(dataDDS);
+      range = list.manual + '!D2:D';
+      let seoStuff = await crud.readData(config.sid_2017.seo_lawt, range);
 
-       await dbRefresh(pool, 'dds_olga', dataDDS)
-        //.then(async (result) => {console.log(result);})
-        .catch(console.log);
+      seoStuff = seoStuff.map(employee => {
+        return employee[0];
+      });
 
-        //---------------------------------------------------------------------
-        // Get data from 'domain-registry'
-        //---------------------------------------------------------------------
+//      seoStuff = ['Базеко Игорь'];
 
-        list = encodeURIComponent('SEO (реестр)');
-        range = list + '!A1:Z';
-        let seoClients = await crud.readData(config.sid_2017.seo, range);
+      for (let e = 0; e < seoStuff.length; e++) {
 
-        //---------------------------------------------------------------------
-        // Build paramsSeoCients and get & update Pay & date in domain clients
-        //---------------------------------------------------------------------
+        range = list.listName(seoStuff[e]) + '!A2:FF1700';
+        let dataSeo = await crud.readData(config.sid_2017.seo_lawt, range);
 
-        for (let m = MONTHS[0]; m <= MONTHS[MONTHS.length - 1]; m++) {
+        let dataHours = [];
+        let dataAdminHours = [];
+        let counter = 0;
 
-          let paramsSeoCients = [[], [], [], [], []];
 
-          try {
-
-            //= Build params =
-            for (let a = (START - 1); a < seoClients.length; a++) {
-              if (seoClients[a][2] && seoClients[a][3]) {
-                paramsSeoCients[0].push(seoClients[a][3]); //site
-                paramsSeoCients[1].push(seoClients[a][2]); //counterparty
-              } else {
-                paramsSeoCients[0].push(' ');
-                paramsSeoCients[1].push(' ');
+        for (let r = START.row; r < dataSeo.length; r++) {
+          for (let c = START.col; c < dataSeo[r].length; c++) {
+            if (dataSeo[r][c] && dataSeo[r][4] == 'факт') {
+              dataHours.push([
+                convertData([dataSeo[2][c], dataSeo[0][c]]),
+                ACTIVITIES.seo,
+                dataSeo[r][c]
+              ]);
+              let direction = dataSeo[r][1]
+              for (let s = 0; s < colLawtDirections[direction]; s++) {
+                dataHours[counter].push('');
               }
+              dataHours[counter].push(dataSeo[r][0]);
+              counter++;
             }
-
-            paramsSeoCients[2] = m; //month
-            paramsSeoCients[3].push(seoClients[4][23]); //direction
-            paramsSeoCients[4].push(seoClients[5][23], seoClients[5][24], seoClients[5][25]); // articles
-
-            //= Get values =
-            let values = await seoQuery(pool, 'dds_olga', paramsSeoCients);
-
-            //= Update data =
-            let sellPayRange = list + '!' + colMonths[m][0] + START + ':' + colMonths[m][0] + (values[0].length + START);
-            let prePayRange = list + '!' + colMonths[m][1] + START + ':' + colMonths[m][1] + (values[0].length + START);
-            let addPayRange = list + '!' + colMonths[m][2] + START + ':' + colMonths[m][2] + (values[0].length + START);
-
-            await Promise.all([
-              crud.updateData(values[0], config.sid_2017.seo, sellPayRange),
-              crud.updateData(values[1], config.sid_2017.seo, prePayRange),
-              crud.updateData(values[2], config.sid_2017.seo, addPayRange),
-            ])
-              //.then(async results => {console.log(results);})
-              .catch(console.log);
-
-          } catch (e) {
-            reject(e.stack);
           }
+        }
 
-      } //end MONTHS
+        for (let c = START.col; c < dataSeo[0].length; c++) {
+          if (dataSeo[5][c]) {
+            dataAdminHours.push([
+              convertData([dataSeo[2][c], dataSeo[0][c]]),
+              ACTIVITIES.admin,
+              dataSeo[5][c],
+              '',
+              DIRECTION.mts
+            ]);
+          }
+          if (dataSeo[6][c]) {
+            dataAdminHours.push([
+              convertData([dataSeo[2][c], dataSeo[0][c]]),
+              ACTIVITIES.admin,
+              Number(dataSeo[6][c]) * 0.5,
+              '',
+              DIRECTION.mts
+            ]);
+            dataAdminHours.push([
+              convertData([dataSeo[2][c], dataSeo[0][c]]),
+              ACTIVITIES.admin,
+              Number(dataSeo[6][c]) * 0.5,
+              '',
+              DIRECTION.profi
+            ]);
+          }
+        }
+
+        dataHours = dataHours.concat(dataAdminHours);
+
+        //console.log(dataHours);
+
+        range = list.listName(seoStuff[e]) + '!A10:Z';
+
+        await crud.updateData(dataHours, config.sid_2017.lawt, range)
+          .then(async results => {console.log(results);})
+          .catch(console.log);
+
+      } //end Staff
 
       //------------------------------------------------------------------------
       // Update date-time in "Monitoring"
       //------------------------------------------------------------------------
 
-      range = 'main!B6';
-
-      let now = new Date();
-      now = [[formatDate(now)]];
-
-      await crud.updateData(now, config.sid_2017.monit, range);
-
-      //resolve('complite!');
+      // range = 'main!B6';
+      //
+      // let now = new Date();
+      // now = [[formatDate(now)]];
+      //
+      // await crud.updateData(now, config.sid_2017.monit, range);
 
     } // = End start function =
 
@@ -122,4 +150,4 @@ async function seoLuvr() {
   });
 }
 
-module.exports = seoLuvr;
+module.exports = seoLawt;
