@@ -96,7 +96,7 @@ async function salaryDistrib() {
             }
           }
 
-          console.log(accruedSalary);
+          //console.log(accruedSalary);
 
           range1 = list.distrib[d] + '!D' + START + ':D';
           range2 = list.fot + '!' + FOT_COLS[d + 1][0] + START + ':' + FOT_COLS[d + 1][0];
@@ -113,7 +113,7 @@ async function salaryDistrib() {
             crud.updateData(accruedSalaryNum, config.sid_2017.salary, range1),
             crud.updateData(accruedSalaryNum, config.sid_2017.salary, range2)
           ])
-            .then(async (results) => {console.log(results);})
+            //.then(async (results) => {console.log(results);})
             .catch(console.log);
 
           //--------------------------------------------------------------------
@@ -121,7 +121,7 @@ async function salaryDistrib() {
           range = list.distrib[d] + '!B' + START + ':I';
           dataDistrib = await crud.readData(config.sid_2017.salary, range);
 
-          range = list.distrib[d] + '!AE5:AN';
+          range = list.distrib[d] + '!AF5:AP';
           let dataDistribDir = await crud.readData(config.sid_2017.salary, range);
 
           //= If existant data =
@@ -164,6 +164,8 @@ async function salaryDistrib() {
               }
             }
 
+            //console.log(salaryDirection);
+
             let salaryDistrib = [];
 
             for (let i = 0; i < dataDistrib.length; i++) {
@@ -179,29 +181,30 @@ async function salaryDistrib() {
                     salaryDistrib[i].push(0);
                   }
                 }
-              } else {
-                for (var key in salaryDirection) {
-                  salaryDistrib[i].push(salaryDirection[key][i][0]);
-                }
-                salaryDistrib[i].push(0);
-                salaryDistrib[i].push(0);
               }
+              else {
+
+                  for (var key in salaryDirection) {
+                    if (salaryDirection[key][i]) {
+                      salaryDistrib[i].push(salaryDirection[key][i][0]);
+                    }
+                  }
+                }
+
             }
 
             range1 = list.distrib[d] + '!K' + START + ':O';
             range2 = list.fot + '!' + FOT_COLS[d + 1][1] + START + ':' + FOT_COLS[d + 1][5];
 
-            //console.log(salaryDistrib);
-
             await Promise.all([
               crud.updateData(salaryDistrib, config.sid_2017.salary, range1),
               crud.updateData(salaryDistrib, config.sid_2017.salary, range2)
             ])
-              .then(async (results) => {console.log(results);})
+              //.then(async (results) => {console.log(results);})
               .catch(console.log);
           }
 
-          await sleep(1000);
+          //await sleep(1000);
           resolve('complite!');
         } // End distribution
 
@@ -221,7 +224,7 @@ async function salaryDistrib() {
       now = [[formatDate(now)]];
       await crud.updateData(now, config.sid_2017.monit, range);
 
-    //  resolve('complite!');
+      //resolve('complite!');
 
     } // = End start function =
 
