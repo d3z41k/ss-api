@@ -65,6 +65,10 @@ router.get('/sales', async ctx => {
 
   const extraReg = require('./ss-scripts-2017-1/extra-reg');
   ctx.body = await extraReg();
+}).get('/extra-reg-2016', async ctx => {
+
+  const extraReg = require('./ss-scripts/extra-reg');
+  ctx.body = await extraReg();
 
 }).get('/amo', async ctx => {
 
