@@ -2,7 +2,7 @@
 
 const config = require('config');
 
-async function dds_monSalary(mon) {
+async function dds_monIndirect(mon) {
   return new Promise(async(resolve, reject) => {
 
     //-------------------------------------------------------------------------
@@ -42,6 +42,15 @@ async function dds_monSalary(mon) {
         'lera': '',
         'olga': ''
       };
+
+     let arrRange1 = [];
+     let arrRange2 = [];
+     let arrRange3 = [];
+     let checkRange = [];
+     let arrCheck = [];
+     let checkFuncions = [];
+     let arrFuncions = [];
+     let colsPlanFact = config.dds_mon.indirect
 
       list = encodeURIComponent('Спр');
       range = list + '!J2:J100';
@@ -122,14 +131,6 @@ async function dds_monSalary(mon) {
          }
        }
 
-       let arrRange1 = [];
-       let arrRange2 = [];
-       let arrRange3 = [];
-       let checkRange = [];
-       let arrCheck = [];
-       let checkFuncions = [];
-       let arrFuncions = [];
-       let colsPlanFact = config.dds_mon.indirect
 
        list = encodeURIComponent('Косвенные расходы(декада)');
 
@@ -203,35 +204,35 @@ async function dds_monSalary(mon) {
         .catch(console.log);
 
       //-------------------------------------------------------------
-      // Read data from dds_lera to RAM
+      //Read data from dds_lera to RAM
       //-------------------------------------------------------------
 
-      // list = encodeURIComponent('ДДС_Лера');
-      // range1 = list + '!A6:V';
-      //
-      // list = encodeURIComponent('ДДС_Ольга');
-      // range2 = list + '!A6:AD';
-      //
-      // await Promise.all([
-      //   crud.readData(config.sid_2017.dds, range1),
-      //   crud.readData(config.sid_2017.dds, range2)
-      // ])
-      //  .then(async ([dds_lera, dds_olga]) => {
-      //     dataDDS.lera = dds_lera;
-      //     dataDDS.olga = dds_olga;
-      //   })
-      //   .catch(console.log);
-      //
-      // //--------------------------------------------------------------------
-      // // Refresh table
-      // //--------------------------------------------------------------------
-      //
-      // await Promise.all([
-      //   dbRefresh(pool, 'dds_lera', dataDDS.lera),
-      //   dbRefresh(pool, 'dds_olga', dataDDS.olga)
-      // ])
-      //   //.then(async (results) => {console.log(results);})
-      //   .catch(console.log);
+      list = encodeURIComponent('ДДС_Лера');
+      range1 = list + '!A6:V';
+
+      list = encodeURIComponent('ДДС_Ольга');
+      range2 = list + '!A6:AD';
+
+      await Promise.all([
+        crud.readData(config.sid_2017.dds, range1),
+        crud.readData(config.sid_2017.dds, range2)
+      ])
+       .then(async ([dds_lera, dds_olga]) => {
+          dataDDS.lera = dds_lera;
+          dataDDS.olga = dds_olga;
+        })
+        .catch(console.log);
+
+      //--------------------------------------------------------------------
+      // Refresh table
+      //--------------------------------------------------------------------
+
+      await Promise.all([
+        dbRefresh(pool, 'dds_lera', dataDDS.lera),
+        dbRefresh(pool, 'dds_olga', dataDDS.olga)
+      ])
+        .then(async (results) => {console.log(results);})
+        .catch(console.log);
 
       //--------------------------------------------------------------------
       // Build paramsSalaryDDS and get & update
@@ -240,7 +241,9 @@ async function dds_monSalary(mon) {
       let paramsIndirectDDS  = {
         '2.1' : [[], [], [], [], []],
         '2.2' : [[], [], [], [], []],
-        '2.3' : [[], [], [], [], []]
+        '2.3' : [[], [], [], [], []],
+        '2.4' : [[], [], [], [], []],
+
       };
 
       for (let key in paramsIndirectDDS) {
@@ -288,6 +291,8 @@ async function dds_monSalary(mon) {
           })
           .catch(console.log);
 
+          //console.log(sum1);
+
           for (let dec = 0; dec < sum1.length; dec++) {
 
             sumDirections.push([]);
@@ -334,6 +339,8 @@ async function dds_monSalary(mon) {
 
       list = encodeURIComponent('Косвенные расходы(декада)');
 
+      console.log(sumDirectionsCommon.length);
+
       for (let dir in colsDecIndirect) {
         arrRange1.push(list + '!' + colsDecIndirect[dir][2] + START + ':' + colsDecIndirect[dir][2]);
         arrRange2.push(list + '!' + colsDecIndirect[dir][3] + START + ':' + colsDecIndirect[dir][3]);
@@ -354,7 +361,7 @@ async function dds_monSalary(mon) {
 
       // = Update DDS Indirect =
       await Promise.all(arrFuncions)
-        //.then(async (results) => {console.log(results);})
+        .then(async (results) => {console.log(results);})
         .catch(console.log);
 
     //----------------------------------------------------------------------
@@ -396,4 +403,4 @@ async function dds_monSalary(mon) {
   });
 }
 
-module.exports = dds_monSalary;
+module.exports = dds_monIndirect;

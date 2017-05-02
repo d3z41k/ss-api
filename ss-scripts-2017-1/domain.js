@@ -104,11 +104,64 @@ async function domain() {
             //.then(async results => {console.log(results);})
             .catch(console.log);
 
+
+
         } catch (e) {
           reject(e.stack);
         }
 
       }
+
+      //-------------------------------------------------------------
+      // Debt 2016 to 2017
+      //-------------------------------------------------------------
+
+      list = encodeURIComponent('ДХ(реестр)');
+      range = list + '!A6:CA';
+
+      let regData2016raw = await crud.readData(config.ssId.domain, range);
+
+      let regData2016 = regData2016raw.map((row) => {
+        if (row[77].trim() != '-' || row[78].trim() != '-') {
+          return [
+            row[2], row[77], row[78]
+          ];
+        } else {
+          return [];
+        }
+      });
+
+      regData2016 = regData2016.filter(val => {
+        if (val[0]) {
+          return val;
+        }
+      });
+
+      //console.log(regData2016);
+
+      range = list + '!C7:C';
+
+      let regData2017 = await crud.readData(config.sid_2017.domain, range);
+
+      //console.log(regData2017raw);
+
+      let debtData2016 = [];
+
+      regData2017.forEach((project2017, p) => {
+        debtData2016.push([]);
+        regData2016.forEach(project2016 => {
+          if (project2017[0] == project2016[0]) {
+            debtData2016[p].push(project2016[1], project2016[2]);
+          }
+        });
+      });
+
+      range = list + '!P7:Q';
+
+      await crud.updateData(debtData2016, config.sid_2017.domain, range)
+        .then(async results => {console.log(results);})
+        .catch(console.log);
+
 
       //------------------------------------------------------------------------
       // Update date-time in "Monitoring"

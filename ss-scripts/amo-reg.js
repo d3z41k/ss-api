@@ -520,53 +520,53 @@ async function amoReg() {
       // Get & Insert mounth and amount of the act
       //--------------------------------------------------------------------------
 
-      // let monthAct = clientInfo.map((row) => {
-      //   return [
-      //     row[0],
-      //     row[11] ? row[11] : 0,
-      //     row[10] && Number(row[10].replace(/\s/g, ''))
-      //     ? Number(row[10].replace(/\s/g, '')) : 0
-      //   ];
-      // });
-      //
-      // let colsAct = config.reg_colsAct;
-      //
-      // for (let x = 0; x < xArray.length; x++) {
-      //
-      //   let month = 0;
-      //
-      //   for (let i = 0; i < monthAct.length; i++) {
-      //     if (registry[xArray[x] - START][0]  == monthAct[i][0]) {
-      //       if (monthAct[i][1]) {
-      //         month = Number(monthAct[i][1].substr(3, 2)) > 6 ? Number(monthAct[i][1].substr(3, 2)) : 7;
-      //       } else {
-      //         month = '';
-      //       }
-      //
-      //       list = encodeURIComponent('AMO (реестр)');
-      //       range = list + '!H' + xArray[x];
-      //
-      //       await crud.updateData([[month]], config.ssId.amo, range)
-      //         .then(async result => {console.log(result);})
-      //         .catch(console.err);
-      //
-      //       if (colsAct[month]) {
-      //         range = list + '!' + colsAct[month] + xArray[x];
-      //
-      //         await crud.updateData([[monthAct[i][2]]], config.ssId.amo, range)
-      //           .then(async result => {console.log(result);})
-      //           .catch(console.err);
-      //         await sleep(1000);
-      //       }
-      //
-      //     }
-      //   }
-      //
-      //   console.log('Project: ' + x);
-      //
-      // }
-      // console.log(new Date());
-      // console.log('* Get & Insert mounth and amount of the act *');
+      let monthAct = clientInfo.map((row) => {
+        return [
+          row[0],
+          row[11] ? row[11] : 0,
+          row[10] && Number(row[10].replace(/\s/g, ''))
+          ? Number(row[10].replace(/\s/g, '')) : 0
+        ];
+      });
+
+      let colsAct = config.reg_colsAct;
+
+      for (let x = 0; x < xArray.length; x++) {
+
+        let month = 0;
+
+        for (let i = 0; i < monthAct.length; i++) {
+          if (registry[xArray[x] - START][0]  == monthAct[i][0]) {
+            if (monthAct[i][1]) {
+              month = Number(monthAct[i][1].substr(3, 2)) > 6 ? Number(monthAct[i][1].substr(3, 2)) : 7;
+            } else {
+              month = '';
+            }
+
+            list = encodeURIComponent('AMO (реестр)');
+            range = list + '!H' + xArray[x];
+
+            await crud.updateData([[month]], config.ssId.amo, range)
+              .then(async result => {console.log(result);})
+              .catch(console.err);
+
+            if (colsAct[month]) {
+              range = list + '!' + colsAct[month] + xArray[x];
+
+              await crud.updateData([[monthAct[i][2]]], config.ssId.amo, range)
+                .then(async result => {console.log(result);})
+                .catch(console.err);
+              await sleep(1000);
+            }
+
+          }
+        }
+      
+        console.log('Project: ' + x);
+
+      }
+      console.log(new Date());
+      console.log('* Get & Insert mounth and amount of the act *');
 
       //------------------------------------------------------------------------
       // The receipt of money from customers (prepaid & finally)

@@ -110,7 +110,7 @@ async function dds_indirectQuery(pool, tableName, params, mode, taxes) {
             }
           }
 
-          return;
+          return; 
 
       } //switch
 

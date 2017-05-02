@@ -374,7 +374,7 @@ async function extraReg() {
 
       let colsAct = config.reg_colsAct;
 
-      for (let x = 0; x < xArray.length; x++) {
+      for (let x = 109; x < xArray.length; x++) {
 
         let month = 0;
 
@@ -400,8 +400,6 @@ async function extraReg() {
                 .then(async result => {console.log(result);})
                 .catch(console.err);
             }
-
-            await sleep(500);
 
           }
         }

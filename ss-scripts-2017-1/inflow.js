@@ -1,7 +1,6 @@
 'use strict';
 
 const config = require('config');
-const util = require('util');
 
 async function inflow(month) {
   return new Promise(async(resolve, reject) => {

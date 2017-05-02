@@ -222,68 +222,123 @@ async function amoReg() {
       // Build params & update Debt/Prepaid of customers
       // -----------------------------------------------------------------------
 
-      // let monthPrepaid = clientData.map((row) => {
-      //   return [
-      //     row[0], row[15] ? row[15] : 0,
-      //     row[14] && Number(row[14].replace(/\s/g, ''))
-      //     ? Number(row[14].replace(/\s/g, '')) : 0
-      //   ];
-      // });
-      //
-      // range = list.amo + '!A6:CX';
-      //
-      // let clientData2016 = await crud.readData(config.ssId.amo, range);
-      //
-      // let debtData2016raw = clientData2016.map((row) => {
-      //   if (row[101] && Number(row[101].replace(/\s/g, ''))) {
-      //     return [
-      //       row[2], Number(row[101].replace(/\s/g, ''))
-      //     ];
-      //   } else {
-      //     return [];
-      //   }
-      // });
-      //
-      // let debtData2016 = debtData2016raw.filter(val => {
-      //   if (val[0]) {
-      //     return val;
-      //   }
-      // });
-      //
-      // let colDebt = config.colDebt_1.debt;
-      //
-      // //console.log(monthPrepaid);
-      //
-      // for (let x = 0; x < xArray.length; x++) {
-      //
-      //   for (let i = 0; i < monthPrepaid.length; i++) {
-      //     if (registryData[xArray[x] - START][0] == monthPrepaid[i][0]) {
-      //       if (!monthPrepaid[i][1] && monthPrepaid[i][2]) {
-      //
-      //         range = list.amo + '!' + colDebt + xArray[x];
-      //
-      //         await crud.updateData([[-(monthPrepaid[i][2])]], config.sid_2017.amo, range)
-      //           .then(async result => {console.log(result);})
-      //           .catch(console.err);
-      //       }
-      //     }
-      //   }
-      //
-      //   for (let j = 0; j < debtData2016.length; j++) {
-      //     if (registryData[xArray[x] - START][0] == debtData2016[j][0]) {
-      //
-      //       range = list.amo + '!' + colDebt + xArray[x];
-      //
-      //       await crud.updateData([[debtData2016[j][1]]], config.sid_2017.amo, range)
-      //         .then(async result => {console.log(result);})
-      //         .catch(console.err);
-      //     }
-      //   }
-      //
-      // }
-      //
-      // console.log(new Date());
-      // console.log('* Get & Insert Debt / Prepaid *');
+      let monthPrepaid = clientData.map((row) => {
+        return [
+          row[0], row[15] ? row[15] : 0,
+          row[14] && Number(row[14].replace(/\s/g, ''))
+          ? Number(row[14].replace(/\s/g, '')) : 0
+        ];
+      });
+
+      range = list.amo + '!A6:DH';
+
+      let clientData2016 = await crud.readData(config.ssId.amo, range);
+
+      let debtData2016raw = clientData2016.map((row) => {
+        if (row[101] && Number(row[101].replace(/\s/g, ''))) {
+          return [
+            row[2], Number(row[101].replace(/\s/g, ''))
+          ];
+        } else {
+          return [];
+        }
+      });
+
+      let debtData2016 = debtData2016raw.filter(val => {
+        if (val[0]) {
+          return val;
+        }
+      });
+
+      let costsData2016raw = clientData2016.map((row) => {
+        if (row[111] && Number(row[111].replace(/\s/g, ''))) {
+          return [
+            row[2], Number(row[111].replace(/\s/g, ''))
+          ];
+        } else {
+          return [];
+        }
+      });
+
+      let costsData2016 = costsData2016raw.filter(val => {
+        if (val[0]) {
+          return val;
+        }
+      });
+
+      let costsData2016project = [];
+      let costsData2016reduce = [];
+
+      costsData2016.forEach(line => {
+        if (!costsData2016project.includes(line[0])) {
+          costsData2016project.push(line[0]);
+        }
+      });
+
+      costsData2016project.forEach((project, i)=> {
+        costsData2016reduce.push([project]);
+        costsData2016.forEach(line => {
+          if (project == line[0]) {
+            if (costsData2016reduce[i][1]) {
+              costsData2016reduce[i][1] += line[1];
+            } else {
+              costsData2016reduce[i].push(line[1]);
+            }
+
+          }
+        });
+      });
+
+      console.log(debtData2016);
+
+      //console.log(costsData2016reduce);
+
+      let colDebt = config.colDebt_1.debt;
+      let colCosts = config.colDebt_1.costs;
+
+      //console.log(monthPrepaid);
+
+      for (let x = 0; x < xArray.length; x++) {
+
+        for (let i = 0; i < monthPrepaid.length; i++) {
+          if (registryData[xArray[x] - START][0] == monthPrepaid[i][0]) {
+            if (!monthPrepaid[i][1] && monthPrepaid[i][2]) {
+
+              range = list.amo + '!' + colDebt + xArray[x];
+
+              await crud.updateData([[-(monthPrepaid[i][2])]], config.sid_2017.amo, range)
+                .then(async result => {console.log(result);})
+                .catch(console.err);
+            }
+          }
+        }
+
+        for (let j = 0; j < debtData2016.length; j++) {
+          if (registryData[xArray[x] - START][0] == debtData2016[j][0]) {
+
+            range = list.amo + '!' + colDebt + xArray[x];
+
+            await crud.updateData([[debtData2016[j][1]]], config.sid_2017.amo, range)
+              .then(async result => {console.log(result);})
+              .catch(console.err);
+          }
+        }
+
+        for (let k = 0; k < costsData2016reduce.length; k++) {
+          if (registryData[xArray[x] - START][0] == costsData2016reduce[k][0]) {
+
+            range = list.amo + '!' + colCosts + xArray[x];
+
+            await crud.updateData([[costsData2016reduce[k][1]]], config.sid_2017.amo, range)
+              .then(async result => {console.log(result);})
+              .catch(console.err);
+          }
+        }
+
+      }
+
+      console.log(new Date());
+      console.log('* Get & Insert Debt / Prepaid *');
 
       // -----------------------------------------------------------------------
       // Refresh DDS (Lera)
@@ -482,116 +537,116 @@ async function amoReg() {
       //------------------------------------------------------------------------
 
       //= Build ABC for margin params =
-      abc = abc.slice(2, 120);
-      let colsMargin = config.colsMargin_1;
-      let paramsMargin = [[], [], [], [], []];
-
-      try {
-
-        for (let x = 0; x < xArray.length; x++) {
-
-          //paramsMargin = [];
-
-          //= Push site in params =
-          paramsMargin[0].push(registryData[xArray[x] - START][0]);
-
-          //= Push cost "P" in params =
-          let col = abc.indexOf(colsMargin.cost);
-          registryData[xArray[x] - START][col] && Number(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-            ? paramsMargin[1].push(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-            : paramsMargin[1].push(0);
-        }
-        //--------------------------------------------------------------------
-
-        //console.log(abc.indexOf(colsMargin.salary[0]));
-
-        for (var m = 0; m < MONTHS.length; m++) {
-          let sCol = abc.indexOf(colsMargin.salary[m]);
-          let wCol = abc.indexOf(colsMargin.warranty[m]);
-          let oCol = [];
-          for (let i = 0; i < colsMargin.other[m].length; i++) {
-            oCol.push(abc.indexOf(colsMargin.other[m][i]));
-          }
-          paramsMargin[2].push([]);
-          paramsMargin[3].push([]);
-          paramsMargin[4].push([]);
-
-          for (let x = 0; x < xArray.length; x++) {
-            paramsMargin[2][m].push([]);
-            paramsMargin[3][m].push([]);
-            paramsMargin[4][m].push([]);
-
-            for (let i = 0; i < colsMargin.other[m].length; i++) {
-              registryData[xArray[x] - START][oCol[i]] && Number(registryData[xArray[x] - START][oCol[i]].replace(/\s/g, '').replace(/,/g, '.'))
-                ? paramsMargin[4][m][x].push(Number(registryData[xArray[x] - START][oCol[i]].replace(/\s/g, '').replace(/,/g, '.')))
-                : paramsMargin[4][m][x].push(0);
-            }
-
-            for (let p = 0; p < registryData.length; p++) {
-              if (paramsMargin[0][x] == registryData[p][0]) {
-
-                registryData[x][sCol] && Number(registryData[p][sCol].replace(/\s/g, '').replace(/,/g, '.'))
-                  ? paramsMargin[2][m][x].push(Number(registryData[p][sCol].replace(/\s/g, '').replace(/,/g, '.')))
-                  : paramsMargin[2][m][x].push(0);
-
-                registryData[x][wCol] && Number(registryData[p][wCol].replace(/\s/g, '').replace(/,/g, '.'))
-                  ? paramsMargin[3][m][x].push(Number(registryData[p][wCol].replace(/\s/g, '').replace(/,/g, '.')))
-                  : paramsMargin[3][m][x].push(0);
-
-              }
-            }
-          }
-        }
-
-      } catch (e) {
-        reject(e.stack);
-      }
-
-      //= Get & Insert values of "Margin & Margins" =
-
-      let margin = await getMargin(contractSum, paramsMargin);
-
-      let margins = [];
-      let marginAll = [];
-      let marginsAll = [];
-
-      for (let p = 0; p < paramsMargin[0].length; p++) {
-        margins.push([]);
-        for (let c = 0; c < contractSum.length; c++) {
-          if(contractSum[c][0] == paramsMargin[0][p]) {
-            margins[p].push(margin[p][0] ? margin[p][0] / contractSum[c][1] : 0);
-
-            //= Cut to 2 number after poin =
-            margins[p][0] = margins[p][0] ? margins[p][0].toFixed(2) : 0;
-          }
-        }
-      }
-
-
-      for (let p = 0; p < margin.length; p++) {
-        marginAll.push(margin[p]);
-        marginsAll.push(margins[p]);
-        for (let c = 0; c < CREW; c++) {
-          marginAll.push([]);
-          marginsAll.push([]);
-        }
-      }
-
-      let colMargin = config.colsMargin_1.margin;
-      let colMargins = config.colsMargin_1.margins;
-
-      range1 = list.amo + '!' + colMargin + START + ':' + colMargin;
-      range2 = list.amo + '!' + colMargins + START + ':' + colMargins;
-
-      await Promise.all([
-        crud.updateData(marginAll, config.sid_2017.amo, range1),
-        crud.updateData(marginsAll, config.sid_2017.amo, range2),
-      ])
-        .then(async result => {console.log(result);})
-        .catch(console.err);
-
-
-      console.log('* update Margin and Margins *');
+      // abc = abc.slice(2, 120);
+      // let colsMargin = config.colsMargin_1;
+      // let paramsMargin = [[], [], [], [], []];
+      //
+      // try {
+      //
+      //   for (let x = 0; x < xArray.length; x++) {
+      //
+      //     //paramsMargin = [];
+      //
+      //     //= Push site in params =
+      //     paramsMargin[0].push(registryData[xArray[x] - START][0]);
+      //
+      //     //= Push cost "P" in params =
+      //     let col = abc.indexOf(colsMargin.cost);
+      //     registryData[xArray[x] - START][col] && Number(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //       ? paramsMargin[1].push(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+      //       : paramsMargin[1].push(0);
+      //   }
+      //   //--------------------------------------------------------------------
+      //
+      //   //console.log(abc.indexOf(colsMargin.salary[0]));
+      //
+      //   for (var m = 0; m < MONTHS.length; m++) {
+      //     let sCol = abc.indexOf(colsMargin.salary[m]);
+      //     let wCol = abc.indexOf(colsMargin.warranty[m]);
+      //     let oCol = [];
+      //     for (let i = 0; i < colsMargin.other[m].length; i++) {
+      //       oCol.push(abc.indexOf(colsMargin.other[m][i]));
+      //     }
+      //     paramsMargin[2].push([]);
+      //     paramsMargin[3].push([]);
+      //     paramsMargin[4].push([]);
+      //
+      //     for (let x = 0; x < xArray.length; x++) {
+      //       paramsMargin[2][m].push([]);
+      //       paramsMargin[3][m].push([]);
+      //       paramsMargin[4][m].push([]);
+      //
+      //       for (let i = 0; i < colsMargin.other[m].length; i++) {
+      //         registryData[xArray[x] - START][oCol[i]] && Number(registryData[xArray[x] - START][oCol[i]].replace(/\s/g, '').replace(/,/g, '.'))
+      //           ? paramsMargin[4][m][x].push(Number(registryData[xArray[x] - START][oCol[i]].replace(/\s/g, '').replace(/,/g, '.')))
+      //           : paramsMargin[4][m][x].push(0);
+      //       }
+      //
+      //       for (let p = 0; p < registryData.length; p++) {
+      //         if (paramsMargin[0][x] == registryData[p][0]) {
+      //
+      //           registryData[x][sCol] && Number(registryData[p][sCol].replace(/\s/g, '').replace(/,/g, '.'))
+      //             ? paramsMargin[2][m][x].push(Number(registryData[p][sCol].replace(/\s/g, '').replace(/,/g, '.')))
+      //             : paramsMargin[2][m][x].push(0);
+      //
+      //           registryData[x][wCol] && Number(registryData[p][wCol].replace(/\s/g, '').replace(/,/g, '.'))
+      //             ? paramsMargin[3][m][x].push(Number(registryData[p][wCol].replace(/\s/g, '').replace(/,/g, '.')))
+      //             : paramsMargin[3][m][x].push(0);
+      //
+      //         }
+      //       }
+      //     }
+      //   }
+      //
+      // } catch (e) {
+      //   reject(e.stack);
+      // }
+      //
+      // //= Get & Insert values of "Margin & Margins" =
+      //
+      // let margin = await getMargin(contractSum, paramsMargin);
+      //
+      // let margins = [];
+      // let marginAll = [];
+      // let marginsAll = [];
+      //
+      // for (let p = 0; p < paramsMargin[0].length; p++) {
+      //   margins.push([]);
+      //   for (let c = 0; c < contractSum.length; c++) {
+      //     if(contractSum[c][0] == paramsMargin[0][p]) {
+      //       margins[p].push(margin[p][0] ? margin[p][0] / contractSum[c][1] : 0);
+      //
+      //       //= Cut to 2 number after poin =
+      //       margins[p][0] = margins[p][0] ? margins[p][0].toFixed(2) : 0;
+      //     }
+      //   }
+      // }
+      //
+      //
+      // for (let p = 0; p < margin.length; p++) {
+      //   marginAll.push(margin[p]);
+      //   marginsAll.push(margins[p]);
+      //   for (let c = 0; c < CREW; c++) {
+      //     marginAll.push([]);
+      //     marginsAll.push([]);
+      //   }
+      // }
+      //
+      // let colMargin = config.colsMargin_1.margin;
+      // let colMargins = config.colsMargin_1.margins;
+      //
+      // range1 = list.amo + '!' + colMargin + START + ':' + colMargin;
+      // range2 = list.amo + '!' + colMargins + START + ':' + colMargins;
+      //
+      // await Promise.all([
+      //   crud.updateData(marginAll, config.sid_2017.amo, range1),
+      //   crud.updateData(marginsAll, config.sid_2017.amo, range2),
+      // ])
+      //   .then(async result => {console.log(result);})
+      //   .catch(console.err);
+      //
+      //
+      // console.log('* update Margin and Margins *');
 
       //-------------------------------------------------------------
       // Update date-time in "Monitoring"

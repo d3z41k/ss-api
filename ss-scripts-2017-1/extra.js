@@ -3,7 +3,7 @@
 const config = require('config');
 
 async function extra() {
-  return new Promise(async(resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
 
     //-------------------------------------------------------------------------
     // Usres libs
@@ -12,7 +12,7 @@ async function extra() {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
-    //const normLength = require('../libs/normalize-length');
+    const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models-2017-1/db_refresh');
     const pool = require('../models-2017-1/db_pool');
     const extraQuery = require('../models/db_extra-query');
@@ -69,8 +69,8 @@ async function extra() {
           }
         }
 
-        paramsExtraCients[2].push(extraClients[0][15]);
-        paramsExtraCients[3].push(extraClients[1][15], extraClients[1][19]);
+        paramsExtraCients[2].push(extraClients[0][15].trim());
+        paramsExtraCients[3].push(extraClients[1][15].trim(), extraClients[1][19].trim());
 
         //= Get values =
         let values = await extraQuery(pool, 'dds_olga', paramsExtraCients);
