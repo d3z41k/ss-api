@@ -45,8 +45,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
           divider = 0;
           for (let t = 0; t < lawt.table[n].length; t++) {
             if (lawt.table[n][t][0]
-              && Number(lawt.table[n][t][0].substr(3,2)) == months[m]
-              && lawt.table[n][t][2] != '-'
+              && Number(lawt.table[n][t][0].substr(3, 2)) == months[m]
               && lawt.table[n][t][2]) {
                divider += Number(lawt.table[n][t][2].replace(/,/g, '.'));
             }
@@ -133,26 +132,28 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
 
                 if (params[0][c] && lawt.name[n] == params[0][c]) {
 
-                  if (cutContractMonths[p][m] && cutContractMonths[p][m] == months[m]) {
 
-                    //= Build factHours for manager and tecnical director =
-                    if (lawt.name[n].trim() == MANAGER) {
-                      let currMonth = cutContractMonths[p][m];
-                      factHour += Math.round(worksHours.manager / quantityProjects[currMonth] * 10000) / 10000;
-                    } else if (lawt.name[n].trim() == CTO) {
-                      let currMonth = cutContractMonths[p][m];
-                      factHour += Math.round(worksHours.cto / quantityProjects[currMonth] * 10000) / 10000;
-                    } else {
+                  if (cutContractMonths[p][m]) {
+                    
+                    if (cutContractMonths[p][m] == months[m]) {
+                      //= Build factHours for manager and tecnical director =
+                      if (lawt.name[n].trim() == MANAGER) {
+                        let currMonth = cutContractMonths[p][m];
+                        factHour += Math.round(worksHours.manager / quantityProjects[currMonth] * 10000) / 10000;
+                      } else if (lawt.name[n].trim() == CTO) {
+                        let currMonth = cutContractMonths[p][m];
+                        factHour += Math.round(worksHours.cto / quantityProjects[currMonth] * 10000) / 10000;
+                      } else {
 
-                      //= Another employee
-                      for (let t = 0; t < lawt.table[n].length; t++) {
-                        if (lawt.table[n][t][0]
-                          && Number(lawt.table[n][t][0].substr(3,2)) == params[1][p][m]
-                          && lawt.table[n][t][5] == params[2][p]
-                          && lawt.table[n][t][2].trim() != '-'
-                          && lawt.table[n][t][1].trim() == DIRECTION
-                          && lawt.table[n][t][2]) {
-                            factHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
+                        //= Another employee
+                        for (let t = 0; t < lawt.table[n].length; t++) {
+                          if (lawt.table[n][t][0]
+                            && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][m]
+                            && lawt.table[n][t][5] == params[2][p]
+                            && lawt.table[n][t][1].trim() == DIRECTION
+                            && lawt.table[n][t][2]) {
+                              factHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
+                          }
                         }
                       }
                     }
@@ -161,9 +162,8 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
 
                     for (let t = 0; t < lawt.table[n].length; t++) {
                       if (lawt.table[n][t][0]
-                        && Number(lawt.table[n][t][0].substr(3,2)) == params[1][p][m]
+                        && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][m]
                         && lawt.table[n][t][5] == params[2][p]
-                        && lawt.table[n][t][2].trim() != '-'
                         && lawt.table[n][t][1].trim() == DIRECTION
                         && lawt.table[n][t][2]) {
                           warrentyHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));

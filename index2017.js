@@ -176,6 +176,11 @@ router.get('/sales', async ctx => {
   const finModelBalance = require('./ss-scripts-2017-1/fin-model-balance');
   ctx.body = await finModelBalance();
 
+}).get('/lawt-underwork', async ctx => {
+
+  const lawtUnderwork = require('./ss-scripts-2017-1/lawt-underwork');
+  ctx.body = await lawtUnderwork();
+
 });
 
 app.use(router.routes());
