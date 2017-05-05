@@ -160,63 +160,63 @@ async function amoReg() {
         reject(e.stack);
       }
 
-      //--------------------------------------------------------------------------
-      // Get & Insert mounth and amount of the act
-      //--------------------------------------------------------------------------
+      --------------------------------------------------------------------------
+      Get & Insert mounth and amount of the act
+      --------------------------------------------------------------------------
 
-      // let monthAct = clientData.map((row) => {
-      //   return [
-      //     row[0],
-      //     row[11] ? row[11] : 0,
-      //     row[10] && Number(row[10].replace(/\s/g, ''))
-      //     ? Number(row[10].replace(/\s/g, '')) : 0
-      //   ];
-      // });
-      //
-      // let colsAct = config.reg_colsAct_1;
-      // let months = [];
-      //
-      //
-      // for (let x = 0; x < xArray.length; x++) {
-      //
-      //   let month = 0;
-      //
-      //   for (let i = 0; i < monthAct.length; i++) {
-      //     if (registryData[xArray[x] - START][0]  == monthAct[i][0]) {
-      //       if (monthAct[i][1]
-      //         && monthAct[i][1].slice(6) == '2016') {
-      //         month = 1;
-      //       } else {
-      //         month = monthAct[i][1] ? Number(monthAct[i][1].substr(3, 2)) : '';
-      //       }
-      //
-      //       if (colsAct[month]) {
-      //         range = list.amo + '!' + colsAct[month] + xArray[x];
-      //
-      //         await crud.updateData([[monthAct[i][2]]], config.sid_2017.amo, range)
-      //           .then(async result => {console.log(result);})
-      //           .catch(console.err);
-      //       }
-      //
-      //       sleep(100)
-      //
-      //     }
-      //   }
-      //
-      //   months.push([month]);
-      //   for (let c = 0; c < CREW; c++) {
-      //     months.push([]);
-      //   }
-      // }
-      //
-      // range = list.amo + '!H' + START + ':H';
+      let monthAct = clientData.map((row) => {
+        return [
+          row[0],
+          row[11] ? row[11] : 0,
+          row[10] && Number(row[10].replace(/\s/g, ''))
+          ? Number(row[10].replace(/\s/g, '')) : 0
+        ];
+      });
 
-      // await crud.updateData(months, config.sid_2017.amo, range)
-      //   .then(async result => {console.log(result);})
-      //   .catch(console.err);
-      //
-      // console.log(new Date());
-      // console.log('* Get & Insert mounth and amount of the act *');
+      let colsAct = config.reg_colsAct_1;
+      let months = [];
+
+
+      for (let x = 0; x < xArray.length; x++) {
+
+        let month = 0;
+
+        for (let i = 0; i < monthAct.length; i++) {
+          if (registryData[xArray[x] - START][0]  == monthAct[i][0]) {
+            if (monthAct[i][1]
+              && monthAct[i][1].slice(6) == '2016') {
+              month = 1;
+            } else {
+              month = monthAct[i][1] ? Number(monthAct[i][1].substr(3, 2)) : '';
+            }
+
+            if (colsAct[month]) {
+              range = list.amo + '!' + colsAct[month] + xArray[x];
+
+              await crud.updateData([[monthAct[i][2]]], config.sid_2017.amo, range)
+                .then(async result => {console.log(result);})
+                .catch(console.err);
+            }
+
+            sleep(100)
+
+          }
+        }
+      
+        months.push([month]);
+        for (let c = 0; c < CREW; c++) {
+          months.push([]);
+        }
+      }
+
+      range = list.amo + '!H' + START + ':H';
+
+      await crud.updateData(months, config.sid_2017.amo, range)
+        .then(async result => {console.log(result);})
+        .catch(console.err);
+
+      console.log(new Date());
+      console.log('* Get & Insert mounth and amount of the act *');
 
       // -----------------------------------------------------------------------
       // Build params & update Debt/Prepaid of customers

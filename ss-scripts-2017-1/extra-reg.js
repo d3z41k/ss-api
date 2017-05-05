@@ -170,54 +170,62 @@ async function extraReg() {
       // Get & Insert mounth and amount of the act
       //------------------------------------------------------------------------
 
-      // let monthAct = clientData.map((row) => {
-      //   return [
-      //     row[0], row[10] ? row[10] : 0,
-      //     row[9] && Number(row[9].replace(/\s/g, ''))
-      //     ? Number(row[9].replace(/\s/g, '')) : 0
-      //   ];
-      // });
-      //
-      // let colsAct = config.reg_colsAct_1;
-      //
-      // for (let x = 0; x < xArray.length; x++) {
-      //
-      //   let month = 0;
-      //
-      //   for (let i = 0; i < monthAct.length; i++) {
-      //     if (registryData[xArray[x] - START][0]  == monthAct[i][0]) {
-      //       if (monthAct[i][1]
-      //         && monthAct[i][1].slice(6) == '2016') {
-      //         month = 1;
-      //       } else {
-      //         month = monthAct[i][1] ? Number(monthAct[i][1].substr(3, 2)) : '';
-      //       }
-      //
-      //       range = list.extra + '!H' + xArray[x];
-      //
-      //       await crud.updateData([[month]], config.sid_2017.extra, range)
-      //         .then(async result => {console.log(result);})
-      //         .catch(console.err);
-      //
-      //       if (colsAct[month]) {
-      //         range = list.extra + '!' + colsAct[month] + xArray[x];
-      //
-      //         await crud.updateData([[monthAct[i][2]]], config.sid_2017.extra, range)
-      //           .then(async result => {console.log(result);})
-      //           .catch(console.err);
-      //       }
-      //
-      //     }
-      //   }
-      //   await sleep(500);
-      // }
-      // console.log(new Date());
-      // console.log('* Get & Insert mounth and amount of the act *');
+      let monthAct = clientData.map((row) => {
+        return [
+          row[0], row[10] ? row[10] : 0,
+          row[12] && Number(row[12].replace(/\s/g, ''))
+          ? Number(row[12].replace(/\s/g, '')) : 0
+        ];
+      });
 
-      // -----------------------------------------------------------------------
-      // Build params & update Debt/Prepaid of customers
-      // -----------------------------------------------------------------------
+      let colsAct = config.reg_colsAct_1;
+      let endMonths = [];
 
+      for (let x = 0; x < xArray.length; x++) {
+
+        let month = 0;
+
+        for (let i = 0; i < monthAct.length; i++) {
+          if (registryData[xArray[x] - START][0]  == monthAct[i][0]) {
+            if (monthAct[i][1]
+              && monthAct[i][1].slice(6) == '2016') {
+              month = 1;
+            } else {
+              month = monthAct[i][1] ? Number(monthAct[i][1].substr(3, 2)) : '';
+            }
+
+            endMonths.push([month]);
+            for (let c = 0; c < CREW; c++) {
+              endMonths.push([]);
+            }
+
+            if (colsAct[month]) {
+              range = list.extra + '!' + colsAct[month] + xArray[x];
+
+              await crud.updateData([[monthAct[i][2]]], config.sid_2017.extra, range)
+                .then(async result => {console.log(result);})
+                .catch(console.err);
+            }
+
+          }
+        }
+
+      }
+
+      range = list.extra + '!H' + START + ':H';
+
+      await crud.updateData(endMonths, config.sid_2017.extra, range)
+        .then(async result => {console.log(result);})
+        .catch(console.err);
+
+
+      console.log(new Date());
+      console.log('* Get & Insert mounth and amount of the act *');
+    //
+    //   // -----------------------------------------------------------------------
+    //   // Build params & update Debt/Prepaid of customers
+    //   // -----------------------------------------------------------------------
+    //
     //   let monthPrepaid = clientData.map((row) => {
     //     return [
     //       row[0], row[16] ? row[16] : 0,
@@ -337,10 +345,10 @@ async function extraReg() {
     //   console.log(new Date());
     //   console.log('* Get & Insert Debt / Prepaid *');
 
-      // //------------------------------------------------------------------------
-      // // Refresh DDS (Olga)
-      // //------------------------------------------------------------------------
-      //
+      //------------------------------------------------------------------------
+      // Refresh DDS (Olga)
+      //------------------------------------------------------------------------
+
       // let ddsData = [];
       // range = list.dds_olga + '!A6:AD';
       //
@@ -353,66 +361,70 @@ async function extraReg() {
       //   .then(async (results) => {console.log(results);})
       //   .catch(console.err);
 
-      try {
-
-        let addCostsParams = [[], [[],[],[]], [], []];
-
-        addCostsParams[0] = [1, 2, 3, 4, 5, 6]; //months
-        addCostsParams[1][0] = 'Фрилансер'; //article
-        addCostsParams[1][1] = 'Лицензия ЮМИ'; //article
-        addCostsParams[1][2] = 'Лицензия Битрикс'; //article
-
-        for (let x = 0; x < xArray.length; x++) {
-          addCostsParams[2].push(registryData[xArray[x] - START][0]); //site
-          addCostsParams[3].push(registryData[xArray[x] - START][1]); //counterparty
-        }
-
-        values = await extraRegAddQuery(pool, 'dds_olga', addCostsParams, CREW);
-
-        zipValues = [];
-        arrRange = [];
-        arrFuncions = [];
-
-        //= Zip valuses =
-        values.forEach(val => {
-          let arrArticles = [];
-          for (let a = 0; a < val.length; a++) {
-            arrArticles.push(val[a]);
-          }
-
-          // !! Hardcode 6 params, months (a half-year)
-          zipValues.push(_.zip(
-            arrArticles[0],
-            arrArticles[1],
-            arrArticles[2],
-            arrArticles[3],
-            arrArticles[4],
-            arrArticles[5]
-          ));
-        });
-
-        //= Prepare array of Range =
-        for (let month in COL_ADD_COSTS){
-          arrRange.push(list.extra + '!' + COL_ADD_COSTS[month][0] + START + ':' + COL_ADD_COSTS[month][2]);
-        }
-
-        //= Prepare array of Functions =
-        zipValues.forEach((arrValues, i)=> {
-          arrFuncions.push(crud.updateData(arrValues, config.sid_2017.extra, arrRange[i]));
-        });
-
-        //= Update data =
-        await Promise.all(arrFuncions)
-          .then(async (results) => {console.log(results);})
-          .catch(console.log);
-
-      } catch (e) {
-        reject(e.stack);
-      }
-
-      console.log(new Date());
-      console.log('* The additional costs *');
-
+      // //------------------------------------------------------------------------
+      // // Build params & update of additional costs
+      // //------------------------------------------------------------------------
+      //
+      // try {
+      //
+      //   let addCostsParams = [[], [[],[],[]], [], []];
+      //
+      //   addCostsParams[0] = [1, 2, 3, 4, 5, 6]; //months
+      //   addCostsParams[1][0] = 'Фрилансер'; //article
+      //   addCostsParams[1][1] = 'Лицензия ЮМИ'; //article
+      //   addCostsParams[1][2] = 'Лицензия Битрикс'; //article
+      //
+      //   for (let x = 0; x < xArray.length; x++) {
+      //     addCostsParams[2].push(registryData[xArray[x] - START][0]); //site
+      //     addCostsParams[3].push(registryData[xArray[x] - START][1]); //counterparty
+      //   }
+      //
+      //   values = await extraRegAddQuery(pool, 'dds_olga', addCostsParams, CREW);
+      //
+      //   zipValues = [];
+      //   arrRange = [];
+      //   arrFuncions = [];
+      //
+      //   //= Zip valuses =
+      //   values.forEach(val => {
+      //     let arrArticles = [];
+      //     for (let a = 0; a < val.length; a++) {
+      //       arrArticles.push(val[a]);
+      //     }
+      //
+      //     // !! Hardcode 6 params, months (a half-year)
+      //     zipValues.push(_.zip(
+      //       arrArticles[0],
+      //       arrArticles[1],
+      //       arrArticles[2],
+      //       arrArticles[3],
+      //       arrArticles[4],
+      //       arrArticles[5]
+      //     ));
+      //   });
+      //
+      //   //= Prepare array of Range =
+      //   for (let month in COL_ADD_COSTS){
+      //     arrRange.push(list.extra + '!' + COL_ADD_COSTS[month][0] + START + ':' + COL_ADD_COSTS[month][2]);
+      //   }
+      //
+      //   //= Prepare array of Functions =
+      //   zipValues.forEach((arrValues, i)=> {
+      //     arrFuncions.push(crud.updateData(arrValues, config.sid_2017.extra, arrRange[i]));
+      //   });
+      //
+      //   //= Update data =
+      //   await Promise.all(arrFuncions)
+      //     .then(async (results) => {console.log(results);})
+      //     .catch(console.log);
+      //
+      // } catch (e) {
+      //   reject(e.stack);
+      // }
+      //
+      // console.log(new Date());
+      // console.log('* The additional costs *');
+      //
       // //------------------------------------------------------------------------
       // // Build params & update receipt of money from customers (prepaid & finalLy)
       // //------------------------------------------------------------------------
@@ -477,10 +489,10 @@ async function extraReg() {
       //
       // console.log(new Date());
       // console.log('* The receipt of money from customers (prepaid & finally) *');
-      //
-      // // --------------------------------------------------------------------------
-      // // Build ratioParams for "Ratio" and "factHours"
-      // // --------------------------------------------------------------------------
+
+      // --------------------------------------------------------------------------
+      // Build ratioParams for "Ratio" and "factHours"
+      // --------------------------------------------------------------------------
       //
       // let ratioParams = [[], [], []];
       //
@@ -495,7 +507,7 @@ async function extraReg() {
       //   if (!lawt.name.includes(registryData[i][7])) {
       //     lawt.name.push(registryData[i][7]); //lawt names
       //     list.name = encodeURIComponent(registryData[i][7]);
-      //     range = list.name + '!B10:L1000';
+      //     range = list.name + '!A10:G1500';
       //     lawt.table.push(await crud.readData(config.sid_2017.lawt, range)); //lawt tables
       //   }
       // }
@@ -503,7 +515,7 @@ async function extraReg() {
       // for (let x = 0; x < xArray.length; x++) {
       //   ratioParams[1].push([]);
       //   for (let m = 0; m < cutActionMonths[x].length; m++) {
-      //       ratioParams[1][x].push(cutActionMonths[x][m]); //action month
+      //     ratioParams[1][x].push(cutActionMonths[x][m]); //action month
       //   }
       //   ratioParams[2].push(registryData[xArray[x] - START][0]); //sites
       // }
@@ -579,10 +591,10 @@ async function extraReg() {
       //   .catch(console.log);
       //
       //  console.log('* ratioParams for Ratio and factHours *');
-      //
-      //  //------------------------------------------------------------------------
-      //  // Build params for Margin
-      //  //------------------------------------------------------------------------
+
+       //------------------------------------------------------------------------
+       // Build params for Margin
+       //------------------------------------------------------------------------
       //
       //  //= Build ABC for margin params =
       //  abc = abc.slice(2, 120);

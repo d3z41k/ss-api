@@ -241,54 +241,55 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
 
                 if (params[0][c] && lawt.name[n] == params[0][c]) {
 
-                  if (cutContractMonths[p][m] && cutContractMonths[p][m] == months[m]) {
+                  if (cutContractMonths[p][m]) {
 
-                    //= Build factHours for manager and cto =
-                    if (lawt.name[n].trim() == MANAGER) {
-                      let currMonth = cutContractMonths[p][m];
-
-                      //= Danger!!! may div by zero=
-
-                      switch(params[3][p]) {
-                        case 'Интеграция (AMO)':
-                          factHour += Math.round(worksHours.manager[params[3][p]]
-                          / quantityProjects.manager[currMonth][params[3][p]] * 10000) / 10000;
-                          break;
-                        case 'Обслуживание (AMO)':
-                          factHour += Math.round(worksHours.manager[params[3][p]]
-                          / quantityProjects.manager[currMonth][params[3][p]] * 10000) / 10000;
-                          break;
-                        case 'Виджеты разработка (AMO)':
-                          factHour += Math.round(worksHours.manager[params[3][p]]
-                          / quantityProjects.manager[currMonth][params[3][p]] * 10000) / 10000;
-                          break;
-                        case 'Виджеты готовые (AMO)':
-                          factHour += Math.round(worksHours.manager[params[3][p]]
-                          / quantityProjects.manager[currMonth][params[3][p]] * 10000) / 10000;
-                          break;
-                        case 'Доп. работы (АМО)':
-                          factHour += Math.round(worksHours.manager[params[3][p]]
-                          / quantityProjects.manager[currMonth][params[3][p]] * 10000) / 10000;
-                          break;
-                        default: break;
-
-                        }
-
-                    } else if (lawt.name[n].trim() == CTO) {
-                      if (types.includes(params[3][p])) {
+                    if (cutContractMonths[p][m] == months[m]) {
+                      //= Build factHours for manager and cto =
+                      if (lawt.name[n].trim() == MANAGER) {
                         let currMonth = cutContractMonths[p][m];
-                          factHour += Math.round(worksHours.cto / quantityProjects.cto[currMonth] * 10000) / 10000;
-                       }
-                    } else {
 
-                      //= Another employee
-                      for (let t = 0; t < lawt.table[n].length; t++) {
-                        if (lawt.table[n][t][0]
-                          && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][m]
-                          && lawt.table[n][t][10] == params[2][p]
-                          && lawt.table[n][t][2].trim() != '-'
-                          && lawt.table[n][t][2]) {
-                            factHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
+                        //= Danger!!! may div by zero=
+
+                        switch(params[3][p]) {
+                          case 'Интеграция (AMO)':
+                            factHour += Math.round(worksHours.manager[params[3][p]]
+                            / quantityProjects.manager[currMonth][params[3][p]] * 10000) / 10000;
+                            break;
+                          case 'Обслуживание (AMO)':
+                            factHour += Math.round(worksHours.manager[params[3][p]]
+                            / quantityProjects.manager[currMonth][params[3][p]] * 10000) / 10000;
+                            break;
+                          case 'Виджеты разработка (AMO)':
+                            factHour += Math.round(worksHours.manager[params[3][p]]
+                            / quantityProjects.manager[currMonth][params[3][p]] * 10000) / 10000;
+                            break;
+                          case 'Виджеты готовые (AMO)':
+                            factHour += Math.round(worksHours.manager[params[3][p]]
+                            / quantityProjects.manager[currMonth][params[3][p]] * 10000) / 10000;
+                            break;
+                          case 'Доп. работы (АМО)':
+                            factHour += Math.round(worksHours.manager[params[3][p]]
+                            / quantityProjects.manager[currMonth][params[3][p]] * 10000) / 10000;
+                            break;
+                          default: break;
+
+                          }
+
+                      } else if (lawt.name[n].trim() == CTO) {
+                        if (types.includes(params[3][p])) {
+                          let currMonth = cutContractMonths[p][m];
+                            factHour += Math.round(worksHours.cto / quantityProjects.cto[currMonth] * 10000) / 10000;
+                         }
+                      } else {
+
+                        //= Another employee
+                        for (let t = 0; t < lawt.table[n].length; t++) {
+                          if (lawt.table[n][t][0]
+                            && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][m]
+                            && lawt.table[n][t][10] == params[2][p]
+                            && lawt.table[n][t][2]) {
+                              factHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
+                          }
                         }
                       }
                     }
@@ -299,7 +300,6 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
                       if (lawt.table[n][t][0]
                         && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][m]
                         && lawt.table[n][t][10] == params[2][p]
-                        && lawt.table[n][t][2].trim() != '-'
                         && lawt.table[n][t][2]) {
                           warrentyHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
                       }

@@ -132,9 +132,8 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
 
                 if (params[0][c] && lawt.name[n] == params[0][c]) {
 
-
                   if (cutContractMonths[p][m]) {
-                    
+
                     if (cutContractMonths[p][m] == months[m]) {
                       //= Build factHours for manager and tecnical director =
                       if (lawt.name[n].trim() == MANAGER) {
@@ -149,7 +148,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
                         for (let t = 0; t < lawt.table[n].length; t++) {
                           if (lawt.table[n][t][0]
                             && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][m]
-                            && lawt.table[n][t][5] == params[2][p]
+                            && lawt.table[n][t][5] == params[2][p] //site (project name)
                             && lawt.table[n][t][1].trim() == DIRECTION
                             && lawt.table[n][t][2]) {
                               factHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
