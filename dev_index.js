@@ -50,6 +50,12 @@ router.get('/sales', async ctx => {
 
   const devReg = require('./ss-scripts-2017-1/dev-reg');
   ctx.body = await devReg();
+
+}).get('/_dev-reg', async ctx => {
+
+  const devReg = require('./ss-scripts-2017-1/_dev-reg');
+  ctx.body = await devReg();
+
 }).get('/dev-reg-2016', async ctx => {
 
   const devReg = require('./ss-scripts/dev-reg');

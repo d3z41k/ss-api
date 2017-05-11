@@ -20,7 +20,7 @@ async function amoReg() {
     const formatDate = require('../libs/format-date');
     const normLength = require('../libs/normalize-length');
     const sleep = require('../libs/sleep');
-    const dbRefresh = require('../models/db_refresh');
+    const dbRefresh = require('../models-2017-1/db_refresh');
     const pool = require('../models-2017-1/db_pool');
     const amoRegQuery = require('../models-2017-1/db_amo-reg-query');
     const getRatioHours = require('../libs/amo-reg/getRatioHours');
@@ -160,9 +160,9 @@ async function amoReg() {
         reject(e.stack);
       }
 
-      --------------------------------------------------------------------------
-      Get & Insert mounth and amount of the act
-      --------------------------------------------------------------------------
+      //------------------------------------------------------------------------
+      // Get & Insert mounth and amount of the act
+      //------------------------------------------------------------------------
 
       let monthAct = clientData.map((row) => {
         return [
@@ -202,7 +202,7 @@ async function amoReg() {
 
           }
         }
-      
+
         months.push([month]);
         for (let c = 0; c < CREW; c++) {
           months.push([]);
@@ -218,9 +218,9 @@ async function amoReg() {
       console.log(new Date());
       console.log('* Get & Insert mounth and amount of the act *');
 
-      // -----------------------------------------------------------------------
+      //------------------------------------------------------------------------
       // Build params & update Debt/Prepaid of customers
-      // -----------------------------------------------------------------------
+      //------------------------------------------------------------------------
 
       let monthPrepaid = clientData.map((row) => {
         return [
@@ -289,7 +289,7 @@ async function amoReg() {
         });
       });
 
-      console.log(debtData2016);
+      //console.log(debtData2016);
 
       //console.log(costsData2016reduce);
 
@@ -340,9 +340,9 @@ async function amoReg() {
       console.log(new Date());
       console.log('* Get & Insert Debt / Prepaid *');
 
-      // -----------------------------------------------------------------------
+      //-----------------------------------------------------------------------
       // Refresh DDS (Lera)
-      // -----------------------------------------------------------------------
+      //-----------------------------------------------------------------------
 
       // let ddsData = [];
       // list = encodeURIComponent('ДДС_Лера');
@@ -361,182 +361,182 @@ async function amoReg() {
       // Build receiptParams The receipt of money from customers (prepaid & finalLy)
       //---------------------------------------------------------------
 
-      // let receiptParams = [[], [[], [], []], [], [], []];
-      //
-      // try {
-      //
-      //   receiptParams[0] = [
-      //     'Интеграция (AMO)',
-      //     'Обслуживание (AMO)',
-      //     'Виджеты разработка (AMO)',
-      //     'Виджеты готовые (AMO)',
-      //     'Доп. работы (АМО)',
-      //     'Лицензия АМО'
-      //   ]; //direction
-      //   receiptParams[1][0] = 'Поступление от новых клиентов (продажа)'; //article
-      //   receiptParams[1][1] = 'Поступление денег от сущ.клиентов (предоплата)'; //article
-      //   receiptParams[1][2] = 'Поступление от сущ.клиентов (оконч. оплата)'; //article
-      //   receiptParams[2] = [1, 2, 3, 4, 5, 6];
-      //
-      //   for (let x = 0; x < xArray.length; x++) {
-      //     receiptParams[3].push(registryData[xArray[x] - START][0]); //site
-      //     receiptParams[4].push(registryData[xArray[x] - START][1]); //counterparty
-      //   }
-      //
-      // } catch (e) {
-      //   reject(e.stack)
-      // }
-      //
-      // //console.log(receiptParams);
-      //
-      // let values = await amoRegQuery(pool, 'dds_lera', receiptParams, CREW);
-      //
-      // //= Zip valuses =
-      // values.forEach(val => {
-      //   let arrArticles = [];
-      //   for (let a = 0; a < val.length; a++) {
-      //     arrArticles.push(val[a]);
-      //   }
-      //
-      //   // !! Hardcode 6 params, months (a half-year)
-      //   zipValues.push(_.zip(
-      //     arrArticles[0],
-      //     arrArticles[1],
-      //     arrArticles[2],
-      //     arrArticles[3],
-      //     arrArticles[4],
-      //     arrArticles[5]
-      //   ));
-      // });
-      //
-      // console.log(zipValues);
-      //
-      // //= Prepare array of Range =
-      // for (let month in COL_MONTH){
-      //   arrRange.push(list.amo + '!' + COL_MONTH[month][0] + START + ':' + COL_MONTH[month][2]);
-      // }
-      //
-      // //= Prepare array of Functions =
-      // zipValues.forEach((arrValues, i)=> {
-      //   arrFuncions.push(crud.updateData(arrValues, config.sid_2017.amo, arrRange[i]));
-      // });
-      //
-      // //= Update data =
-      // await Promise.all(arrFuncions)
-      //   .then(async (results) => {console.log(results);})
-      //   .catch(console.log);
-      //
-      // console.log(new Date());
-      // console.log('* The receipt of money from customers (prepaid & finally) *');
+      let receiptParams = [[], [[], [], []], [], [], []];
+
+      try {
+
+        receiptParams[0] = [
+          'Интеграция (AMO)',
+          'Обслуживание (AMO)',
+          'Виджеты разработка (AMO)',
+          'Виджеты готовые (AMO)',
+          'Доп. работы (АМО)',
+          'Лицензия АМО'
+        ]; //direction
+        receiptParams[1][0] = 'Поступление от новых клиентов (продажа)'; //article
+        receiptParams[1][1] = 'Поступление денег от сущ.клиентов (предоплата)'; //article
+        receiptParams[1][2] = 'Поступление от сущ.клиентов (оконч. оплата)'; //article
+        receiptParams[2] = [1, 2, 3, 4, 5, 6];
+
+        for (let x = 0; x < xArray.length; x++) {
+          receiptParams[3].push(registryData[xArray[x] - START][0]); //site
+          receiptParams[4].push(registryData[xArray[x] - START][1]); //counterparty
+        }
+
+      } catch (e) {
+        reject(e.stack)
+      }
+
+      //console.log(receiptParams);
+
+      let values = await amoRegQuery(pool, 'dds_lera', receiptParams, CREW);
+
+      //= Zip valuses =
+      values.forEach(val => {
+        let arrArticles = [];
+        for (let a = 0; a < val.length; a++) {
+          arrArticles.push(val[a]);
+        }
+
+        // !! Hardcode 6 params, months (a half-year)
+        zipValues.push(_.zip(
+          arrArticles[0],
+          arrArticles[1],
+          arrArticles[2],
+          arrArticles[3],
+          arrArticles[4],
+          arrArticles[5]
+        ));
+      });
+
+      //console.log(zipValues);
+
+      //= Prepare array of Range =
+      for (let month in COL_MONTH){
+        arrRange.push(list.amo + '!' + COL_MONTH[month][0] + START + ':' + COL_MONTH[month][2]);
+      }
+
+      //= Prepare array of Functions =
+      zipValues.forEach((arrValues, i)=> {
+        arrFuncions.push(crud.updateData(arrValues, config.sid_2017.amo, arrRange[i]));
+      });
+
+      //= Update data =
+      await Promise.all(arrFuncions)
+        .then(async (results) => {console.log(results);})
+        .catch(console.log);
+
+      console.log(new Date());
+      console.log('* The receipt of money from customers (prepaid & finally) *');
 
       //--------------------------------------------------------------------------
       // Build ratioParams for "Ratio" and "factHours"
       //--------------------------------------------------------------------------
-      //
-      // let ratioParams = [[], [], [], []];
-      //
-      // //= l.a.w.t - The list accounting work time =
-      // let lawt = {
-      //   name: [],
-      //   table: []
-      // };
-      //
-      // for (let i = (xArray[0] - START); i < (xArray[0] - START) + CREW; i++) {
-      //   ratioParams[0].push(registryData[i][7]); //staff
-      //   if (!lawt.name.includes(registryData[i][7])) {
-      //     lawt.name.push(registryData[i][7]); //lawt names
-      //     list.name = encodeURIComponent(registryData[i][7]);
-      //     range = list.name + '!A10:K1500';
-      //     lawt.table.push(await crud.readData(config.sid_2017.lawt, range)); //lawt tables
-      //   }
-      // }
-      //
-      // for (let x = 0; x < xArray.length; x++) {
-      //   ratioParams[1].push([]);
-      //   for (let m = 0; m < cutActionMonths[x].length; m++) {
-      //       ratioParams[1][x].push(cutActionMonths[x][m]); //action month
-      //   }
-      //   ratioParams[2].push(registryData[xArray[x] - START][0]); //sites
-      //   ratioParams[3].push(registryData[xArray[x] - START][4]); //types
-      // }
-      //
-      // range = list.fot + '!A6:ER77';
-      //
-      // let salaryData = await crud.readData(config.sid_2017.salary, range);
-      //
-      // let accruedMonth = config.accruedMonth_1;
-      // let accruedIndex = {
-      //   '1': '',
-      //   '2': '',
-      //   '3': '',
-      //   '4': '',
-      //   '5': '',
-      //   '6': ''
-      // };
-      //
-      // abc.forEach((letter, l) => {
-      //   for (let month in accruedMonth) {
-      //     if (letter == accruedMonth[month]) {
-      //       accruedIndex[month] = l;
-      //     }
-      //   }
-      // });
-      //
-      // //------------------------------------------------------------------------
-      // // Get & Insert "Ratio & factHours"
-      // //------------------------------------------------------------------------
-      //
-      // let [ratio, factHours, warrentyHours] = await getRatioHours(salaryData, lawt, ratioParams, cutContractMonths, accruedIndex);
-      //
-      // arrFuncions = [];
-      // arrRange = {
-      //   'ratio': [],
-      //   'factHours': [],
-      //   'warrentyHours': []
-      // }
-      //
-      // //= Prepare array of ratio range & functions =
-      // for (let month in COL_MONTH) {
-      //   let letter = COL_MONTH[month].slice(3, 4);
-      //   arrRange.ratio.push(list.amo + '!' + letter + START + ':' + letter);
-      // }
-      //
-      // ratio.forEach((arrValues, i)=> {
-      //   arrFuncions.push(crud.updateData(arrValues, config.sid_2017.amo, arrRange.ratio[i]));
-      // });
-      //
-      // //= Prepare array of factHours range & functions =
-      // for (let month in COL_MONTH) {
-      //   let letter = COL_MONTH[month].slice(4, 5);
-      //   arrRange.factHours.push(list.amo + '!' + letter + START + ':' + letter);
-      // }
-      //
-      // factHours.forEach((arrValues, i)=> {
-      //   arrFuncions.push(crud.updateData(arrValues, config.sid_2017.amo, arrRange.factHours[i]));
-      // });
-      //
-      // //= Prepare array of warrentyHours range & functions =
-      // for (let month in COL_MONTH) {
-      //   let letter = COL_MONTH[month].slice(5);
-      //   arrRange.warrentyHours.push(list.amo + '!' + letter + START + ':' + letter);
-      // }
-      //
-      // warrentyHours.forEach((arrValues, i) => {
-      //   arrFuncions.push(crud.updateData(arrValues, config.sid_2017.amo, arrRange.warrentyHours[i]));
-      // });
-      //
-      // //= Update data =
-      // await Promise.all(arrFuncions)
-      //   .then(async (results) => {console.log(results);})
-      //   .catch(console.log);
-      //
-      //  console.log('* ratioParams for Ratio and factHours *');
+
+      let ratioParams = [[], [], [], []];
+
+      //= l.a.w.t - The list accounting work time =
+      let lawt = {
+        name: [],
+        table: []
+      };
+
+      for (let i = (xArray[0] - START); i < (xArray[0] - START) + CREW; i++) {
+        ratioParams[0].push(registryData[i][7]); //staff
+        if (!lawt.name.includes(registryData[i][7])) {
+          lawt.name.push(registryData[i][7]); //lawt names
+          list.name = encodeURIComponent(registryData[i][7]);
+          range = list.name + '!A10:K1500';
+          lawt.table.push(await crud.readData(config.sid_2017.lawt, range)); //lawt tables
+        }
+      }
+
+      for (let x = 0; x < xArray.length; x++) {
+        ratioParams[1].push([]);
+        for (let m = 0; m < cutActionMonths[x].length; m++) {
+            ratioParams[1][x].push(cutActionMonths[x][m]); //action month
+        }
+        ratioParams[2].push(registryData[xArray[x] - START][0]); //sites
+        ratioParams[3].push(registryData[xArray[x] - START][4]); //types
+      }
+
+      range = list.fot + '!A6:ER77';
+
+      let salaryData = await crud.readData(config.sid_2017.salary, range);
+
+      let accruedMonth = config.accruedMonth_1;
+      let accruedIndex = {
+        '1': '',
+        '2': '',
+        '3': '',
+        '4': '',
+        '5': '',
+        '6': ''
+      };
+
+      abc.forEach((letter, l) => {
+        for (let month in accruedMonth) {
+          if (letter == accruedMonth[month]) {
+            accruedIndex[month] = l;
+          }
+        }
+      });
+
+      //------------------------------------------------------------------------
+      // Get & Insert "Ratio & factHours"
+      //------------------------------------------------------------------------
+
+      let [ratio, factHours, warrentyHours] = await getRatioHours(salaryData, lawt, ratioParams, cutContractMonths, accruedIndex);
+
+      arrFuncions = [];
+      arrRange = {
+        'ratio': [],
+        'factHours': [],
+        'warrentyHours': []
+      }
+
+      //= Prepare array of ratio range & functions =
+      for (let month in COL_MONTH) {
+        let letter = COL_MONTH[month].slice(3, 4);
+        arrRange.ratio.push(list.amo + '!' + letter + START + ':' + letter);
+      }
+
+      ratio.forEach((arrValues, i)=> {
+        arrFuncions.push(crud.updateData(arrValues, config.sid_2017.amo, arrRange.ratio[i]));
+      });
+
+      //= Prepare array of factHours range & functions =
+      for (let month in COL_MONTH) {
+        let letter = COL_MONTH[month].slice(4, 5);
+        arrRange.factHours.push(list.amo + '!' + letter + START + ':' + letter);
+      }
+
+      factHours.forEach((arrValues, i)=> {
+        arrFuncions.push(crud.updateData(arrValues, config.sid_2017.amo, arrRange.factHours[i]));
+      });
+
+      //= Prepare array of warrentyHours range & functions =
+      for (let month in COL_MONTH) {
+        let letter = COL_MONTH[month].slice(5);
+        arrRange.warrentyHours.push(list.amo + '!' + letter + START + ':' + letter);
+      }
+
+      warrentyHours.forEach((arrValues, i) => {
+        arrFuncions.push(crud.updateData(arrValues, config.sid_2017.amo, arrRange.warrentyHours[i]));
+      });
+
+      //= Update data =
+      await Promise.all(arrFuncions)
+        .then(async (results) => {console.log(results);})
+        .catch(console.log);
+
+       console.log('* ratioParams for Ratio and factHours *');
 
       //------------------------------------------------------------------------
       // Build params for Margin
       //------------------------------------------------------------------------
 
-      //= Build ABC for margin params =
+      // //= Build ABC for margin params =
       // abc = abc.slice(2, 120);
       // let colsMargin = config.colsMargin_1;
       // let paramsMargin = [[], [], [], [], []];

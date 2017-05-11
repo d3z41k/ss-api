@@ -193,8 +193,24 @@ async function salaryDistrib() {
 
             }
 
+            //console.log(salaryDistrib);
+
+            let zeroArray = [];
+
+            for (let i = 0; i < 70; i++) {
+              zeroArray.push([]);
+              for (let j = 0; j < 5; j++) {
+                zeroArray[i].push(0);
+              }
+            }
+
             range1 = list.distrib[d] + '!K' + START + ':O';
             range2 = list.fot + '!' + FOT_COLS[d + 1][1] + START + ':' + FOT_COLS[d + 1][5];
+
+            // Clear old data
+            await crud.updateData(zeroArray, config.sid_2017.salary, range1)
+              //.then(async (results) => {console.log(results);})
+              .catch(console.log);
 
             await Promise.all([
               crud.updateData(salaryDistrib, config.sid_2017.salary, range1),

@@ -10,16 +10,13 @@ async function amoRegQuery(pool, tableName, params, CREW) {
       for (let a = 0; a < params[1].length; a++) {
         values[m].push([]);
         for (let i = 0; i < params[3].length; i++) {
-        //  for (let d = 0; d < params[0].length; d++) {
 
             await pool.execute('SELECT SUM(`Сумма итого руб`) FROM ' + tableName + ' WHERE ' +
-                //'`Направление деятельноcти` = ? ' +
                 '`Статья движения денег` = ? ' +
                 'AND `Месяц` = ? ' +
                 'AND `Проекты AMO` = ? ' +
                 'AND `Контрагент AMO` = ?'
                 , [
-                  //params[0][d],
                   params[1][a],
                   params[2][m],
                   params[3][i],
@@ -34,7 +31,6 @@ async function amoRegQuery(pool, tableName, params, CREW) {
                 }
               })
               .catch(console.log);
-          //  }
           }
         }
       }
