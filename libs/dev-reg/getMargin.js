@@ -11,9 +11,6 @@ async function getMargin(contractSum, params) {
           params[2][m][x] = params[2][m][x].reduce((sum, current) => {
             return sum + current;
           });
-          params[3][m][x] = params[3][m][x].reduce((sum, current) => {
-            return sum + current;
-          });
           params[4][m][x] = params[4][m][x].reduce((sum, current) => {
             return sum + current;
           });
@@ -27,7 +24,6 @@ async function getMargin(contractSum, params) {
 
         for (let m = 0; m < params[2].length; m++) {
           sub[p] += params[2][m][p];
-          sub[p] += params[3][m][p];
           sub[p] += params[4][m][p];
         }
 

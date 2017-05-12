@@ -114,13 +114,11 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
         quantityProjects[key] = quantityProjects[key].length;
       }
 
-      //console.log(quantityProjects);
-
       //= Build factHours =
       for (let m = 0; m < months.length ; m++) {
         factHours.push([]);
 
-        for (let p = 0; p < params[1].length; p++) {
+        for (let p = 0; p < params[2].length; p++) {
           factHours[m].push([]);
 
           for (let c = 0; c < CREW; c++) {
@@ -132,15 +130,15 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
 
                 if (params[0][c] && lawt.name[n] == params[0][c]) {
 
-                  if (cutContractMonths[p][m]) {
+                  for (var mm = 0; mm < cutContractMonths[p].length; mm++) {
 
-                    if (cutContractMonths[p][m] == months[m]) {
+                    if (cutContractMonths[p][mm] == months[m]) {
                       //= Build factHours for manager and tecnical director =
                       if (lawt.name[n].trim() == MANAGER) {
-                        let currMonth = cutContractMonths[p][m];
+                        let currMonth = cutContractMonths[p][mm];
                         factHour += Math.round(worksHours.manager / quantityProjects[currMonth] * 10000) / 10000;
                       } else if (lawt.name[n].trim() == CTO) {
-                        let currMonth = cutContractMonths[p][m];
+                        let currMonth = cutContractMonths[p][mm];
                         factHour += Math.round(worksHours.cto / quantityProjects[currMonth] * 10000) / 10000;
                       } else {
 
@@ -156,8 +154,8 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
                         }
                       }
                     }
-
                   }
+
                 }
               }
 
@@ -166,6 +164,8 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
           }
         }
       }
+
+      //console.log(require('util').inspect(factHours, { depth: null }));
 
       ratio.forEach((crew, m) => {
         ratioAll.push([]);
