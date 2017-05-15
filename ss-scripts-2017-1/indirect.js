@@ -94,8 +94,6 @@ async function indirect(months) {
       // Build paramsIndirect and get & update Indirect
       //------------------------------------------------------------------------
 
-      try {
-
         let paramsIndirect = {
           '1.1' : [[], []],
           '1.2' : [[], [], []],
@@ -385,11 +383,9 @@ async function indirect(months) {
 
           await sleep(1000);
 
-        } //end Types loop
 
-      } catch (e) {
-        reject(e.stack);
-      }
+
+      } //end Types loop
 
       //------------------------------------------------------------------------
       // Update date-time in "Monitoring"

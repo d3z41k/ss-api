@@ -106,13 +106,17 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
 
       for (let i = 0; i < cutContractMonths.length; i++) {
         for (let j = 0; j < cutContractMonths[i].length; j++) {
-            quantityProjects[cutContractMonths[i][j]].push(cutContractMonths[i][j]);
+            quantityProjects[cutContractMonths[i][j]]
+            ? quantityProjects[cutContractMonths[i][j]].push(cutContractMonths[i][j])
+            : null;
         }
       }
 
       for (let key in quantityProjects) {
         quantityProjects[key] = quantityProjects[key].length;
       }
+
+      //console.log(params[1]);
 
       //= Build factHours =
       for (let m = 0; m < months.length ; m++) {
@@ -123,8 +127,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
 
           for (let c = 0; c < CREW; c++) {
             factHours[m][p].push([]);
-
-              let factHour = 0;
+            let factHour = 0;
 
               for (let n = 0; n < lawt.name.length; n++) {
 
@@ -145,7 +148,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
                         //= Another employee
                         for (let t = 0; t < lawt.table[n].length; t++) {
                           if (lawt.table[n][t][0]
-                            && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][m]
+                            && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][mm]
                             && lawt.table[n][t][5] == params[2][p] //site (project name)
                             && lawt.table[n][t][1].trim() == DIRECTION
                             && lawt.table[n][t][2]) {

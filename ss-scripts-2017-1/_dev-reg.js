@@ -185,7 +185,7 @@ async function devReg() {
                //= Push end month =
                if (clientData[i][10]
                  && clientData[i][10].slice(6) == '2016') {
-                 actionMonth[x].push(1);
+                 actionMonth[x].push(0);
                } else {
                  actionMonth[x].push(clientData[i][10] && clientData[i][10].slice(3, 5) < 7
                     ? Number(clientData[i][10].slice(3, 5)) : 6);
@@ -195,27 +195,36 @@ async function devReg() {
             actionMonth[x].length = 2;
           }
 
-        //= Get Actual months for a projects =
-        actionMonth.forEach((months) => {
-            actionMonths.push(YEAR.slice(months[0]));
-            contractMonths.push(YEAR.slice(months[0], months[1] + 1));
-        });
+          // console.log(actionMonth);
 
-        //= Сut Action months for a projects =
-        actionMonths.forEach((months) => {
-          let line = months.filter((month) => {
-            return month < 7;
-          });
-          cutActionMonths.push(line);
-        });
+          //= Get Actual months for a projects =
+          actionMonth.forEach((months) => {
+              if (!months[1]) {
+                contractMonths.push([0]);
+              } else {
+                contractMonths.push(YEAR.slice(months[0], months[1] + 1));
+              }
+              actionMonths.push(YEAR.slice(months[0]));
 
-        //= Get Contract months for a projects =
-        contractMonths.forEach((months) => {
-          let line = months.filter((month) => {
-            return month < 7;
           });
-          cutContractMonths.push(line);
-        });
+
+          //console.log(contractMonths);
+
+          //= Сut Action months for a projects =
+          actionMonths.forEach((months) => {
+            let line = months.filter((month) => {
+              return month < 7;
+            });
+            cutActionMonths.push(line);
+          });
+
+          //= Get Contract months for a projects =
+          contractMonths.forEach((months) => {
+            let line = months.filter((month) => {
+              return month < 7;
+            });
+            cutContractMonths.push(line);
+          });
 
       } catch (e) {
         reject(e.stack);
@@ -246,7 +255,7 @@ async function devReg() {
           if (registryData[xArray[x] - START][0]  == monthAct[i][0]) {
             if (monthAct[i][1]
               && monthAct[i][1].slice(6) == '2016') {
-              month = 1;
+              month = 0;
             } else {
               month = monthAct[i][1] ? Number(monthAct[i][1].substr(3, 2)) : '';
             }
@@ -658,122 +667,122 @@ async function devReg() {
 
        console.log('* ratioParams for Ratio and factHours *');
 
-     /*************************************************************************
-      *** Part 7 - Margin
-      ************************************************************************/
-
-      //------------------------------------------------------------------------
-      // Build params for Margin
-      //------------------------------------------------------------------------
-
-      //= Build ABC for margin params =
-      abc = abc.slice(2, 120);
-      let colsMargin = config.colsMargin_1;
-      let paramsMargin = [[], [], [], [], []];
-
-      try {
-
-        for (let x = 0; x < xArray.length; x++) {
-
-          //paramsMargin = [];
-
-          //= Push site in params =
-          paramsMargin[0].push(registryData[xArray[x] - START][0]);
-
-          //= Push cost "P" in params =
-          let col = abc.indexOf(colsMargin.cost);
-          registryData[xArray[x] - START][col] && Number(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-            ? paramsMargin[1].push(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-            : paramsMargin[1].push(0);
-        }
-        //--------------------------------------------------------------------
-
-        //console.log(abc.indexOf(colsMargin.salary[0]));
-
-        for (var m = 0; m < MONTHS.length; m++) {
-          let sCol = abc.indexOf(colsMargin.salary[m]);
-
-          let oCol = [];
-          for (let i = 0; i < colsMargin.other[m].length; i++) {
-            oCol.push(abc.indexOf(colsMargin.other[m][i]));
-          }
-          paramsMargin[2].push([]);
-          paramsMargin[4].push([]);
-
-          for (let x = 0; x < xArray.length; x++) {
-            paramsMargin[2][m].push([]);
-            paramsMargin[4][m].push([]);
-
-            for (let i = 0; i < colsMargin.other[m].length; i++) {
-              registryData[xArray[x] - START][oCol[i]] && Number(registryData[xArray[x] - START][oCol[i]].replace(/\s/g, '').replace(/,/g, '.'))
-                ? paramsMargin[4][m][x].push(Number(registryData[xArray[x] - START][oCol[i]].replace(/\s/g, '').replace(/,/g, '.')))
-                : paramsMargin[4][m][x].push(0);
-            }
-
-            for (let p = 0; p < registryData.length; p++) {
-              if (paramsMargin[0][x] == registryData[p][0]) {
-
-                registryData[x][sCol] && Number(registryData[p][sCol].replace(/\s/g, '').replace(/,/g, '.'))
-                  ? paramsMargin[2][m][x].push(Number(registryData[p][sCol].replace(/\s/g, '').replace(/,/g, '.')))
-                  : paramsMargin[2][m][x].push(0);
-              }
-            }
-          }
-        }
-
-      } catch (e) {
-        reject(e.stack);
-      }
-
-      //= Get & Insert values of "Margin & Margins" =
-
-      let margin = await getMargin(contractSum, paramsMargin);
-      let margins = [];
-      let marginAll = [];
-      let marginsAll = [];
-
-      try {
-
-        for (let p = 0; p < paramsMargin[0].length; p++) {
-          margins.push([]);
-          for (let c = 0; c < contractSum.length; c++) {
-            if(contractSum[c][0] == paramsMargin[0][p]) {
-              margins[p].push(margin[p][0] ? margin[p][0] / contractSum[c][1] : 0);
-
-              //= Cut to 2 number after poin =
-              margins[p][0] = margins[p][0].toFixed(2);
-            }
-          }
-        }
-
-        for (let p = 0; p < margin.length; p++) {
-          marginAll.push(margin[p]);
-          marginsAll.push(margins[p]);
-          for (let c = 0; c < CREW; c++) {
-            marginAll.push([]);
-            marginsAll.push([]);
-          }
-        }
-
-        let colMargin = config.colsMargin_1.margin;
-        let colMargins = config.colsMargin_1.margins;
-
-        range1 = list.development + '!' + colMargin + START + ':' + colMargin;
-        range2 = list.development + '!' + colMargins + START + ':' + colMargins;
-
-      } catch (e) {
-        reject(e.stack);
-      }
-
-      await Promise.all([
-        crud.updateData(marginAll, config.sid_2017.dev, range1),
-        crud.updateData(marginsAll, config.sid_2017.dev, range2),
-      ])
-        .then(async result => {console.log(result);})
-        .catch(console.err);
-
-
-      console.log('* update Margin and Margins *');
+    //  /*************************************************************************
+    //   *** Part 7 - Margin
+    //   ************************************************************************/
+     //
+    //   //------------------------------------------------------------------------
+    //   // Build params for Margin
+    //   //------------------------------------------------------------------------
+     //
+    //   //= Build ABC for margin params =
+    //   abc = abc.slice(2, 120);
+    //   let colsMargin = config.colsMargin_1;
+    //   let paramsMargin = [[], [], [], [], []];
+     //
+    //   try {
+     //
+    //     for (let x = 0; x < xArray.length; x++) {
+     //
+    //       //paramsMargin = [];
+     //
+    //       //= Push site in params =
+    //       paramsMargin[0].push(registryData[xArray[x] - START][0]);
+     //
+    //       //= Push cost "P" in params =
+    //       let col = abc.indexOf(colsMargin.cost);
+    //       registryData[xArray[x] - START][col] && Number(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+    //         ? paramsMargin[1].push(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+    //         : paramsMargin[1].push(0);
+    //     }
+    //     //--------------------------------------------------------------------
+     //
+    //     //console.log(abc.indexOf(colsMargin.salary[0]));
+     //
+    //     for (var m = 0; m < MONTHS.length; m++) {
+    //       let sCol = abc.indexOf(colsMargin.salary[m]);
+     //
+    //       let oCol = [];
+    //       for (let i = 0; i < colsMargin.other[m].length; i++) {
+    //         oCol.push(abc.indexOf(colsMargin.other[m][i]));
+    //       }
+    //       paramsMargin[2].push([]);
+    //       paramsMargin[4].push([]);
+     //
+    //       for (let x = 0; x < xArray.length; x++) {
+    //         paramsMargin[2][m].push([]);
+    //         paramsMargin[4][m].push([]);
+     //
+    //         for (let i = 0; i < colsMargin.other[m].length; i++) {
+    //           registryData[xArray[x] - START][oCol[i]] && Number(registryData[xArray[x] - START][oCol[i]].replace(/\s/g, '').replace(/,/g, '.'))
+    //             ? paramsMargin[4][m][x].push(Number(registryData[xArray[x] - START][oCol[i]].replace(/\s/g, '').replace(/,/g, '.')))
+    //             : paramsMargin[4][m][x].push(0);
+    //         }
+     //
+    //         for (let p = 0; p < registryData.length; p++) {
+    //           if (paramsMargin[0][x] == registryData[p][0]) {
+     //
+    //             registryData[x][sCol] && Number(registryData[p][sCol].replace(/\s/g, '').replace(/,/g, '.'))
+    //               ? paramsMargin[2][m][x].push(Number(registryData[p][sCol].replace(/\s/g, '').replace(/,/g, '.')))
+    //               : paramsMargin[2][m][x].push(0);
+    //           }
+    //         }
+    //       }
+    //     }
+     //
+    //   } catch (e) {
+    //     reject(e.stack);
+    //   }
+     //
+    //   //= Get & Insert values of "Margin & Margins" =
+     //
+    //   let margin = await getMargin(contractSum, paramsMargin);
+    //   let margins = [];
+    //   let marginAll = [];
+    //   let marginsAll = [];
+     //
+    //   try {
+     //
+    //     for (let p = 0; p < paramsMargin[0].length; p++) {
+    //       margins.push([]);
+    //       for (let c = 0; c < contractSum.length; c++) {
+    //         if(contractSum[c][0] == paramsMargin[0][p]) {
+    //           margins[p].push(margin[p][0] ? margin[p][0] / contractSum[c][1] : 0);
+     //
+    //           //= Cut to 2 number after poin =
+    //           margins[p][0] = margins[p][0].toFixed(2);
+    //         }
+    //       }
+    //     }
+     //
+    //     for (let p = 0; p < margin.length; p++) {
+    //       marginAll.push(margin[p]);
+    //       marginsAll.push(margins[p]);
+    //       for (let c = 0; c < CREW; c++) {
+    //         marginAll.push([]);
+    //         marginsAll.push([]);
+    //       }
+    //     }
+     //
+    //     let colMargin = config.colsMargin_1.margin;
+    //     let colMargins = config.colsMargin_1.margins;
+     //
+    //     range1 = list.development + '!' + colMargin + START + ':' + colMargin;
+    //     range2 = list.development + '!' + colMargins + START + ':' + colMargins;
+     //
+    //   } catch (e) {
+    //     reject(e.stack);
+    //   }
+     //
+    //   await Promise.all([
+    //     crud.updateData(marginAll, config.sid_2017.dev, range1),
+    //     crud.updateData(marginsAll, config.sid_2017.dev, range2),
+    //   ])
+    //     .then(async result => {console.log(result);})
+    //     .catch(console.err);
+     //
+     //
+    //   console.log('* update Margin and Margins *');
 
       //-------------------------------------------------------------
       // Update date-time in "Monitoring"
