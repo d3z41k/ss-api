@@ -37,12 +37,23 @@ async function salaryDistrib() {
           encodeURIComponent('Распределение 4'),
           encodeURIComponent('Распределение 5'),
           encodeURIComponent('Распределение 6')
-        ]
+        ],
+        'listName': function(name) {
+          return encodeURIComponent(name);
+        }
       };
+
+      //--------------------------------------------------------------------
+      //
+      //--------------------------------------------------------------------
 
       try {
 
         for (let d = 0; d < list.distrib.length; d++) { //Start distribution
+
+          //--------------------------------------------------------------------
+          // Accrued salary
+          //--------------------------------------------------------------------
 
           let range1;
           let range2;
@@ -116,6 +127,149 @@ async function salaryDistrib() {
             //.then(async (results) => {console.log(results);})
             .catch(console.log);
 
+          //--------------------------------------------------------------------
+          // Distribution of hours (admin and project)
+          //--------------------------------------------------------------------
+
+          let adminTime = {
+            'hours': []
+          };
+
+          let projectTime = {
+            'hours': []
+          };
+
+          let paramsHours = [[], [], [], []];
+          let employee = [];
+          let valuesCommonTime = [];
+          let valuesCommonTimeFinal = [];
+
+          range = list.distrib[d] + '!B1:I';
+          dataDistrib = await crud.readData(config.sid_2017.salary, range);
+
+          paramsHours[0] = dataDistrib[0][6]; //current month
+          paramsHours[1] = ['Административные задачи', 'Гарант. обслуж (сайт сдан)']; //admin type
+          paramsHours[2] = ['МТС', 'Профи', 'AMO']; //directions
+          paramsHours[3] = [
+            'Разработка сайта ',
+            'Доп.работы по разработке (МТС)',
+            'SEO ',
+            'Обслуживание (МТС)',
+            'Контекстная реклама',
+            'Аренда сайта (Профи)',
+            'AMO', //en
+            'АМО'  //ru
+          ]; //activities
+
+          for (let i = START; i < dataDistrib.length; i++) {
+            if (dataDistrib[i][1] == 'ЛУВР') {
+              employee.push(dataDistrib[i][0]); //lawt employee
+            }
+          }
+
+          for (var e = 0; e < employee.length; e++) {
+
+            adminTime.hours = [0, 0, 0, 0, 0]; //reset by new emploee
+            projectTime.hours = [0, 0, 0, 0, 0, 0, 0, 0]; //reset by new emploee
+
+            range = list.listName(employee[e]) + '!A10:E';
+            let dataLawt = await crud.readData(config.sid_2017.lawt, range);
+
+            for (let i = 0; i < dataLawt.length; i++) {
+              if (Number(dataLawt[i][0].substr(3, 2)) == paramsHours[0]) {
+
+                //= common adminTime =
+                if ((dataLawt[i][2]
+                  && dataLawt[i][1] == paramsHours[1][0])
+                  || (dataLawt[i][2]
+                  && dataLawt[i][1] == paramsHours[1][1])) {
+                  adminTime.hours[0] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                }
+
+                //= common projectTime =
+               if (dataLawt[i][2]
+                 && dataLawt[i][1] != paramsHours[1][0]
+                 && dataLawt[i][1] != paramsHours[1][1]) {
+                 projectTime.hours[0] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+               }
+
+                //= direction adminTime =
+                if (dataLawt[i][1] == paramsHours[1][0] && dataLawt[i][2]) {
+                  switch(dataLawt[i][4]) {
+                    case paramsHours[2][0]:
+                      adminTime.hours[1] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                      break;
+                    case paramsHours[2][1]:
+                      adminTime.hours[2] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                      break;
+                    case paramsHours[2][2]:
+                      adminTime.hours[3] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                      break;
+                    default:
+                      break;
+                  }
+                } else if (dataLawt[i][1] == paramsHours[1][1] && dataLawt[i][2]) {
+                    adminTime.hours[4] += Number(dataLawt[i][2].replace(/\,/g, '.'))
+                }
+
+                //= direction projectTime =
+
+                if (dataLawt[i][2]) {
+                  switch(dataLawt[i][1]) {
+                    case paramsHours[3][0]:
+                        projectTime.hours[1] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                      break;
+                    case paramsHours[3][1]:
+                      projectTime.hours[2] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                      break;
+                    case paramsHours[3][2]:
+                      projectTime.hours[3] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                      break;
+                    case paramsHours[3][3]:
+                      projectTime.hours[4] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                      break;
+                    case paramsHours[3][4]:
+                      projectTime.hours[5] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                      break;
+                    case paramsHours[3][5]:
+                      projectTime.hours[6] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                      break;
+                    default:
+                      break;
+                  }
+                }
+
+                if (dataLawt[i][1].indexOf(paramsHours[3][6]) !== -1 && dataLawt[i][2]) {
+                  projectTime.hours[7] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                } else if (dataLawt[i][1].indexOf(paramsHours[3][7]) !== -1 && dataLawt[i][2]) {
+                  projectTime.hours[7] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                }
+
+              } //end if current month
+            } //end months
+
+            valuesCommonTime.push(adminTime.hours.concat([''], projectTime.hours));
+
+          } //end employee
+
+
+          //= Add epty lines =
+          for (let i = (START - 1); i < dataDistrib.length; i++) {
+            if (dataDistrib[i][1] == 'ЛУВР') {
+              valuesCommonTimeFinal.push(valuesCommonTime.shift());
+            } else {
+              valuesCommonTimeFinal.push([0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, 0, 0]);
+            }
+          }
+
+          range = list.distrib[d] + '!Q' + START + ':AD';
+          await crud.updateData(valuesCommonTimeFinal, config.sid_2017.salary, range)
+            .then(async (results) => {console.log(results);})
+            .catch(console.log);
+
+
+          //--------------------------------------------------------------------
+          // Distribution of salary
           //--------------------------------------------------------------------
 
           range = list.distrib[d] + '!B' + START + ':I';
@@ -220,8 +374,7 @@ async function salaryDistrib() {
               .catch(console.log);
           }
 
-          //await sleep(1000);
-          resolve('complite!');
+          //resolve('complite!');
         } // End distribution
 
         //----------------------------------------------------------------------
@@ -240,7 +393,7 @@ async function salaryDistrib() {
       now = [[formatDate(now)]];
       await crud.updateData(now, config.sid_2017.monit, range);
 
-      //resolve('complite!');
+      resolve('complite!');
 
     } // = End start function =
 
