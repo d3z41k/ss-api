@@ -81,7 +81,9 @@ async function finModelBalance() {
               balancePlanInfo[p].push(fact[3], fact[4], fact[5], fact[6], fact[7], fact[8]);
             } else if(cutFact[2] == 'Рассрочка за компьютер' && plan[2] == 'Рассрочка ') {
               balancePlanInfo[p].push(fact[3], fact[4], fact[5], fact[6], fact[7], fact[8]);
-            } else if(cutFact[2] == 'Прочие выплаты' && plan[2] == 'Прочее') {
+            } else if(cutFact[2] == 'Прочие выплаты' && plan[0] == 'Прочие выплаты' && plan[2] == 'Прочее') {
+              balancePlanInfo[p].push(fact[3], fact[4], fact[5], fact[6], fact[7], fact[8]);
+            } else if(cutFact[0] == 'Прочие поступления' && plan[0] == 'Прочие поступления' && plan[2] == 'Прочее') {
               balancePlanInfo[p].push(fact[3], fact[4], fact[5], fact[6], fact[7], fact[8]);
             }
           });

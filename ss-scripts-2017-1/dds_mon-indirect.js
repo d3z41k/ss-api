@@ -278,8 +278,6 @@ async function dds_monIndirect(mon) {
         let sum1;
         let sum2;
         let sumDirections = [];
-        let start = 0;
-        let end = 0;
 
         await Promise.all([
           dds_indirectQuery(pool, 'dds_lera', paramsIndirectDDS, mode, taxes),
@@ -338,8 +336,6 @@ async function dds_monIndirect(mon) {
       arrFuncions = [];
 
       list = encodeURIComponent('Косвенные расходы(декада)');
-
-      console.log(sumDirectionsCommon.length);
 
       for (let dir in colsDecIndirect) {
         arrRange1.push(list + '!' + colsDecIndirect[dir][2] + START + ':' + colsDecIndirect[dir][2]);

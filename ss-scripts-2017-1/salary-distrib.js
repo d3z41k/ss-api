@@ -47,7 +47,7 @@ async function salaryDistrib() {
       //
       //--------------------------------------------------------------------
 
-      try {
+      // try {
 
         for (let d = 0; d < list.distrib.length; d++) { //Start distribution
 
@@ -239,11 +239,15 @@ async function salaryDistrib() {
                   }
                 }
 
-                if (dataLawt[i][1].indexOf(paramsHours[3][6]) !== -1 && dataLawt[i][2]) {
-                  projectTime.hours[7] += Number(dataLawt[i][2].replace(/\,/g, '.'));
-                } else if (dataLawt[i][1].indexOf(paramsHours[3][7]) !== -1 && dataLawt[i][2]) {
-                  projectTime.hours[7] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                if (dataLawt[i][1]) {
+                  if (dataLawt[i][1].indexOf(paramsHours[3][6]) !== -1 && dataLawt[i][2]) {
+                    projectTime.hours[7] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                  } else if (dataLawt[i][1].indexOf(paramsHours[3][7]) !== -1 && dataLawt[i][2]) {
+                    projectTime.hours[7] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                  }
                 }
+
+
 
               } //end if current month
             } //end months
@@ -370,18 +374,20 @@ async function salaryDistrib() {
               crud.updateData(salaryDistrib, config.sid_2017.salary, range1),
               crud.updateData(salaryDistrib, config.sid_2017.salary, range2)
             ])
-              //.then(async (results) => {console.log(results);})
+              .then(async (results) => {console.log(results);})
               .catch(console.log);
           }
 
-          //resolve('complite!');
+          resolve('complite!');
+
+          console.log('======== Распределение ' + (d + 1) + ' ========');
         } // End distribution
 
         //----------------------------------------------------------------------
 
-      } catch (e) {
-        reject(e.stack);
-      }
+      // } catch (e) {
+      //   reject(e.stack);
+      // }
 
       //------------------------------------------------------------------------
       // Update date-time in "Monitoring"
@@ -393,7 +399,7 @@ async function salaryDistrib() {
       now = [[formatDate(now)]];
       await crud.updateData(now, config.sid_2017.monit, range);
 
-      resolve('complite!');
+      //resolve('complite!');
 
     } // = End start function =
 

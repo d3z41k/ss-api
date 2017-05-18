@@ -51,36 +51,36 @@ async function indirect(months) {
         olga: ''
       };
 
-      //-------------------------------------------------------------
-      // Read data from dds_lera to RAM
-      //-------------------------------------------------------------
-
-      list = encodeURIComponent('ДДС_Лера');
-      range1 = list + '!A6:V';
-
-      list = encodeURIComponent('ДДС_Ольга');
-      range2 = list + '!A6:AD';
-
-      await Promise.all([
-        crud.readData(config.sid_2017.dds, range1),
-        crud.readData(config.sid_2017.dds, range2)
-      ])
-       .then(async ([dds_lera, dds_olga]) => {
-          srcRows.lera = dds_lera;
-          srcRows.olga = dds_olga;
-        })
-        .catch(console.log);
-
-      //---------------------------------------------------------------
-      // Refresh table
-      //---------------------------------------------------------------
-
-      await Promise.all([
-        dbRefresh(pool, 'dds_lera', srcRows.lera),
-        dbRefresh(pool, 'dds_olga', srcRows.olga)
-      ])
-        //.then(async (results) => {console.log(results);})
-        .catch(console.log);
+      // //-------------------------------------------------------------
+      // // Read data from dds_lera to RAM
+      // //-------------------------------------------------------------
+      //
+      // list = encodeURIComponent('ДДС_Лера');
+      // range1 = list + '!A6:V';
+      //
+      // list = encodeURIComponent('ДДС_Ольга');
+      // range2 = list + '!A6:AD';
+      //
+      // await Promise.all([
+      //   crud.readData(config.sid_2017.dds, range1),
+      //   crud.readData(config.sid_2017.dds, range2)
+      // ])
+      //  .then(async ([dds_lera, dds_olga]) => {
+      //     srcRows.lera = dds_lera;
+      //     srcRows.olga = dds_olga;
+      //   })
+      //   .catch(console.log);
+      //
+      // //---------------------------------------------------------------
+      // // Refresh table
+      // //---------------------------------------------------------------
+      //
+      // await Promise.all([
+      //   dbRefresh(pool, 'dds_lera', srcRows.lera),
+      //   dbRefresh(pool, 'dds_olga', srcRows.olga)
+      // ])
+      //   //.then(async (results) => {console.log(results);})
+      //   .catch(console.log);
 
       //------------------------------------------------------------------------
       // Get data from 'Indirect'
@@ -298,15 +298,15 @@ async function indirect(months) {
 
               //= Async update data for Directions =
               Promise.all(arrFuncions1)
-              //  .then(async (results) => {console.log(results);})
+                .then(async (results) => {console.log(results);})
                 .catch(console.log);
 
               Promise.all(arrFuncions2)
-              //  .then(async (results) => {console.log(results);})
+                .then(async (results) => {console.log(results);})
                 .catch(console.log);
 
               Promise.all(arrFuncions3)
-              //  .then(async (results) => {console.log(results);})
+                .then(async (results) => {console.log(results);})
                 .catch(console.log);
 
             //------------------------------------------------------------------
