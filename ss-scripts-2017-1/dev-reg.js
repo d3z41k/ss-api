@@ -20,7 +20,6 @@ async function devReg() {
     const formatDate = require('../libs/format-date');
     const normLength = require('../libs/normalize-length');
     const normType = require('../libs/normalize-type');
-    const sleep = require('../libs/sleep');
     const dbRefresh = require('../models-2017-1/db_refresh');
     const pool = require('../models-2017-1/db_pool');
     const devRegQuery = require('../models-2017-1/db_dev-reg-query');
@@ -669,6 +668,11 @@ async function devReg() {
       let colsMargin = config.colsMargin_1;
       let paramsMargin = [[], [], [], [], []];
 
+      let col = {
+        'cost': abc.indexOf(colsMargin.cost),
+        'debt': abc.indexOf(colsMargin.debt)
+      };
+
       try {
 
         for (let x = 0; x < xArray.length; x++) {
@@ -678,13 +682,16 @@ async function devReg() {
           //= Push site in params =
           paramsMargin[0].push(registryData[xArray[x] - START][0]);
 
-          //= Push cost "P" in params =
-          let col = abc.indexOf(colsMargin.cost);
-          registryData[xArray[x] - START][col] && Number(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
-            ? paramsMargin[1].push(registryData[xArray[x] - START][col].replace(/\s/g, '').replace(/,/g, '.'))
+          //= Push Cost in params =
+          registryData[xArray[x] - START][col.cost] && Number(registryData[xArray[x] - START][col.cost].replace(/\s/g, '').replace(/,/g, '.'))
+            ? paramsMargin[1].push(registryData[xArray[x] - START][col.cost].replace(/\s/g, '').replace(/,/g, '.'))
             : paramsMargin[1].push(0);
-        }
 
+          // //= Push Debt in params =
+          // registryData[xArray[x] - START][col.debt] && Number(registryData[xArray[x] - START][col.debt].replace(/\s/g, '').replace(/,/g, '.'))
+          //   ? paramsMargin[3].push(registryData[xArray[x] - START][col.debt].replace(/\s/g, '').replace(/,/g, '.'))
+          //   : paramsMargin[3].push(0);
+        }
         //--------------------------------------------------------------------
 
         for (var m = 0; m < MONTHS.length; m++) {
@@ -770,6 +777,10 @@ async function devReg() {
         .catch(console.err);
 
       // console.log('* update Margin and Margins *');
+
+      /*************************************************************************
+       *** Part 8 - Monitioring
+       ************************************************************************/
 
       //-------------------------------------------------------------
       // Update date-time in "Monitoring"

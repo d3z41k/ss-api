@@ -83,7 +83,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
             div = dividers[d][1][months[m] - 1];
             sal = sum[m][d];
             ratio[m].push(div ? Math.round(sal / div * 10000) / 10000 : 0);
-          }
+        }
       }
 
       ratio.forEach(line => {
@@ -129,40 +129,39 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
             factHours[m][p].push([]);
             let factHour = 0;
 
-              for (let n = 0; n < lawt.name.length; n++) {
+            for (let n = 0; n < lawt.name.length; n++) {
 
-                if (params[0][c] && lawt.name[n] == params[0][c]) {
+              if (params[0][c] && lawt.name[n] == params[0][c]) {
 
-                  for (var mm = 0; mm < cutContractMonths[p].length; mm++) {
+                for (var mm = 0; mm < cutContractMonths[p].length; mm++) {
 
-                    if (cutContractMonths[p][mm] == months[m]) {
-                      //= Build factHours for manager and tecnical director =
-                      if (lawt.name[n].trim() == MANAGER) {
-                        let currMonth = cutContractMonths[p][mm];
-                        factHour += Math.round(worksHours.manager / quantityProjects[currMonth] * 10000) / 10000;
-                      } else if (lawt.name[n].trim() == CTO) {
-                        let currMonth = cutContractMonths[p][mm];
-                        factHour += Math.round(worksHours.cto / quantityProjects[currMonth] * 10000) / 10000;
-                      } else {
+                  if (cutContractMonths[p][mm] == months[m]) {
+                    //= Build factHours for manager and tecnical director =
+                    if (lawt.name[n].trim() == MANAGER) {
+                      let currMonth = cutContractMonths[p][mm];
+                      factHour += Math.round(worksHours.manager / quantityProjects[currMonth] * 10000) / 10000;
+                    } else if (lawt.name[n].trim() == CTO) {
+                      let currMonth = cutContractMonths[p][mm];
+                      factHour += Math.round(worksHours.cto / quantityProjects[currMonth] * 10000) / 10000;
+                    } else {
 
-                        //= Another employee
-                        for (let t = 0; t < lawt.table[n].length; t++) {
-                          if (lawt.table[n][t][0]
-                            && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][mm]
-                            && lawt.table[n][t][5] == params[2][p] //site (project name)
-                            && lawt.table[n][t][1].trim() == DIRECTION
-                            && lawt.table[n][t][2]) {
-                              factHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
-                          }
+                      //= Another employee
+                      for (let t = 0; t < lawt.table[n].length; t++) {
+                        if (lawt.table[n][t][0]
+                          && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][mm]
+                          && lawt.table[n][t][5] == params[2][p] //site (project name)
+                          && lawt.table[n][t][1].trim() == DIRECTION
+                          && lawt.table[n][t][2]) {
+                            factHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
                         }
                       }
                     }
                   }
-
                 }
               }
+            }
 
-              factHours[m][p][c].push(Math.round(factHour * 10000) / 10000);
+            factHours[m][p][c].push(Math.round(factHour * 10000) / 10000);
 
           }
         }
@@ -195,6 +194,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
     }
 
     resolve([ratioAll, factHoursAll]);
+
   });
 }
 

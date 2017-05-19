@@ -1,7 +1,6 @@
-async function getRatioHours(salaryData, lawt, params, cutContractMonths, accruedIndex) {
+async function getRatioHours(salaryData, lawt, params, cutContractMonths, accruedIndex, CREW) {
   return new Promise(async (resolve, reject) => {
 
-    const CREW = 11;
     const DIRECTION = 'Доп.работы по разработке (МТС)';
     const CTO = 'Заводов Павел';
 
@@ -14,8 +13,6 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
     let ratioAll = [];
     let factHours = [];
     let factHoursAll = [];
-    let warrentyHours = [];
-    let warrentyHoursAll = [];
     let months = [1, 2, 3, 4, 5, 6];
 
     //= Build the salaryData sum for each month =
@@ -63,6 +60,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
 
       for (let n = 0; n < lawt.name.length; n++) {
         for (let t = 0; t < lawt.table[n].length; t++) {
+
           if (lawt.name[n].trim() == CTO
             && lawt.table[n][t][1].trim() == DIRECTION
             && lawt.table[n][t][2]) {
@@ -80,8 +78,14 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
             div = dividers[d][1][months[m] - 1];
             sal = sum[m][d];
             ratio[m].push(div ? Math.round(sal / div * 10000) / 10000 : 0);
-          }
+        }
       }
+
+      ratio.forEach(line => {
+        for (let c = line.length; c < CREW; c++) {
+          line.push(0);
+        }
+      });
 
       //= Build quantinty of a projects =
       let quantityProjects = {
@@ -95,7 +99,9 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
 
       for (let i = 0; i < cutContractMonths.length; i++) {
         for (let j = 0; j < cutContractMonths[i].length; j++) {
-            quantityProjects[cutContractMonths[i][j]].push(cutContractMonths[i][j]);
+            quantityProjects[cutContractMonths[i][j]]
+            ? quantityProjects[cutContractMonths[i][j]].push(cutContractMonths[i][j])
+            : null;
         }
       }
 
@@ -108,63 +114,45 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
       //= Build factHours and warrentyHours =
       for (let m = 0; m < months.length ; m++) {
         factHours.push([]);
-        warrentyHours.push([]);
 
         for (let p = 0; p < params[1].length; p++) {
           factHours[m].push([]);
-          warrentyHours[m].push([]);
 
           for (let c = 0; c < CREW; c++) {
 
             factHours[m][p].push([]);
-            warrentyHours[m][p].push([]);
+            let factHour = 0;
 
-              let factHour = 0;
-              let warrentyHour = 0;
+            for (let n = 0; n < lawt.name.length; n++) {
 
-              for (let n = 0; n < lawt.name.length; n++) {
+              if (params[0][c] && lawt.name[n] == params[0][c]) {
 
-                if (params[0][c] && lawt.name[n] == params[0][c]) {
+                for (var mm = 0; mm < cutContractMonths[p].length; mm++) {
 
-                  if (cutContractMonths[p][m]) {
+                  if (cutContractMonths[p][mm] == months[m]) {
+                    //= Build factHours for tecnical director =
+                    if (lawt.name[n].trim() == CTO) {
+                      let currMonth = cutContractMonths[p][mm];
+                      factHour += Math.round(worksHours.cto / quantityProjects[currMonth] * 10000) / 10000;
+                    } else {
 
-                    if (cutContractMonths[p][m] == months[m]) {
-                      //= Build factHours for tecnical director =
-                      if (lawt.name[n].trim() == CTO) {
-                        let currMonth = cutContractMonths[p][m];
-                        factHour += Math.round(worksHours.cto / quantityProjects[currMonth] * 10000) / 10000;
-                      } else {
-
-                        //= Another employee
-                        for (let t = 0; t < lawt.table[n].length; t++) {
-                          if (lawt.table[n][t][0]
-                            && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][m]
-                            && lawt.table[n][t][6] == params[2][p] //site (project name)
-                            && lawt.table[n][t][1].trim() == DIRECTION
-                            && lawt.table[n][t][2]) {
-                              factHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
-                          }
+                      //= Another employee
+                      for (let t = 0; t < lawt.table[n].length; t++) {
+                        if (lawt.table[n][t][0]
+                          && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][mm]
+                          && lawt.table[n][t][6] == params[2][p] //site (project name)
+                          && lawt.table[n][t][1].trim() == DIRECTION
+                          && lawt.table[n][t][2]) {
+                            factHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
                         }
-                      }
-                    }
-
-                  } else {
-
-                    for (let t = 0; t < lawt.table[n].length; t++) {
-                      if (lawt.table[n][t][0]
-                        && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][m]
-                        && lawt.table[n][t][6] == params[2][p] //site (project name)
-                        && lawt.table[n][t][1].trim() == DIRECTION
-                        && lawt.table[n][t][2]) {
-                          warrentyHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
                       }
                     }
                   }
                 }
               }
+            }
 
-              factHours[m][p][c].push(Math.round(factHour * 10000) / 10000);
-              warrentyHours[m][p][c].push(Math.round(warrentyHour * 10000) / 10000);
+            factHours[m][p][c].push(Math.round(factHour * 10000) / 10000);
 
           }
         }
@@ -190,21 +178,11 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
         });
       });
 
-      warrentyHours.forEach((monthWarrentyHours, m) => {
-        warrentyHoursAll.push([]);
-        monthWarrentyHours.forEach(crewWarrentyHours => {
-          crewWarrentyHours.forEach(warrentyHours => {
-            warrentyHoursAll[m].push(warrentyHours);
-          });
-          warrentyHoursAll[m].push([]);
-        });
-      });
-
     } catch (e) {
       reject(e.stack);
     }
 
-   resolve([ratioAll, factHoursAll, warrentyHoursAll]);
+   resolve([ratioAll, factHoursAll]);
 
   });
 
