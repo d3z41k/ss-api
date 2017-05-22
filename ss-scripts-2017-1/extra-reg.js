@@ -213,14 +213,12 @@ async function extraReg() {
             if (colsAct[month]) {
               range = list.extra + '!' + colsAct[month] + xArray[x];
 
-              await crud.updateData([[monthAct[i][2]]], config.sid_2017.extra, range)
-                .then(async result => {console.log(result);})
-                .catch(console.err);
+            await crud.updateData([[monthAct[i][2]]], config.sid_2017.extra, range)
+              .then(async result => {console.log(result);})
+              .catch(console.err);
             }
-
           }
         }
-
       }
 
       range = list.extra + '!H' + START + ':H';
@@ -418,8 +416,12 @@ async function extraReg() {
 
       console.log('* The additional costs *');
 
+      /*************************************************************************
+       *** Part 4 - Client sell, prepaid and finally
+       ************************************************************************/
+
       //------------------------------------------------------------------------
-      // Build params & update receipt of money from customers (prepaid & finalLy)
+      // Build params & update receipt of money from customers (prepaid & finally)
       //------------------------------------------------------------------------
 
       let receiptParams = [[], [[], [], []], [], [], []];
@@ -608,11 +610,6 @@ async function extraReg() {
            registryData[xArray[x] - START][col.cost] && Number(registryData[xArray[x] - START][col.cost].replace(/\s/g, '').replace(/,/g, '.'))
              ? paramsMargin[1].push(registryData[xArray[x] - START][col.cost].replace(/\s/g, '').replace(/,/g, '.'))
              : paramsMargin[1].push(0);
-
-          //  //= Push Debt in params =
-          //  registryData[xArray[x] - START][col.debt] && Number(registryData[xArray[x] - START][col.debt].replace(/\s/g, '').replace(/,/g, '.'))
-          //    ? paramsMargin[3].push(registryData[xArray[x] - START][col.debt].replace(/\s/g, '').replace(/,/g, '.'))
-          //    : paramsMargin[3].push(0);
          }
 
          //--------------------------------------------------------------------
@@ -702,7 +699,7 @@ async function extraReg() {
       console.log('* update Margin and Margins *');
 
      /*************************************************************************
-      *** Part 8 - Monitioring
+      *** Part 7 - Monitioring
       ************************************************************************/
 
       // -------------------------------------------------------------

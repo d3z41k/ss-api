@@ -50,8 +50,6 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
         }
       }
 
-      //console.log(dividers);
-
       //= Build work hours of tecnical director per month=
 
       let worksHours = {
@@ -68,8 +66,6 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
           }
         }
       }
-
-      //console.log(worksHours);
 
       //= Build ratio =
       for (let m = 0; m < months.length; m++) {
@@ -101,7 +97,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
         for (let j = 0; j < cutContractMonths[i].length; j++) {
             quantityProjects[cutContractMonths[i][j]]
             ? quantityProjects[cutContractMonths[i][j]].push(cutContractMonths[i][j])
-            : null;
+            : '';
         }
       }
 

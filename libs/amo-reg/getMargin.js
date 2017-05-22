@@ -11,9 +11,6 @@ async function getMargin(contractSum, params) {
           params[2][m][x] = params[2][m][x].reduce((sum, current) => {
             return sum + current;
           });
-          params[3][m][x] = params[3][m][x].reduce((sum, current) => {
-            return sum + current;
-          });
           params[4][m][x] = params[4][m][x].reduce((sum, current) => {
             return sum + current;
           });
@@ -23,21 +20,24 @@ async function getMargin(contractSum, params) {
       for (let p = 0; p < params[0].length; p++) {
         margin.push([]);
         sub.push([]);
-        sub[p] = params[1][p];
+        sub[p] = Number(params[1][p]);
 
         for (let m = 0; m < params[2].length; m++) {
-          sub[p] += params[2][m][p];
-          sub[p] += params[3][m][p];
-          sub[p] += params[4][m][p];
+          sub[p] += Number(params[2][m][p]);
+          sub[p] += Number(params[4][m][p]);
         }
 
         for (let c = 0; c < contractSum.length; c++) {
-          if(contractSum[c][0] == params[0][p]) {
+          if (contractSum[c][0] == params[0][p]) {
+
+            console.log(contractSum[c][1] + ' - ' + Number(sub[p]));
             margin[p].push(Number(contractSum[c][1]) - Number(sub[p]));
           }
         }
 
       }
+
+      console.log(margin);
 
     } catch (e) {
       reject(e.stack);
