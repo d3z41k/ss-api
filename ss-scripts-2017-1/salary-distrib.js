@@ -12,7 +12,6 @@ async function salaryDistrib() {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
-    const sleep = require('../libs/sleep');
     //const normLength = require('../libs/normalize-length');
 
     //--------------------------------------------------------------------------
@@ -268,9 +267,8 @@ async function salaryDistrib() {
 
           range = list.distrib[d] + '!Q' + START + ':AD';
           await crud.updateData(valuesCommonTimeFinal, config.sid_2017.salary, range)
-            .then(async (results) => {console.log(results);})
+          //  .then(async (results) => {console.log(results);})
             .catch(console.log);
-
 
           //--------------------------------------------------------------------
           // Distribution of salary
@@ -365,22 +363,27 @@ async function salaryDistrib() {
             range1 = list.distrib[d] + '!K' + START + ':O';
             range2 = list.fot + '!' + FOT_COLS[d + 1][1] + START + ':' + FOT_COLS[d + 1][5];
 
-            // Clear old data
-            await crud.updateData(zeroArray, config.sid_2017.salary, range1)
-              //.then(async (results) => {console.log(results);})
+            // Clear old data in FOT and Distribution
+
+            await Promise.all([
+              crud.updateData(zeroArray, config.sid_2017.salary, range1),
+              crud.updateData(zeroArray, config.sid_2017.salary, range2)
+            ])
+            //  .then(async (results) => {console.log(results);})
               .catch(console.log);
 
             await Promise.all([
               crud.updateData(salaryDistrib, config.sid_2017.salary, range1),
               crud.updateData(salaryDistrib, config.sid_2017.salary, range2)
             ])
-              .then(async (results) => {console.log(results);})
+            //  .then(async (results) => {console.log(results);})
               .catch(console.log);
+
           }
 
           resolve('complite!');
 
-          console.log('======== Распределение ' + (d + 1) + ' ========');
+          //console.log('======== Распределение ' + (d + 1) + ' ========');
         } // End distribution
 
         //----------------------------------------------------------------------
