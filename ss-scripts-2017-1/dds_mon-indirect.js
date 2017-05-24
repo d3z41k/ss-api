@@ -13,7 +13,6 @@ async function dds_monIndirect(mon) {
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
     const normalizeMinus = require('../libs/normalize-minus');
-    const sleep = require('../libs/sleep');
     //const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models-2017-1/db_refresh');
     const pool = require('../models-2017-1/db_pool');
@@ -130,6 +129,8 @@ async function dds_monIndirect(mon) {
            ]);
          }
        }
+
+       console.log(require('util').inspect(dds_fact, { depth: null }));
 
 
        list = encodeURIComponent('Косвенные расходы(декада)');
@@ -355,10 +356,10 @@ async function dds_monIndirect(mon) {
         arrFuncions.push(crud.updateData(arrValues, SIDS[mon], arrRange3[i]));
       });
 
-      // = Update DDS Indirect =
-      await Promise.all(arrFuncions)
-        .then(async (results) => {console.log(results);})
-        .catch(console.log);
+      //// = Update DDS Indirect =
+      // await Promise.all(arrFuncions)
+      //   .then(async (results) => {console.log(results);})
+      //   .catch(console.log);
 
     //----------------------------------------------------------------------
     // Update date-time in "Monitoring"

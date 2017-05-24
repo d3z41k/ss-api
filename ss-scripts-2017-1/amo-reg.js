@@ -173,59 +173,59 @@ async function amoReg() {
         reject(e.stack);
       }
 
-      //------------------------------------------------------------------------
-      // Get & Insert mounth and amount of the act
-      //------------------------------------------------------------------------
-
-      let monthAct = clientData.map((row) => {
-        return [
-          row[0],
-          row[11] ? row[11] : 0,
-          row[10] && Number(row[10].replace(/\s/g, ''))
-          ? Number(row[10].replace(/\s/g, '')) : 0
-        ];
-      });
-
-      let colsAct = config.reg_colsAct_1;
-      let endMonths = [];
-
-      for (let x = 0; x < xArray.length; x++) {
-
-        let month = 0;
-
-        for (let i = 0; i < monthAct.length; i++) {
-          if (registryData[xArray[x] - START][0]  == monthAct[i][0]) {
-            if (monthAct[i][1]
-              && monthAct[i][1].slice(6) == '2016') {
-              month = 0;
-            } else {
-              month = monthAct[i][1] ? Number(monthAct[i][1].substr(3, 2)) : '';
-            }
-
-            endMonths.push([month]);
-            for (let c = 0; c < CREW; c++) {
-              endMonths.push([]);
-            }
-
-            if (colsAct[month]) {
-              range = list.amo + '!' + colsAct[month] + xArray[x];
-
-            await crud.updateData([[monthAct[i][2]]], config.sid_2017.amo, range)
-              .then(async result => {console.log(result);})
-              .catch(console.err);
-
-            }
-          }
-        }
-      }
-
-      range = list.amo + '!H' + START + ':H';
-
-      await crud.updateData(endMonths, config.sid_2017.amo, range)
-        .then(async result => {console.log(result);})
-        .catch(console.err);
-
-      console.log('* Get & Insert mounth and amount of the act *');
+      // //------------------------------------------------------------------------
+      // // Get & Insert mounth and amount of the act
+      // //------------------------------------------------------------------------
+      //
+      // let monthAct = clientData.map((row) => {
+      //   return [
+      //     row[0],
+      //     row[11] ? row[11] : 0,
+      //     row[10] && Number(row[10].replace(/\s/g, ''))
+      //     ? Number(row[10].replace(/\s/g, '')) : 0
+      //   ];
+      // });
+      //
+      // let colsAct = config.reg_colsAct_1;
+      // let endMonths = [];
+      //
+      // for (let x = 0; x < xArray.length; x++) {
+      //
+      //   let month = 0;
+      //
+      //   for (let i = 0; i < monthAct.length; i++) {
+      //     if (registryData[xArray[x] - START][0]  == monthAct[i][0]) {
+      //       if (monthAct[i][1]
+      //         && monthAct[i][1].slice(6) == '2016') {
+      //         month = 0;
+      //       } else {
+      //         month = monthAct[i][1] ? Number(monthAct[i][1].substr(3, 2)) : '';
+      //       }
+      //
+      //       endMonths.push([month]);
+      //       for (let c = 0; c < CREW; c++) {
+      //         endMonths.push([]);
+      //       }
+      //
+      //       if (colsAct[month]) {
+      //         range = list.amo + '!' + colsAct[month] + xArray[x];
+      //
+      //       await crud.updateData([[monthAct[i][2]]], config.sid_2017.amo, range)
+      //         .then(async result => {console.log(result);})
+      //         .catch(console.err);
+      //
+      //       }
+      //     }
+      //   }
+      // }
+      //
+      // range = list.amo + '!H' + START + ':H';
+      //
+      // await crud.updateData(endMonths, config.sid_2017.amo, range)
+      //   .then(async result => {console.log(result);})
+      //   .catch(console.err);
+      //
+      // console.log('* Get & Insert mounth and amount of the act *');
 
       /*************************************************************************
        *** Part 2 - Debt/Prepaid of customers
@@ -358,7 +358,7 @@ async function amoReg() {
          addCostsParams[0] = [1, 2, 3, 4, 5, 6]; //months
          addCostsParams[1][0] = 'Фрилансер'; //article
          addCostsParams[1][1] = 'Лицензия ЮМИ'; //article
-         addCostsParams[1][2] = 'Лицензия Битрикс'; //article
+         addCostsParams[1][2] = 'Лицензия АМО'; //article
 
          for (let x = 0; x < xArray.length; x++) {
            addCostsParams[2].push(registryData[xArray[x] - START][0]); //site
@@ -413,7 +413,7 @@ async function amoReg() {
        console.log('* The additional costs *');
 
        /*************************************************************************
-        *** Part 4 - Additional costs (licences, freelance)
+        *** Part 4 - Prepaid & Finally
         ************************************************************************/
 
        //----------------------------------------------------------------------------
@@ -581,16 +581,16 @@ async function amoReg() {
         .then(async (results) => {console.log(results);})
         .catch(console.log);
 
-       console.log('* ratioParams for Ratio and factHours *');
+      console.log('* ratioParams for Ratio and factHours *');
 
      /*************************************************************************
       *** Part 7 - Margin
       ************************************************************************/
 
-      // //------------------------------------------------------------------------
-      // // Build params for Margin
-      // //------------------------------------------------------------------------
-      //
+      //------------------------------------------------------------------------
+      // Build params for Margin
+      //------------------------------------------------------------------------
+
       // //= Build ABC for margin params =
       // abc = abc.slice(2, 120);
       // let colsMargin = config.colsMargin_1;

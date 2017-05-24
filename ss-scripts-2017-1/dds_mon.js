@@ -11,10 +11,6 @@ async function dds_mon(mon) {
 
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
-    //const formatDate = require('../libs/format-date');
-    //const sleep = require('../libs/sleep');
-    //const normLength = require('../libs/normalize-length');
-    const dbRefresh = require('../models-2017-1/db_refresh');
     const pool = require('../models-2017-1/db_pool');
     const dds_monQuery = require('../models/db_dds_mon-query');
 
@@ -36,41 +32,6 @@ async function dds_mon(mon) {
       let range = '';
       let range1 = '';
       let range2 = '';
-      let dataDDS = {
-        lera: '',
-        olga: ''
-      };
-
-      //-------------------------------------------------------------
-      // Read data from dds_lera to RAM
-      //-------------------------------------------------------------
-
-      // list = encodeURIComponent('ДДС_Лера');
-      // range1 = list + '!A6:V';
-      //
-      // list = encodeURIComponent('ДДС_Ольга');
-      // range2 = list + '!A6:AD';
-      //
-      // await Promise.all([
-      //   crud.readData(config.sid_2017.dds, range1),
-      //   crud.readData(config.sid_2017.dds, range2)
-      // ])
-      //  .then(async ([dds_lera, dds_olga]) => {
-      //     dataDDS.lera = dds_lera;
-      //     dataDDS.olga = dds_olga;
-      //   })
-      //   .catch(console.log);
-      //
-      // //---------------------------------------------------------------
-      // // Refresh table
-      // //---------------------------------------------------------------
-      //
-      // await Promise.all([
-      //   dbRefresh(pool, 'dds_lera', dataDDS.lera),
-      //   dbRefresh(pool, 'dds_olga', dataDDS.olga)
-      // ])
-      //   //.then(async (results) => {console.log(results);})
-      //   .catch(console.log);
 
       //------------------------------------------------------------------------
       // Build paramsMonDDS and get & update

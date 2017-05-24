@@ -10,8 +10,6 @@ const _ = require('lodash/array');
 async function extraReg() {
   return new Promise(async (resolve, reject) => {
 
-    console.log('Start: ' + new Date());
-
     //--------------------------------------------------------------------------
     // Usres libs
     //--------------------------------------------------------------------------
@@ -21,8 +19,6 @@ async function extraReg() {
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
     const normLength = require('../libs/normalize-length');
-    const normType = require('../libs/normalize-type');
-    const sleep = require('../libs/sleep');
     const dbRefresh = require('../models/db_refresh');
     const pool = require('../models-2017-1/db_pool');
     const extraRegQuery = require('../models-2017-1/db_extra-reg-query');
@@ -224,10 +220,10 @@ async function extraReg() {
       range = list.extra + '!H' + START + ':H';
 
       await crud.updateData(endMonths, config.sid_2017.extra, range)
-      //  .then(async result => {console.log(result);})
+        .then(async result => {console.log(result);})
         .catch(console.err);
 
-      //console.log('* Get & Insert mounth and amount of the act *');
+      console.log('* Get & Insert mounth and amount of the act *');
 
       /*************************************************************************
        *** Part 2 - Debt/Prepaid of customers
@@ -342,10 +338,10 @@ async function extraReg() {
       range = list.extra + '!' + colCosts + START + ':' + colDebt;
 
       await crud.updateData(zipValues, config.sid_2017.extra, range)
-      //  .then(async result => {console.log(result);})
+        .then(async result => {console.log(result);})
         .catch(console.err);
 
-      //console.log('* Get & Insert Debt / Prepaid *');
+      console.log('* Get & Insert Debt / Prepaid *');
 
       /*************************************************************************
        *** Part 3 - Additional costs (licences, freelance)
@@ -407,14 +403,14 @@ async function extraReg() {
 
         // = Update data =
         await Promise.all(arrFuncions)
-        //  .then(async (results) => {console.log(results);})
+          .then(async (results) => {console.log(results);})
           .catch(console.log);
 
       } catch (e) {
         reject(e.stack);
       }
 
-      //console.log('* The additional costs *');
+      console.log('* The additional costs *');
 
       /*************************************************************************
        *** Part 4 - Client sell, prepaid and finally
@@ -479,10 +475,10 @@ async function extraReg() {
 
       //= Update data =
       await Promise.all(arrFuncions)
-      //  .then(async (results) => {console.log(results);})
+        .then(async (results) => {console.log(results);})
         .catch(console.log);
 
-      //console.log('* The receipt of money from customers (prepaid & finally) *');
+      console.log('* The receipt of money from customers (prepaid & finally) *');
 
       /*************************************************************************
        *** Part 5 - Ratio and fact hours
@@ -574,10 +570,10 @@ async function extraReg() {
 
       //= Update data =
       await Promise.all(arrFuncions)
-      //  .then(async (results) => {console.log(results);})
+        .then(async (results) => {console.log(results);})
         .catch(console.log);
 
-      //console.log('* ratioParams for Ratio and factHours *');
+      console.log('* ratioParams for Ratio and factHours *');
 
       /*************************************************************************
        *** Part 6 - Margin
@@ -693,10 +689,10 @@ async function extraReg() {
          crud.updateData(marginAll, config.sid_2017.extra, range1),
          crud.updateData(marginsAll, config.sid_2017.extra, range2),
        ])
-      //   .then(async result => {console.log(result);})
+         .then(async result => {console.log(result);})
          .catch(console.err);
 
-      //console.log('* update Margin and Margins *');
+      console.log('* update Margin and Margins *');
 
      /*************************************************************************
       *** Part 7 - Monitioring

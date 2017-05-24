@@ -123,7 +123,7 @@ async function indirect(months) {
           //= Type 1.1 params =
           if ((i >= TYPES[1.1].range1[0] && i <= TYPES[1.1].range1[1])
             || (i >= TYPES[1.1].range2[0] && i <= TYPES[1.1].range2[1] && i != range2[2])
-            || (i == TYPES[1.1].range3)
+            || (i >= TYPES[1.1].range3)
           ) {
             paramsIndirect['1.1'][1].push(dataIndirect[i][1]); //articles
             paramsIndirect['2.1'][1].push(dataIndirect[i][1]); //articles

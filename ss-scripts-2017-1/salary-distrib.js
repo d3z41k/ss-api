@@ -168,7 +168,7 @@ async function salaryDistrib() {
 
           for (var e = 0; e < employee.length; e++) {
 
-            adminTime.hours = [0, 0, 0, 0, 0]; //reset by new emploee
+            adminTime.hours = [0, 0, 0, 0, 0, 0]; //reset by new emploee
             projectTime.hours = [0, 0, 0, 0, 0, 0, 0, 0]; //reset by new emploee
 
             range = list.listName(employee[e]) + '!A10:E';
@@ -193,7 +193,7 @@ async function salaryDistrib() {
                }
 
                 //= direction adminTime =
-                if (dataLawt[i][1] == paramsHours[1][0] && dataLawt[i][2]) {
+                if (dataLawt[i][2] && dataLawt[i][1] == paramsHours[1][0]) {
                   switch(dataLawt[i][4]) {
                     case paramsHours[2][0]:
                       adminTime.hours[1] += Number(dataLawt[i][2].replace(/\,/g, '.'));
@@ -207,8 +207,10 @@ async function salaryDistrib() {
                     default:
                       break;
                   }
-                } else if (dataLawt[i][1] == paramsHours[1][1] && dataLawt[i][2]) {
+                } else if (dataLawt[i][2] && dataLawt[i][1] == paramsHours[1][1] &&  dataLawt[i][4] == paramsHours[2][0]) {
                     adminTime.hours[4] += Number(dataLawt[i][2].replace(/\,/g, '.'))
+                } else if (dataLawt[i][2] && dataLawt[i][1] == paramsHours[1][1] &&  dataLawt[i][4] == paramsHours[2][2]) {
+                    adminTime.hours[5] += Number(dataLawt[i][2].replace(/\,/g, '.'))
                 }
 
                 //= direction projectTime =
@@ -246,12 +248,10 @@ async function salaryDistrib() {
                   }
                 }
 
-
-
               } //end if current month
             } //end months
 
-            valuesCommonTime.push(adminTime.hours.concat([''], projectTime.hours));
+            valuesCommonTime.push(adminTime.hours.concat(projectTime.hours));
 
           } //end employee
 
@@ -261,7 +261,7 @@ async function salaryDistrib() {
             if (dataDistrib[i][1] == 'ЛУВР') {
               valuesCommonTimeFinal.push(valuesCommonTime.shift());
             } else {
-              valuesCommonTimeFinal.push([0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, 0, 0]);
+              valuesCommonTimeFinal.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
             }
           }
 
@@ -277,7 +277,7 @@ async function salaryDistrib() {
           range = list.distrib[d] + '!B' + START + ':I';
           dataDistrib = await crud.readData(config.sid_2017.salary, range);
 
-          range = list.distrib[d] + '!AF5:AP';
+          range = list.distrib[d] + '!AF5:AQ';
           let dataDistribDir = await crud.readData(config.sid_2017.salary, range);
 
           //= If existant data =

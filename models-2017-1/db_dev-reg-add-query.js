@@ -22,7 +22,7 @@ async function devRegAddQuery(pool, tableName, params, CREW) {
               ])
             .then(([col, feilds]) => {
               for (let key in col[0]) {
-                values[m][a].push(col[0][key] ? col[0][key] : 0);
+                values[m][a].push(col[0][key] ? Number(col[0][key]) * -1 : 0);
                 for (let i = 0; i < CREW; i++) {
                   values[m][a].push(null);
                 }
