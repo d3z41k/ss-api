@@ -13,11 +13,11 @@ async function devRegAddQuery(pool, tableName, params, CREW) {
           await pool.execute('SELECT SUM(`Сумма итого руб`) FROM ' + tableName + ' WHERE ' +
               '`Месяц` = ? ' +
               'AND `Статья движения денег` = ? ' +
-              'AND `Проекты разработка` = ? ' +
+              'AND `Проекты разработка` LIKE ? ' +
               'AND `Контрагент Разработка` = ?', [
                 params[0][m],
                 params[1][a],
-                params[2][i],
+                '%' + params[2][i] + '%',
                 params[3][i]
               ])
             .then(([col, feilds]) => {

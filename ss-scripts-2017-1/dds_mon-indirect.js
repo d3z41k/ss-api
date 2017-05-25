@@ -130,7 +130,7 @@ async function dds_monIndirect(mon) {
          }
        }
 
-       console.log(require('util').inspect(dds_fact, { depth: null }));
+  //     console.log(require('util').inspect(dds_fact, { depth: null }));
 
 
        list = encodeURIComponent('Косвенные расходы(декада)');

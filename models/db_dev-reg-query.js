@@ -31,7 +31,7 @@ async function devRegQuery(pool, tableName, params) {
 
     } catch (e) {
       reject(e.stack);
-    } 
+    }
     resolve(values);
   });
 }

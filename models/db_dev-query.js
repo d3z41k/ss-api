@@ -11,11 +11,11 @@ async function devQuery(pool, tableName, params) {
         values[t].push([]);
 
         await pool.execute('SELECT SUM(`Сумма итого руб`), `Дата` FROM '+ tableName +' WHERE ' +
-            '`Проекты разработка` = ? ' +
+            '`Проекты разработка` LIKE ? ' +
             'AND `Контрагент Разработка` = ? ' +
             'AND `Направление деятельноcти` = ? ' +
             'AND `Статья движения денег` = ?', [
-              params[0][i],
+              '%' + params[0][i] + '%',
               params[1][i],
               params[2],
               params[3][t]
