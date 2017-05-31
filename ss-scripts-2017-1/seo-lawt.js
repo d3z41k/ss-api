@@ -62,8 +62,6 @@ async function seoLawt() {
         return employee[0];
       });
 
-//      seoStuff = ['Базеко Игорь'];
-
       for (let e = 0; e < seoStuff.length; e++) {
 
         range = list.listName(seoStuff[e]) + '!A2:FF1700';
@@ -72,7 +70,6 @@ async function seoLawt() {
         let dataHours = [];
         let dataAdminHours = [];
         let counter = 0;
-
 
         for (let r = START.row; r < dataSeo.length; r++) {
           for (let c = START.col; c < dataSeo[r].length; c++) {
@@ -106,14 +103,14 @@ async function seoLawt() {
             dataAdminHours.push([
               convertData([dataSeo[2][c], dataSeo[0][c]]),
               ACTIVITIES.admin,
-              Number(dataSeo[6][c]) * 0.5,
+              Number(dataSeo[6][c].replace(/,/g, '.')) * 0.5,
               '',
               DIRECTION.mts
             ]);
             dataAdminHours.push([
               convertData([dataSeo[2][c], dataSeo[0][c]]),
               ACTIVITIES.admin,
-              Number(dataSeo[6][c]) * 0.5,
+              Number(dataSeo[6][c].replace(/,/g, '.')) * 0.5,
               '',
               DIRECTION.profi
             ]);
@@ -122,13 +119,13 @@ async function seoLawt() {
 
         dataHours = dataHours.concat(dataAdminHours);
 
-        //console.log(dataHours);
-
         range = list.listName(seoStuff[e]) + '!A10:Z';
 
         await crud.updateData(dataHours, config.sid_2017.lawt, range)
-          .then(async results => {console.log(results);})
+        //  .then(async results => {console.log(results);})
           .catch(console.log);
+
+        //console.log('Сотрудник ' + seoStuff[e] + ': Update - OK!');
 
       } //end Staff
 
@@ -136,12 +133,12 @@ async function seoLawt() {
       // Update date-time in "Monitoring"
       //------------------------------------------------------------------------
 
-      // range = 'main!B6';
-      //
-      // let now = new Date();
-      // now = [[formatDate(now)]];
-      //
-      // await crud.updateData(now, config.sid_2017.monit, range);
+      range = 'main!E32';
+
+      let now = new Date();
+      now = [[formatDate(now)]];
+
+      await crud.updateData(now, config.sid_2017.monit, range);
 
     } // = End start function =
 

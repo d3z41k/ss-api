@@ -41,7 +41,7 @@ async function amo() {
       //normLength(srcRows);
 
        await dbRefresh(pool, 'dds_lera', ddsData)
-        //.then(async (result) => {console.log(result);})
+        .then(async (result) => {console.log(result);})
         .catch(console.log);
 
       //------------------------------------------------------------------------
@@ -86,7 +86,7 @@ async function amo() {
           crud.updateData(values[0], config.sid_2017.amo, prePayRange),
           crud.updateData(values[1], config.sid_2017.amo, addPayRange)
         ])
-        //  .then(async results => {console.log(results);})
+          .then(async results => {console.log(results);})
           .catch(console.log);
 
       } catch (e) {

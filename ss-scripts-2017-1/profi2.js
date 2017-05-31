@@ -13,7 +13,7 @@ async function profi2(months) {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
-    const sleep = require('../libs/sleep');
+    //const sleep = require('../libs/sleep');
     //const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models-2017-1/db_refresh');
     const pool = require('../models-2017-1/db_pool');
@@ -54,21 +54,21 @@ async function profi2(months) {
       // Read data from DDS to RAM
       //--------------------------------------------------------------
 
-      list = encodeURIComponent('ДДС_Лера');
-      range = list + '!A6:V';
-
-      let dataDDS = await crud.readData(config.sid_2017.dds, range);
-
-      // = Normalizing of length "dataDDS" =
-      //normLength(dataDDS);
-
-      await dbRefresh(pool, 'dds_lera', dataDDS)
-      //  .then(async (result) => {console.log(result);})
-        .catch(console.log);
+      // list = encodeURIComponent('ДДС_Лера');
+      // range = list + '!A6:V';
+      //
+      // let dataDDS = await crud.readData(config.sid_2017.dds, range);
+      //
+      // // = Normalizing of length "dataDDS" =
+      // //normLength(dataDDS);
+      //
+      // await dbRefresh(pool, 'dds_lera', dataDDS)
+      // //  .then(async (result) => {console.log(result);})
+      //   .catch(console.log);
 
       //---------------------------------------------------------------
 
-      try {
+      //try {
 
         //--------------------------------------------------------------
         // Build *static* Profi params
@@ -183,8 +183,6 @@ async function profi2(months) {
               //.then(async (results) => {console.log(results);})
               .catch(console.log);
 
-            await sleep(1000);
-
             //--------------------------------------------------------------
             // To zip result, rend and ad in stack, prepair array of
             // function and update
@@ -227,8 +225,6 @@ async function profi2(months) {
             await Promise.all(arrFuncions3)
               //.then(async (results) => {console.log(results);})
               .catch(console.log);
-
-            await sleep(1000);
 
           } else {
 
@@ -298,8 +294,6 @@ async function profi2(months) {
               //.then(async (results) => {console.log(results);})
               .catch(console.log);
 
-            await sleep(1000);
-
             //--------------------------------------------------------------
             // To zip result, rend and ad in stack, prepair array of
             // function and update
@@ -340,19 +334,20 @@ async function profi2(months) {
 
             //= Update data =
             await Promise.all(arrFuncions3)
-              //.then(async (results) => {console.log(results);})
+              .then(async (results) => {console.log(results);})
               .catch(console.log);
 
-            await sleep(1000);
-
           }
+
           resolve('complite!');
-          await sleep(2000);
+
         } //= End directions =
 
-      } catch (e) {
-        reject(e.stack);
-      }
+      // } catch (e) {
+      //   reject(e.stack);
+      // }
+
+      console.log('finish');
 
       //------------------------------------------------------------------------
       // Update date-time in "Monitoring"

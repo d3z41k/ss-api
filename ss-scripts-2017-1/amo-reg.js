@@ -3,9 +3,9 @@
 const config = require('config');
 const _ = require('lodash/array');
 
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Main function
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 async function amoReg() {
   return new Promise(async(resolve, reject) => {
@@ -19,8 +19,8 @@ async function amoReg() {
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
     const normLength = require('../libs/normalize-length');
-    const sleep = require('../libs/sleep');
-    const dbRefresh = require('../models-2017-1/db_refresh');
+    //const sleep = require('../libs/sleep');
+    //const dbRefresh = require('../models-2017-1/db_refresh');
     const pool = require('../models-2017-1/db_pool');
     const amoRegQuery = require('../models-2017-1/db_amo-reg-query');
     const amoRegAddQuery = require('../models-2017-1/db_amo-reg-add-query');
@@ -173,59 +173,59 @@ async function amoReg() {
         reject(e.stack);
       }
 
-      // //------------------------------------------------------------------------
-      // // Get & Insert mounth and amount of the act
-      // //------------------------------------------------------------------------
-      //
-      // let monthAct = clientData.map((row) => {
-      //   return [
-      //     row[0],
-      //     row[11] ? row[11] : 0,
-      //     row[10] && Number(row[10].replace(/\s/g, ''))
-      //     ? Number(row[10].replace(/\s/g, '')) : 0
-      //   ];
-      // });
-      //
-      // let colsAct = config.reg_colsAct_1;
-      // let endMonths = [];
-      //
-      // for (let x = 0; x < xArray.length; x++) {
-      //
-      //   let month = 0;
-      //
-      //   for (let i = 0; i < monthAct.length; i++) {
-      //     if (registryData[xArray[x] - START][0]  == monthAct[i][0]) {
-      //       if (monthAct[i][1]
-      //         && monthAct[i][1].slice(6) == '2016') {
-      //         month = 0;
-      //       } else {
-      //         month = monthAct[i][1] ? Number(monthAct[i][1].substr(3, 2)) : '';
-      //       }
-      //
-      //       endMonths.push([month]);
-      //       for (let c = 0; c < CREW; c++) {
-      //         endMonths.push([]);
-      //       }
-      //
-      //       if (colsAct[month]) {
-      //         range = list.amo + '!' + colsAct[month] + xArray[x];
-      //
-      //       await crud.updateData([[monthAct[i][2]]], config.sid_2017.amo, range)
-      //         .then(async result => {console.log(result);})
-      //         .catch(console.err);
-      //
-      //       }
-      //     }
-      //   }
-      // }
-      //
-      // range = list.amo + '!H' + START + ':H';
-      //
-      // await crud.updateData(endMonths, config.sid_2017.amo, range)
-      //   .then(async result => {console.log(result);})
-      //   .catch(console.err);
-      //
-      // console.log('* Get & Insert mounth and amount of the act *');
+      //------------------------------------------------------------------------
+      // Get & Insert mounth and amount of the act
+      //------------------------------------------------------------------------
+
+      let monthAct = clientData.map((row) => {
+        return [
+          row[0],
+          row[11] ? row[11] : 0,
+          row[10] && Number(row[10].replace(/\s/g, ''))
+          ? Number(row[10].replace(/\s/g, '')) : 0
+        ];
+      });
+
+      let colsAct = config.reg_colsAct_1;
+      let endMonths = [];
+
+      for (let x = 0; x < xArray.length; x++) {
+
+        let month = 0;
+
+        for (let i = 0; i < monthAct.length; i++) {
+          if (registryData[xArray[x] - START][0]  == monthAct[i][0]) {
+            if (monthAct[i][1]
+              && monthAct[i][1].slice(6) == '2016') {
+              month = 0;
+            } else {
+              month = monthAct[i][1] ? Number(monthAct[i][1].substr(3, 2)) : '';
+            }
+
+            endMonths.push([month]);
+            for (let c = 0; c < CREW; c++) {
+              endMonths.push([]);
+            }
+
+            if (colsAct[month]) {
+              range = list.amo + '!' + colsAct[month] + xArray[x];
+
+            await crud.updateData([[monthAct[i][2]]], config.sid_2017.amo, range)
+            //  .then(async result => {console.log(result);})
+              .catch(console.err);
+
+            }
+          }
+        }
+      }
+
+      range = list.amo + '!H' + START + ':H';
+
+      await crud.updateData(endMonths, config.sid_2017.amo, range)
+      //  .then(async result => {console.log(result);})
+        .catch(console.err);
+
+      //console.log('* Get & Insert mounth and amount of the act *');
 
       /*************************************************************************
        *** Part 2 - Debt/Prepaid of customers
@@ -338,10 +338,10 @@ async function amoReg() {
       range = list.amo + '!' + colCosts + START + ':' + colDebt;
 
       await crud.updateData(zipValues, config.sid_2017.amo, range)
-        .then(async result => {console.log(result);})
+      //  .then(async result => {console.log(result);})
         .catch(console.err);
 
-      console.log('* Get & Insert Debt / Prepaid *');
+      //console.log('* Get & Insert Debt / Prepaid *');
 
       /*************************************************************************
        *** Part 3 - Additional costs (licences, freelance)
@@ -403,14 +403,14 @@ async function amoReg() {
 
          // = Update data =
          await Promise.all(arrFuncions)
-           .then(async (results) => {console.log(results);})
+        //   .then(async (results) => {console.log(results);})
            .catch(console.log);
 
        } catch (e) {
          reject(e.stack);
        }
 
-       console.log('* The additional costs *');
+       //console.log('* The additional costs *');
 
        /*************************************************************************
         *** Part 4 - Prepaid & Finally
@@ -482,10 +482,10 @@ async function amoReg() {
 
         //= Update data =
         await Promise.all(arrFuncions)
-          .then(async (results) => {console.log(results);})
+        //  .then(async (results) => {console.log(results);})
           .catch(console.log);
 
-        console.log('* The receipt of money from customers (prepaid & finally) *');
+        //console.log('* The receipt of money from customers (prepaid & finally) *');
 
        /*************************************************************************
         *** Part 5 - Ratio and fact hours
@@ -578,10 +578,10 @@ async function amoReg() {
 
       //= Update data =
       await Promise.all(arrFuncions)
-        .then(async (results) => {console.log(results);})
+      //  .then(async (results) => {console.log(results);})
         .catch(console.log);
 
-      console.log('* ratioParams for Ratio and factHours *');
+      //console.log('* ratioParams for Ratio and factHours *');
 
      /*************************************************************************
       *** Part 7 - Margin
@@ -591,119 +591,119 @@ async function amoReg() {
       // Build params for Margin
       //------------------------------------------------------------------------
 
-      // //= Build ABC for margin params =
-      // abc = abc.slice(2, 120);
-      // let colsMargin = config.colsMargin_1;
-      // let paramsMargin = [[], [], [], [], []];
-      //
-      // let col = {
-      //   'cost': abc.indexOf(colsMargin.cost),
-      //   'debt': abc.indexOf(colsMargin.debt)
-      // };
-      //
-      // try {
-      //
-      //   for (let x = 0; x < xArray.length; x++) {
-      //
-      //     //paramsMargin = [];
-      //
-      //     //= Push site in params =
-      //     paramsMargin[0].push(registryData[xArray[x] - START][0]);
-      //
-      //     //= Push Cost in params =
-      //     registryData[xArray[x] - START][col.cost] && Number(registryData[xArray[x] - START][col.cost].replace(/\s/g, '').replace(/,/g, '.'))
-      //       ? paramsMargin[1].push(registryData[xArray[x] - START][col.cost].replace(/\s/g, '').replace(/,/g, '.'))
-      //       : paramsMargin[1].push(0);
-      //
-      //   }
-      //   //--------------------------------------------------------------------
-      //
-      //   for (var m = 0; m < MONTHS.length; m++) {
-      //     let sCol = abc.indexOf(colsMargin.salary[m]);
-      //
-      //     let oCol = [];
-      //     for (let i = 0; i < colsMargin.other[m].length; i++) {
-      //       oCol.push(abc.indexOf(colsMargin.other[m][i]));
-      //     }
-      //     paramsMargin[2].push([]);
-      //     paramsMargin[4].push([]);
-      //
-      //     for (let x = 0; x < xArray.length; x++) {
-      //       paramsMargin[2][m].push([]);
-      //       paramsMargin[4][m].push([]);
-      //
-      //       for (let i = 0; i < colsMargin.other[m].length; i++) {
-      //         registryData[xArray[x] - START][oCol[i]] && Number(registryData[xArray[x] - START][oCol[i]].replace(/\s/g, '').replace(/,/g, '.'))
-      //           ? paramsMargin[4][m][x].push(Number(registryData[xArray[x] - START][oCol[i]].replace(/\s/g, '').replace(/,/g, '.')))
-      //           : paramsMargin[4][m][x].push(0);
-      //       }
-      //
-      //       for (let p = 0; p < registryData.length; p++) {
-      //         if (paramsMargin[0][x] == registryData[p][0]) {
-      //
-      //           registryData[x][sCol] && Number(registryData[p][sCol].replace(/\s/g, '').replace(/,/g, '.'))
-      //             ? paramsMargin[2][m][x].push(Number(registryData[p][sCol].replace(/\s/g, '').replace(/,/g, '.')))
-      //             : paramsMargin[2][m][x].push(0);
-      //         }
-      //       }
-      //     }
-      //   }
-      //
-      // } catch (e) {
-      //   reject(e.stack);
-      // }
-      //
-      // //= Get & Insert values of "Margin & Margins" =
-      // let margin = await getMargin(contractSum, paramsMargin);
-      // let margins = [];
-      // let marginAll = [];
-      // let marginsAll = [];
-      //
-      // //console.log(margin);
-      //
-      // try {
-      //
-      //   for (let p = 0; p < paramsMargin[0].length; p++) {
-      //     margins.push([]);
-      //     for (let c = 0; c < contractSum.length; c++) {
-      //       if(contractSum[c][0] == paramsMargin[0][p]) {
-      //         margins[p].push(margin[p][0] ? margin[p][0] / contractSum[c][1] : 0);
-      //
-      //         //= Cut to 2 number after poin =
-      //         if (isFinite(margins[p][0])) {
-      //           margins[p][0] = Number(margins[p][0]).toFixed(2);
-      //         }
-      //       }
-      //     }
-      //   }
-      //
-      //   for (let p = 0; p < margin.length; p++) {
-      //     marginAll.push(margin[p]);
-      //     marginsAll.push(margins[p]);
-      //     for (let c = 0; c < CREW; c++) {
-      //       marginAll.push([]);
-      //       marginsAll.push([]);
-      //     }
-      //   }
-      //
-      //   let colMargin = config.colsMargin_1.margin;
-      //   let colMargins = config.colsMargin_1.margins;
-      //
-      //   range1 = list.amo + '!' + colMargin + START + ':' + colMargin;
-      //   range2 = list.amo + '!' + colMargins + START + ':' + colMargins;
-      //
-      // } catch (e) {
-      //   reject(e.stack);
-      // }
-      //
-      // await Promise.all([
-      //   crud.updateData(marginAll, config.sid_2017.amo, range1),
-      //   crud.updateData(marginsAll, config.sid_2017.amo, range2),
-      // ])
-      //   .then(async result => {console.log(result);})
-      //   .catch(console.err);
-      //
-      // console.log('* update Margin and Margins *');
+      //= Build ABC for margin params =
+      abc = abc.slice(2, 120);
+      let colsMargin = config.colsMargin_1;
+      let paramsMargin = [[], [], [], [], []];
+
+      let col = {
+        'cost': abc.indexOf(colsMargin.cost),
+        'debt': abc.indexOf(colsMargin.debt)
+      };
+
+      try {
+
+        for (let x = 0; x < xArray.length; x++) {
+
+          //paramsMargin = [];
+
+          //= Push site in params =
+          paramsMargin[0].push(registryData[xArray[x] - START][0]);
+
+          //= Push Cost in params =
+          registryData[xArray[x] - START][col.cost] && Number(registryData[xArray[x] - START][col.cost].replace(/\s/g, '').replace(/,/g, '.'))
+            ? paramsMargin[1].push(registryData[xArray[x] - START][col.cost].replace(/\s/g, '').replace(/,/g, '.'))
+            : paramsMargin[1].push(0);
+
+        }
+        //--------------------------------------------------------------------
+
+        for (var m = 0; m < MONTHS.length; m++) {
+          let sCol = abc.indexOf(colsMargin.salary[m]);
+
+          let oCol = [];
+          for (let i = 0; i < colsMargin.other[m].length; i++) {
+            oCol.push(abc.indexOf(colsMargin.other[m][i]));
+          }
+          paramsMargin[2].push([]);
+          paramsMargin[4].push([]);
+
+          for (let x = 0; x < xArray.length; x++) {
+            paramsMargin[2][m].push([]);
+            paramsMargin[4][m].push([]);
+
+            for (let i = 0; i < colsMargin.other[m].length; i++) {
+              registryData[xArray[x] - START][oCol[i]] && Number(registryData[xArray[x] - START][oCol[i]].replace(/\s/g, '').replace(/,/g, '.'))
+                ? paramsMargin[4][m][x].push(Number(registryData[xArray[x] - START][oCol[i]].replace(/\s/g, '').replace(/,/g, '.')))
+                : paramsMargin[4][m][x].push(0);
+            }
+
+            for (let p = 0; p < registryData.length; p++) {
+              if (paramsMargin[0][x] == registryData[p][0]) {
+
+                registryData[x][sCol] && Number(registryData[p][sCol].replace(/\s/g, '').replace(/,/g, '.'))
+                  ? paramsMargin[2][m][x].push(Number(registryData[p][sCol].replace(/\s/g, '').replace(/,/g, '.')))
+                  : paramsMargin[2][m][x].push(0);
+              }
+            }
+          }
+        }
+
+      } catch (e) {
+        reject(e.stack);
+      }
+
+      //= Get & Insert values of "Margin & Margins" =
+      let margin = await getMargin(contractSum, paramsMargin);
+      let margins = [];
+      let marginAll = [];
+      let marginsAll = [];
+
+      //console.log(margin);
+
+      try {
+
+        for (let p = 0; p < paramsMargin[0].length; p++) {
+          margins.push([]);
+          for (let c = 0; c < contractSum.length; c++) {
+            if(contractSum[c][0] == paramsMargin[0][p]) {
+              margins[p].push(margin[p][0] ? margin[p][0] / contractSum[c][1] : 0);
+
+              //= Cut to 2 number after poin =
+              if (isFinite(margins[p][0])) {
+                margins[p][0] = Number(margins[p][0]).toFixed(2);
+              }
+            }
+          }
+        }
+
+        for (let p = 0; p < margin.length; p++) {
+          marginAll.push(margin[p]);
+          marginsAll.push(margins[p]);
+          for (let c = 0; c < CREW; c++) {
+            marginAll.push([]);
+            marginsAll.push([]);
+          }
+        }
+
+        let colMargin = config.colsMargin_1.margin;
+        let colMargins = config.colsMargin_1.margins;
+
+        range1 = list.amo + '!' + colMargin + START + ':' + colMargin;
+        range2 = list.amo + '!' + colMargins + START + ':' + colMargins;
+
+      } catch (e) {
+        reject(e.stack);
+      }
+
+      await Promise.all([
+        crud.updateData(marginAll, config.sid_2017.amo, range1),
+        crud.updateData(marginsAll, config.sid_2017.amo, range2),
+      ])
+      //  .then(async result => {console.log(result);})
+        .catch(console.err);
+
+      //console.log('* update Margin and Margins *');
 
       /*************************************************************************
        *** Part 7 - Monitioring

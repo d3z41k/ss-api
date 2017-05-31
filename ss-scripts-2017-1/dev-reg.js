@@ -134,7 +134,7 @@ async function devReg() {
         //.then(async result => {console.log(result);})
         .catch(console.err);
 
-      //console.log('* Get and Update allHours *');
+      console.log('* Get and Update allHours *');
 
       /*************************************************************************
        *** Part 2 - Contract sum and Action months
@@ -289,7 +289,7 @@ async function devReg() {
       //  .then(async result => {console.log(result);})
         .catch(console.err);
 
-      //console.log('* Get & Insert mounth and amount of the act *');
+      console.log('* Get & Insert mounth and amount of the act *');
 
       /*************************************************************************
        *** Part 3 - Debt/Prepaid of customers
@@ -407,7 +407,7 @@ async function devReg() {
       //  .then(async result => {console.log(result);})
         .catch(console.err);
 
-      //console.log('* Get & Insert Debt / Prepaid *');
+      console.log('* Get & Insert Debt / Prepaid *');
 
       /*************************************************************************
        *** Part 4 - Additional costs (licences, freelance)
@@ -490,7 +490,7 @@ async function devReg() {
         reject(e.stack);
       }
 
-      //console.log('* The additional costs *');
+      console.log('* The additional costs *');
 
       /*************************************************************************
        *** Part 5 - Client sell, prepaid and finally
@@ -558,7 +558,7 @@ async function devReg() {
       //  .then(async (results) => {console.log(results);})
         .catch(console.log);
 
-      //console.log('* The receipt of money from customers (prepaid & finally) *');
+      console.log('* The receipt of money from customers (prepaid & finally) *');
 
       /*************************************************************************
        *** Part 6 - Ratio and fact hours
@@ -653,7 +653,7 @@ async function devReg() {
       //  .then(async (results) => {console.log(results);})
         .catch(console.log);
 
-      // console.log('* ratioParams for Ratio and factHours *');
+      console.log('* ratioParams for Ratio and factHours *');
 
      /*************************************************************************
       *** Part 7 - Margin
@@ -686,11 +686,6 @@ async function devReg() {
           registryData[xArray[x] - START][col.cost] && Number(registryData[xArray[x] - START][col.cost].replace(/\s/g, '').replace(/,/g, '.'))
             ? paramsMargin[1].push(registryData[xArray[x] - START][col.cost].replace(/\s/g, '').replace(/,/g, '.'))
             : paramsMargin[1].push(0);
-
-          // //= Push Debt in params =
-          // registryData[xArray[x] - START][col.debt] && Number(registryData[xArray[x] - START][col.debt].replace(/\s/g, '').replace(/,/g, '.'))
-          //   ? paramsMargin[3].push(registryData[xArray[x] - START][col.debt].replace(/\s/g, '').replace(/,/g, '.'))
-          //   : paramsMargin[3].push(0);
         }
         //--------------------------------------------------------------------
 
@@ -776,7 +771,7 @@ async function devReg() {
       //  .then(async result => {console.log(result);})
         .catch(console.err);
 
-      // console.log('* update Margin and Margins *');
+      console.log('* update Margin and Margins *');
 
       /*************************************************************************
        *** Part 8 - Monitioring
