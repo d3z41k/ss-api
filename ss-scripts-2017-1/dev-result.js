@@ -82,13 +82,13 @@ async function dev() {
         let registryInfo = registryData.map(row => {
           return [
             row[0], row[5], row[7], row[8], row[9]
-          ]
+          ];
         });
 
         let devResultInfo = devResultData.map(row => {
           return [
             row[0], row[6]
-          ]
+          ];
         });
 
         // = Fetch data =
@@ -113,8 +113,6 @@ async function dev() {
             }
           }
         });
-
-        console.log(hoursProject);
 
         projects.forEach((project, p) => {
           normaFactHours.push([]);
@@ -171,8 +169,8 @@ async function dev() {
             crud.updateData(normaFactHoursPrep, config.sid_2017.dev, range2),
             crud.updateData(endMonth, config.sid_2017.dev, range3)
         ])
-         .then(async results => {console.log(results);})
-         .catch(console.log);
+        //  .then(async results => {console.log(results);})
+          .catch(console.log);
 
       } catch (e) {
         reject(e.stack);
@@ -182,12 +180,12 @@ async function dev() {
       // Update date-time in "Monitoring"
       //------------------------------------------------------------------------
 
-      // range = 'main!B4';
-      //
-      // let now = new Date();
-      // now = [[formatDate(now)]];
-      //
-      // await crud.updateData(now, config.sid_2017.monit, range);
+      range = 'main!E4';
+
+      let now = new Date();
+      now = [[formatDate(now)]];
+
+      await crud.updateData(now, config.sid_2017.monit, range);
 
       resolve('complite!');
 

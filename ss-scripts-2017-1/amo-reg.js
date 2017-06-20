@@ -57,10 +57,6 @@ async function amoReg() {
       let zipValues = [];
       let arrRange = [];
       let arrFuncions = [];
-      let arrFuncions1 = [];
-      let arrFuncions2 = [];
-
-      let cols = '';
 
       //------------------------------------------------------------------------
       // Get Project length (Build xArray)
@@ -225,7 +221,7 @@ async function amoReg() {
       //  .then(async result => {console.log(result);})
         .catch(console.err);
 
-      //console.log('* Get & Insert mounth and amount of the act *');
+      console.log('* Get & Insert mounth and amount of the act *');
 
       /*************************************************************************
        *** Part 2 - Debt/Prepaid of customers
@@ -341,7 +337,7 @@ async function amoReg() {
       //  .then(async result => {console.log(result);})
         .catch(console.err);
 
-      //console.log('* Get & Insert Debt / Prepaid *');
+      console.log('* Get & Insert Debt / Prepaid *');
 
       /*************************************************************************
        *** Part 3 - Additional costs (licences, freelance)
@@ -410,7 +406,7 @@ async function amoReg() {
          reject(e.stack);
        }
 
-       //console.log('* The additional costs *');
+       console.log('* The additional costs *');
 
        /*************************************************************************
         *** Part 4 - Prepaid & Finally
@@ -443,7 +439,7 @@ async function amoReg() {
           }
 
         } catch (e) {
-          reject(e.stack)
+          reject(e.stack);
         }
 
         //console.log(receiptParams);
@@ -485,7 +481,7 @@ async function amoReg() {
         //  .then(async (results) => {console.log(results);})
           .catch(console.log);
 
-        //console.log('* The receipt of money from customers (prepaid & finally) *');
+        console.log('* The receipt of money from customers (prepaid & finally) *');
 
        /*************************************************************************
         *** Part 5 - Ratio and fact hours
@@ -554,7 +550,7 @@ async function amoReg() {
       arrRange = {
         'ratio': [],
         'factHours': [],
-      }
+      };
 
       //= Prepare array of ratio range & functions =
       for (let month in COL_MONTH) {
@@ -581,7 +577,7 @@ async function amoReg() {
       //  .then(async (results) => {console.log(results);})
         .catch(console.log);
 
-      //console.log('* ratioParams for Ratio and factHours *');
+      console.log('* ratioParams for Ratio and factHours *');
 
      /*************************************************************************
       *** Part 7 - Margin
@@ -703,7 +699,7 @@ async function amoReg() {
       //  .then(async result => {console.log(result);})
         .catch(console.err);
 
-      //console.log('* update Margin and Margins *');
+      console.log('* update Margin and Margins *');
 
       /*************************************************************************
        *** Part 7 - Monitioring

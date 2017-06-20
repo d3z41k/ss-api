@@ -180,7 +180,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
         'Обслуживание (AMO)',
         'Виджеты разработка (AMO)',
         'Виджеты готовые (AMO)',
-        'Доп. работы (АМО)',
+        'Доп. работы (АМО)', //АМО - rus
       ];
 
       for (let i = 0; i < cutContractMonths.length; i++) {

@@ -29,15 +29,11 @@ async function getMargin(contractSum, params) {
 
         for (let c = 0; c < contractSum.length; c++) {
           if (contractSum[c][0] == params[0][p]) {
-
-            console.log(contractSum[c][1] + ' - ' + Number(sub[p]));
             margin[p].push(Number(contractSum[c][1]) - Number(sub[p]));
           }
         }
 
       }
-
-      console.log(margin);
 
     } catch (e) {
       reject(e.stack);

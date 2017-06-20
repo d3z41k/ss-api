@@ -46,9 +46,11 @@ async function salaryDistrib() {
       //
       //--------------------------------------------------------------------
 
-      // try {
+      try {
 
         for (let d = 0; d < list.distrib.length; d++) { //Start distribution
+        //  for (let d = 4; d < 5; d++) { //Start distribution
+
 
           //--------------------------------------------------------------------
           // Accrued salary
@@ -123,8 +125,10 @@ async function salaryDistrib() {
             crud.updateData(accruedSalaryNum, config.sid_2017.salary, range1),
             crud.updateData(accruedSalaryNum, config.sid_2017.salary, range2)
           ])
-            //.then(async (results) => {console.log(results);})
+          //  .then(async (results) => {console.log(results);})
             .catch(console.log);
+
+          resolve('complite!');
 
           //--------------------------------------------------------------------
           // Distribution of hours (admin and project)
@@ -142,6 +146,7 @@ async function salaryDistrib() {
           let employee = [];
           let valuesCommonTime = [];
           let valuesCommonTimeFinal = [];
+          let dataLawt = '';
 
           range = list.distrib[d] + '!B1:I';
           dataDistrib = await crud.readData(config.sid_2017.salary, range);
@@ -161,7 +166,7 @@ async function salaryDistrib() {
           ]; //activities
 
           for (let i = START; i < dataDistrib.length; i++) {
-            if (dataDistrib[i][1] == 'ЛУВР') {
+            if (dataDistrib[i][0] && dataDistrib[i][1] == 'ЛУВР') {
               employee.push(dataDistrib[i][0]); //lawt employee
             }
           }
@@ -172,84 +177,88 @@ async function salaryDistrib() {
             projectTime.hours = [0, 0, 0, 0, 0, 0, 0, 0]; //reset by new emploee
 
             range = list.listName(employee[e]) + '!A10:E';
-            let dataLawt = await crud.readData(config.sid_2017.lawt, range);
 
-            for (let i = 0; i < dataLawt.length; i++) {
-              if (Number(dataLawt[i][0].substr(3, 2)) == paramsHours[0]) {
+            dataLawt = await crud.readData(config.sid_2017.lawt, range);
 
-                //= common adminTime =
-                if ((dataLawt[i][2]
-                  && dataLawt[i][1] == paramsHours[1][0])
-                  || (dataLawt[i][2]
-                  && dataLawt[i][1] == paramsHours[1][1])) {
-                  adminTime.hours[0] += Number(dataLawt[i][2].replace(/\,/g, '.'));
-                }
+            if (dataLawt) {
 
-                //= common projectTime =
-               if (dataLawt[i][2]
-                 && dataLawt[i][1] != paramsHours[1][0]
-                 && dataLawt[i][1] != paramsHours[1][1]) {
-                 projectTime.hours[0] += Number(dataLawt[i][2].replace(/\,/g, '.'));
-               }
+              for (let i = 0; i < dataLawt.length; i++) {
+                if (dataLawt[i][0] && Number(dataLawt[i][0].substr(3, 2)) == paramsHours[0]) {
 
-                //= direction adminTime =
-                if (dataLawt[i][2] && dataLawt[i][1] == paramsHours[1][0]) {
-                  switch(dataLawt[i][4]) {
-                    case paramsHours[2][0]:
-                      adminTime.hours[1] += Number(dataLawt[i][2].replace(/\,/g, '.'));
-                      break;
-                    case paramsHours[2][1]:
-                      adminTime.hours[2] += Number(dataLawt[i][2].replace(/\,/g, '.'));
-                      break;
-                    case paramsHours[2][2]:
-                      adminTime.hours[3] += Number(dataLawt[i][2].replace(/\,/g, '.'));
-                      break;
-                    default:
-                      break;
+                  //= common adminTime =
+                  if ((dataLawt[i][2]
+                    && dataLawt[i][1] == paramsHours[1][0])
+                    || (dataLawt[i][2]
+                    && dataLawt[i][1] == paramsHours[1][1])) {
+                    adminTime.hours[0] += Number(dataLawt[i][2].replace(/\,/g, '.'));
                   }
-                } else if (dataLawt[i][2] && dataLawt[i][1] == paramsHours[1][1] &&  dataLawt[i][4] == paramsHours[2][0]) {
-                    adminTime.hours[4] += Number(dataLawt[i][2].replace(/\,/g, '.'))
-                } else if (dataLawt[i][2] && dataLawt[i][1] == paramsHours[1][1] &&  dataLawt[i][4] == paramsHours[2][2]) {
-                    adminTime.hours[5] += Number(dataLawt[i][2].replace(/\,/g, '.'))
-                }
 
-                //= direction projectTime =
+                  //= common projectTime =
+                 if (dataLawt[i][2]
+                   && dataLawt[i][1] != paramsHours[1][0]
+                   && dataLawt[i][1] != paramsHours[1][1]) {
+                   projectTime.hours[0] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                 }
 
-                if (dataLawt[i][2]) {
-                  switch(dataLawt[i][1]) {
-                    case paramsHours[3][0]:
-                        projectTime.hours[1] += Number(dataLawt[i][2].replace(/\,/g, '.'));
-                      break;
-                    case paramsHours[3][1]:
-                      projectTime.hours[2] += Number(dataLawt[i][2].replace(/\,/g, '.'));
-                      break;
-                    case paramsHours[3][2]:
-                      projectTime.hours[3] += Number(dataLawt[i][2].replace(/\,/g, '.'));
-                      break;
-                    case paramsHours[3][3]:
-                      projectTime.hours[4] += Number(dataLawt[i][2].replace(/\,/g, '.'));
-                      break;
-                    case paramsHours[3][4]:
-                      projectTime.hours[5] += Number(dataLawt[i][2].replace(/\,/g, '.'));
-                      break;
-                    case paramsHours[3][5]:
-                      projectTime.hours[6] += Number(dataLawt[i][2].replace(/\,/g, '.'));
-                      break;
-                    default:
-                      break;
+                  //= direction adminTime =
+                  if (dataLawt[i][2] && dataLawt[i][1] == paramsHours[1][0]) {
+                    switch(dataLawt[i][4]) {
+                      case paramsHours[2][0]:
+                        adminTime.hours[1] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                        break;
+                      case paramsHours[2][1]:
+                        adminTime.hours[2] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                        break;
+                      case paramsHours[2][2]:
+                        adminTime.hours[3] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                        break;
+                      default:
+                        break;
+                    }
+                  } else if (dataLawt[i][2] && dataLawt[i][1] == paramsHours[1][1] &&  dataLawt[i][4] == paramsHours[2][0]) {
+                      adminTime.hours[4] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                  } else if (dataLawt[i][2] && dataLawt[i][1] == paramsHours[1][1] &&  dataLawt[i][4] == paramsHours[2][2]) {
+                      adminTime.hours[5] += Number(dataLawt[i][2].replace(/\,/g, '.'));
                   }
-                }
 
-                if (dataLawt[i][1]) {
-                  if (dataLawt[i][1].indexOf(paramsHours[3][6]) !== -1 && dataLawt[i][2]) {
-                    projectTime.hours[7] += Number(dataLawt[i][2].replace(/\,/g, '.'));
-                  } else if (dataLawt[i][1].indexOf(paramsHours[3][7]) !== -1 && dataLawt[i][2]) {
-                    projectTime.hours[7] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                  //= direction projectTime =
+
+                  if (dataLawt[i][2]) {
+                    switch(dataLawt[i][1]) {
+                      case paramsHours[3][0]:
+                          projectTime.hours[1] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                        break;
+                      case paramsHours[3][1]:
+                        projectTime.hours[2] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                        break;
+                      case paramsHours[3][2]:
+                        projectTime.hours[3] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                        break;
+                      case paramsHours[3][3]:
+                        projectTime.hours[4] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                        break;
+                      case paramsHours[3][4]:
+                        projectTime.hours[5] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                        break;
+                      case paramsHours[3][5]:
+                        projectTime.hours[6] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                        break;
+                      default:
+                        break;
+                    }
                   }
-                }
 
-              } //end if current month
-            } //end months
+                  if (dataLawt[i][1]) {
+                    if (dataLawt[i][1].indexOf(paramsHours[3][6]) !== -1 && dataLawt[i][2]) {
+                      projectTime.hours[7] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                    } else if (dataLawt[i][1].indexOf(paramsHours[3][7]) !== -1 && dataLawt[i][2]) {
+                      projectTime.hours[7] += Number(dataLawt[i][2].replace(/\,/g, '.'));
+                    }
+                  }
+
+                } //end if current month
+              } //end months
+            }
 
             valuesCommonTime.push(adminTime.hours.concat(projectTime.hours));
 
@@ -266,6 +275,7 @@ async function salaryDistrib() {
           }
 
           range = list.distrib[d] + '!Q' + START + ':AD';
+
           await crud.updateData(valuesCommonTimeFinal, config.sid_2017.salary, range)
           //  .then(async (results) => {console.log(results);})
             .catch(console.log);
@@ -295,7 +305,7 @@ async function salaryDistrib() {
                   dataDistribDir[i][j] = '-' + dataDistribDir[i][j].replace(/\s/g, '');
                   dataDistribDir[i][j] = Number(dataDistribDir[i][j]);
                 } else if (dataDistribDir[i][j] && dataDistribDir[i][j].trim() != '-') {
-                  dataDistribDir[i][j] = Number(dataDistribDir[i][j].replace(/\s/g, ''))
+                  dataDistribDir[i][j] = Number(dataDistribDir[i][j].replace(/\s/g, ''));
                 } else {
                   dataDistribDir[i][j] = 0;
                 }
@@ -314,7 +324,7 @@ async function salaryDistrib() {
                   if (dataDistribDir[0][d] == key) {
                     dataDistribDir[i][d]
                       ? salaryDirection[key][i - 1][0] += Number(dataDistribDir[i][d])
-                      : salaryDirection[key][i - 1][0] += 0
+                      : salaryDirection[key][i - 1][0] += 0;
                   }
                 }
               }
@@ -349,8 +359,6 @@ async function salaryDistrib() {
 
             }
 
-            //console.log(salaryDistrib);
-
             let zeroArray = [];
 
             for (let i = 0; i < 70; i++) {
@@ -379,18 +387,16 @@ async function salaryDistrib() {
             //  .then(async (results) => {console.log(results);})
               .catch(console.log);
 
-          }
-
-          resolve('complite!');
+          } //end " > 2"
 
           console.log('======== Распределение ' + (d + 1) + ' ========');
         } // End distribution
 
         //----------------------------------------------------------------------
 
-      // } catch (e) {
-      //   reject(e.stack);
-      // }
+      } catch (e) {
+        reject(e.stack);
+      }
 
       //------------------------------------------------------------------------
       // Update date-time in "Monitoring"

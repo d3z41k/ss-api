@@ -41,7 +41,7 @@ async function finState(nowMonths) {
 
       const crud = new Crud(auth);
       const START = 8;
-      const END = 98;
+      const END = 100;
 
       let range = '';
       let range1 = '';
@@ -223,7 +223,7 @@ async function finState(nowMonths) {
             });
 
             await Promise.all(arrFuncions)
-              //.then(async (results) => {console.log(results);})
+            //  .then(async (results) => {console.log(results);})
               .catch(console.log);
 
           } //end divisions
