@@ -36,6 +36,11 @@ router.get('/sales', async ctx => {
   const seo = require('./ss-scripts-2017-1/seo');
   ctx.body = await seo();
 
+}).get('/seo-reg', async ctx => {
+
+  const seoReg = require('./ss-scripts-2017-1/seo-reg');
+  ctx.body = await seoReg();
+
 }).get('/seo-lawt', async ctx => {
 
   const seoLawt = require('./ss-scripts-2017-1/seo-lawt');
@@ -175,6 +180,11 @@ router.get('/sales', async ctx => {
 
   const finModelBalance = require('./ss-scripts-2017-1/fin-model-balance');
   ctx.body = await finModelBalance();
+
+}).get('/lawt-hours', async ctx => {
+
+  const lawtHours = require('./ss-scripts-2017-1/lawt-hours');
+  ctx.body = await lawtHours();
 
 }).get('/lawt-underwork', async ctx => {
 

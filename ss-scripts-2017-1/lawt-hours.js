@@ -2,7 +2,7 @@
 
 const config = require('config');
 
-async function lawtUnderwork() {
+async function lawtHours() {
   return new Promise(async (resolve, reject) => {
 
     //-------------------------------------------------------------------------
@@ -22,17 +22,18 @@ async function lawtUnderwork() {
       const crud = new Crud(auth);
 
       let range = '';
-      let valueUnderworkAll = [];
+      let valueHoursAll = [];
       const START = 10;
+      const MONTHS = ['1', '2', '3', '4', '5' ,'6'];
 
       let list = {
-        'underwork': encodeURIComponent('Переработки'),
+        'hoursWorked': encodeURIComponent('Отработанные часы'),
         'listName': function(name) {
           return encodeURIComponent(name);
         }
       };
 
-      range = list.underwork + '!A2:A';
+      range = list.hoursWorked + '!A3:A';
       let stuff = await crud.readData(config.sid_2017.lawt, range);
 
       stuff = stuff.map(employee => {
@@ -41,32 +42,39 @@ async function lawtUnderwork() {
 
       for (let e = 0; e < stuff.length; e++) {
 
-        try {
-          range = list.listName(stuff[e]) + '!A' + START + ':AD';
-          let dataUnderworkRaw = await crud.readData(config.sid_2017.lawt, range);
+        console.log(stuff[e]);
 
-          let dataUnderwork = dataUnderworkRaw.map((row) => {
-            return [row[2], row[27], row[29]];
+        try {
+
+          range = list.listName(stuff[e]) + '!A' + START + ':AB';
+          let dataHoursRaw = await crud.readData(config.sid_2017.lawt, range);
+
+          let dataHours = dataHoursRaw.map((row) => {
+            return [row[2], row[27]];
           });
 
-          //console.log(dataUnderwork);
-          let valueUnderwork = [0, 0, 0, 0, 0, 0];
+          //console.log(dataHours);
+          let valueHours = [0, 0, 0, 0, 0, 0];
 
-          dataUnderwork.forEach(line => {
-            if (line[2]) {
-              valueUnderwork[line[1] - 1] += Number(line[0].replace(/\,/g, '.'));
+          dataHours.forEach(line => {
+            if (MONTHS.includes(line[1])) {
+              valueHours[line[1] - 1] += Number(line[0].replace(/\,/g, '.'));
             }
           });
 
-          valueUnderworkAll.push(valueUnderwork);
+          console.log(valueHours);
+Д
+          valueHoursAll.push(valueHours);
+
         } catch (e) {
           reject(e.stack);
         }
+
       } //end staff
 
-      range = list.underwork + '!B2:G';
+      range = list.hoursWorked + '!B3:G';
 
-      await crud.updateData(valueUnderworkAll, config.sid_2017.lawt, range)
+      await crud.updateData(valueHoursAll, config.sid_2017.lawt, range)
         //.then(async result => {console.log(result);})
         .catch(console.err);
 
@@ -88,4 +96,4 @@ async function lawtUnderwork() {
   });
 }
 
-module.exports = lawtUnderwork;
+module.exports = lawtHours;
