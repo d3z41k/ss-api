@@ -1,0 +1,114 @@
+'use strict';
+
+const config = require('config');
+
+async function amo() {
+  return new Promise(async(resolve, reject) => {
+
+    //-------------------------------------------------------------------------
+    // Usres libs
+    //-------------------------------------------------------------------------
+
+    require('../libs/auth')(start);
+    const Crud = require('../controllers/crud');
+    const formatDate = require('../libs/format-date');
+    //const normLength = require('../libs/normalize-length');
+    const dbRefresh = require('../models-2017-2/db_refresh');
+    const pool = require('../models-2017-2/db_pool');
+    const amoQuery = require('../models/db_amo-query');
+
+    //---------------------------------------------------------------
+    // Main function
+    //---------------------------------------------------------------
+
+    async function start(auth) {
+
+      const crud = new Crud(auth);
+      const START = 12;
+
+      let list = '';
+      let range = '';
+
+      //-------------------------------------------------------------
+      // Read data from DDS and refresh DB
+      //-------------------------------------------------------------
+
+      list = encodeURIComponent('ДДС_Лера');
+      range = list + '!A6:V';
+      let ddsData = await crud.readData(config.sid_2017_2.dds, range);
+
+      // = Normalizing of length "srcRows" =
+      //normLength(srcRows);
+
+       await dbRefresh(pool, 'dds_lera', ddsData)
+        .then(async (result) => {console.log(result);})
+        .catch(console.log);
+
+      //------------------------------------------------------------------------
+      // Get data from 'dev-registry'
+      //------------------------------------------------------------------------
+
+      list = encodeURIComponent('Клиенты (AMO)');
+      range = list + '!B1:U';
+      let amoClients = await crud.readData(config.sid_2017_2.amo, range);
+
+      //------------------------------------------------------------------------
+      // Build paramsAmoCients and get & update Pay & date in amo clients
+      //------------------------------------------------------------------------
+
+      let paramsAmoCients = [[], [], [], []];
+
+      try {
+
+        //= Build params =
+        for (let a = (START - 1); a < amoClients.length; a++) {
+          if (amoClients[a][0] && amoClients[a][1] && amoClients[a][3]) {
+            paramsAmoCients[0].push(amoClients[a][0]);
+            paramsAmoCients[1].push(amoClients[a][1]);
+            paramsAmoCients[2].push(amoClients[a][3]);
+          } else {
+            paramsAmoCients[0].push(' ');
+            paramsAmoCients[1].push(' ');
+            paramsAmoCients[2].push(' ');
+          }
+        }
+
+        paramsAmoCients[3].push(amoClients[8][14], amoClients[8][18]);
+
+        //= Get values =
+        let values = await amoQuery(pool, 'dds_lera', paramsAmoCients);
+
+        //= Update data =
+        let prePayRange = list + '!P' + START + ':Q' + (values[0].length + START);
+        let addPayRange = list + '!T' + START + ':U' + (values[1].length + START);
+
+        await Promise.all([
+          crud.updateData(values[0], config.sid_2017_2.amo, prePayRange),
+          crud.updateData(values[1], config.sid_2017_2.amo, addPayRange)
+        ])
+          .then(async results => {console.log(results);})
+          .catch(console.log);
+
+      } catch (e) {
+        reject(e.stack);
+      }
+
+      //------------------------------------------------------------------------
+      // Update date-time in "Monitoring"
+      //------------------------------------------------------------------------
+
+      range = 'main!B9';
+
+      let now = new Date();
+      now = [[formatDate(now)]];
+
+      await crud.updateData(now, config.sid_2017_2.monit, range);
+
+    } // = End start function =
+
+    resolve('complite!');
+
+  });
+}
+
+module.exports = amo;
