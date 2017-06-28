@@ -11,7 +11,7 @@ async function dds_mon(mon) {
 
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
-    const pool = require('../models-2017-1/db_pool');
+    const pool = require('../models-2017-2/db_pool');
     const dds_monQuery = require('../models/db_dds_mon-query');
 
     //---------------------------------------------------------------
@@ -26,7 +26,7 @@ async function dds_mon(mon) {
       const END = 100;
       const DIRECTIONS = config.directions.common_cut;
       const DEC = '(декада)';
-      const SIDS = config.sid_2017.dds_mon;
+      const SIDS = config.sid_2017_2.dds_mon;
 
       let list = '';
       let range = '';
@@ -153,7 +153,7 @@ async function dds_mon(mon) {
       // let now = new Date();
       // now = [[formatDate(now)]];
       //
-      // await crud.updateData(now, config.sid_2017.monit, range);
+      // await crud.updateData(now, config.sid_2017_2.monit, range);
 
 
     } // = End start function =

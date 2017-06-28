@@ -14,8 +14,8 @@ async function dds_monIndirect(mon) {
     const formatDate = require('../libs/format-date');
     const normalizeMinus = require('../libs/normalize-minus');
     //const normLength = require('../libs/normalize-length');
-    const dbRefresh = require('../models-2017-1/db_refresh');
-    const pool = require('../models-2017-1/db_pool');
+    const dbRefresh = require('../models-2017-2/db_refresh');
+    const pool = require('../models-2017-2/db_pool');
     const dds_indirectQuery = require('../models/db_dds-indirect-query');
 
     //-------------------------------------------------------------------------
@@ -26,7 +26,7 @@ async function dds_monIndirect(mon) {
 
       const crud = new Crud(auth);
 
-      const SIDS = config.sid_2017.dds_mon;
+      const SIDS = config.sid_2017_2.dds_mon;
       const START = 9;
       const MONTHS = config.months;
       const DECS = [1, 2, 3];
@@ -54,7 +54,7 @@ async function dds_monIndirect(mon) {
       list = encodeURIComponent('Спр');
       range = list + '!J2:J100';
 
-      let dataManDDS = await crud.readData(config.sid_2017.dds, range);
+      let dataManDDS = await crud.readData(config.sid_2017_2.dds, range);
 
       range = list + '!A1:A';
 
@@ -94,8 +94,8 @@ async function dds_monIndirect(mon) {
       range2 = list + '!' + colsFact.start + '1:' + colsFact.end;
 
       await Promise.all([
-        crud.readData(config.sid_2017.fin_model, range1),
-        crud.readData(config.sid_2017.indirect, range2)
+        crud.readData(config.sid_2017_2.fin_model, range1),
+        crud.readData(config.sid_2017_2.indirect, range2)
       ])
         .then(async ([plan, fact]) => {
            dataPlan = plan;
@@ -215,8 +215,8 @@ async function dds_monIndirect(mon) {
       range2 = list + '!A6:AD';
 
       await Promise.all([
-        crud.readData(config.sid_2017.dds, range1),
-        crud.readData(config.sid_2017.dds, range2)
+        crud.readData(config.sid_2017_2.dds, range1),
+        crud.readData(config.sid_2017_2.dds, range2)
       ])
        .then(async ([dds_lera, dds_olga]) => {
           dataDDS.lera = dds_lera;
@@ -368,22 +368,22 @@ async function dds_monIndirect(mon) {
     let monRange;
 
     switch (mon[0]) {
-      case 'Jan':
+      case 'Jul':
         monRange = 'main!B24';
         break;
-      case 'Feb':
+      case 'Aug':
         monRange = 'main!B25';
         break;
-      case 'Mar':
+      case 'Sep':
         monRange = 'main!B26';
         break;
-      case 'Apr':
+      case 'Oct':
         monRange = 'main!B27';
         break;
-      case 'May':
+      case 'Nov':
         monRange = 'main!B28';
         break;
-      case 'Jun':
+      case 'Dec':
         monRange = 'main!B29';
         break;
     }
@@ -391,7 +391,7 @@ async function dds_monIndirect(mon) {
     let now = new Date();
     now = [[formatDate(now)]];
 
-    await crud.updateData(now, config.sid_2017.monit, monRange);
+    await crud.updateData(now, config.sid_2017_2.monit, monRange);
 
     } // = End start function =
 

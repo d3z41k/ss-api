@@ -28,7 +28,7 @@ async function serv() {
       let list = '';
       let range = '';
       const START = 7;
-      const MONTHS = [1, 2, 3, 4, 5, 6];
+      const MONTHS = ['1', '2', '3', '4', '5', '6'];
       const colMonths = config.serv_colMonths_2017;
 
       //-----------------------------------------------------------------------
@@ -88,7 +88,6 @@ async function serv() {
             //console.log(paramsServCients);
 
             let values = await servQuery(pool, 'dds_olga', paramsServCients);
-
 
             let sellPayRange = list + '!' + colMonths[m][0] + START + ':' + colMonths[m][0] + (values[0].length + START);
             let prePayRange = list + '!' + colMonths[m][1] + START + ':' + colMonths[m][1] + (values[0].length + START);

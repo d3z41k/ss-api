@@ -15,8 +15,8 @@ async function dds_monSalary(mon) {
     const normalizeMinus = require('../libs/normalize-minus');
     const sleep = require('../libs/sleep');
     //const normLength = require('../libs/normalize-length');
-    const dbRefresh = require('../models-2017-1/db_refresh');
-    const pool = require('../models-2017-1/db_pool');
+    const dbRefresh = require('../models-2017-2/db_refresh');
+    const pool = require('../models-2017-2/db_pool');
     const dds_salaryQuery = require('../models/db_dds-salary-query');
 
     //-------------------------------------------------------------------------
@@ -27,7 +27,7 @@ async function dds_monSalary(mon) {
 
       const crud = new Crud(auth);
 
-      const SIDS = config.sid_2017.dds_mon;
+      const SIDS = config.sid_2017_2.dds_mon;
       const START = 9;
       const MONTHS = config.months;
       const DECS = [1, 2, 3];
@@ -38,15 +38,11 @@ async function dds_monSalary(mon) {
       let range = '';
       let range1 = '';
       let range2 = '';
-      let dataDDS = {
-        'lera': '',
-        'olga': ''
-      };
 
       list = encodeURIComponent('ФОТ (план)');
       range = list + '!B6:N69';
 
-      let dataReport = await crud.readData(config.sid_2017.fin_model, range);
+      let dataReport = await crud.readData(config.sid_2017_2.fin_model, range);
 
       let prepairDataReport = [];
 
@@ -124,8 +120,8 @@ async function dds_monSalary(mon) {
       range2 = list + '!' + colsFact.start + '1:' + colsFact.end;
 
       await Promise.all([
-        crud.readData(config.sid_2017.fin_model, range1),
-        crud.readData(config.sid_2017.salary, range2)
+        crud.readData(config.sid_2017_2.fin_model, range1),
+        crud.readData(config.sid_2017_2.salary, range2)
       ])
         .then(async ([plan, fact]) => {
            dataPlan = plan;
@@ -242,37 +238,6 @@ async function dds_monSalary(mon) {
         .then(async (results) => {console.log(results);})
         .catch(console.log);
 
-      //-------------------------------------------------------------
-      // Read data from dds_lera to RAM
-      //-------------------------------------------------------------
-
-      // list = encodeURIComponent('ДДС_Лера');
-      // range1 = list + '!A6:V';
-      //
-      // list = encodeURIComponent('ДДС_Ольга');
-      // range2 = list + '!A6:AD';
-      //
-      // await Promise.all([
-      //   crud.readData(config.sid_2017.dds, range1),
-      //   crud.readData(config.sid_2017.dds, range2)
-      // ])
-      //  .then(async ([dds_lera, dds_olga]) => {
-      //     dataDDS.lera = dds_lera;
-      //     dataDDS.olga = dds_olga;
-      //   })
-      //   .catch(console.log);
-      //
-      // //--------------------------------------------------------------------
-      // // Refresh table
-      // //--------------------------------------------------------------------
-      //
-      // await Promise.all([
-      //   dbRefresh(pool, 'dds_lera', dataDDS.lera),
-      //   dbRefresh(pool, 'dds_olga', dataDDS.olga)
-      // ])
-      //   //.then(async (results) => {console.log(results);})
-      //   .catch(console.log);
-
       //--------------------------------------------------------------------
       // Build paramsSalaryDDS and get & update
       //--------------------------------------------------------------------
@@ -364,7 +329,7 @@ async function dds_monSalary(mon) {
     let now = new Date();
     now = [[formatDate(now)]];
 
-    await crud.updateData(now, config.sid_2017.monit, range);
+    await crud.updateData(now, config.sid_2017_2.monit, range);
 
     } // = End start function =
 

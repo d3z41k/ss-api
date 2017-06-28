@@ -12,8 +12,8 @@ async function inflow(month) {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
-    const dbRefresh = require('../models-2017-1/db_refresh');
-    const pool = require('../models-2017-1/db_pool');
+    const dbRefresh = require('../models-2017-2/db_refresh');
+    const pool = require('../models-2017-2/db_pool');
     const inflowQuery = require('../models/db_inflow-query');
 
     //---------------------------------------------------------------
@@ -46,8 +46,8 @@ async function inflow(month) {
       range2 = list + '!A6:AD';
 
       await Promise.all([
-        crud.readData(config.sid_2017.dds, range1),
-        crud.readData(config.sid_2017.dds, range2)
+        crud.readData(config.sid_2017_2.dds, range1),
+        crud.readData(config.sid_2017_2.dds, range2)
       ])
        .then(async ([dds_lera, dds_olga]) => {
           srcRows.lera = dds_lera;
@@ -80,8 +80,8 @@ async function inflow(month) {
       let forecast;
 
       await Promise.all([
-        crud.readData(config.sid_2017.fin_model, range1),
-        crud.readData(config.sid_2017.fin_model, range2)
+        crud.readData(config.sid_2017_2.fin_model, range1),
+        crud.readData(config.sid_2017_2.fin_model, range2)
       ]).then(async ([par, forc]) => {
           parishes = par;
           forecast = forc;
@@ -96,7 +96,7 @@ async function inflow(month) {
       list = encodeURIComponent(RU_MONTHS[month][1]);
       range = list + '!B1:T95';
 
-      let inflow = await crud.readData(config.sid_2017.inflow, range);
+      let inflow = await crud.readData(config.sid_2017_2.inflow, range);
 
       //= Build params and get values for parishes & forecast =
 
@@ -178,9 +178,9 @@ async function inflow(month) {
           for (let d = 1; d < 4; d++) {
 
             await Promise.all([
-              crud.updateData(values[division][d], config.sid_2017.inflow,
+              crud.updateData(values[division][d], config.sid_2017_2.inflow,
                 list + '!' + COLS[d][0] + values[division].range[0] + ':' + COLS[d][0] + values[division].range[1]),
-              crud.updateData(sum[d - 1], config.sid_2017.inflow,
+              crud.updateData(sum[d - 1], config.sid_2017_2.inflow,
                 list + '!' + COLS[d][1] + values[division].range[0] + ':' + COLS[d][1] + values[division].range[1])
             ])
               //.then(async results => {console.log(results);})
@@ -188,7 +188,7 @@ async function inflow(month) {
 
           }
 
-          await crud.updateData(values[division]['check'], config.sid_2017.inflow,
+          await crud.updateData(values[division]['check'], config.sid_2017_2.inflow,
           list + '!' + COLS['check'] + values[division].range[0] + ':' + COLS['check'] + values[division].range[1])
             //.then(async results => {console.log(results);})
             .catch(console.log);
@@ -208,7 +208,7 @@ async function inflow(month) {
       let now = new Date();
       now = [[formatDate(now)]];
 
-      await crud.updateData(now, config.sid_2017.monit, range);
+      await crud.updateData(now, config.sid_2017_2.monit, range);
 
       resolve('complite!');
 
