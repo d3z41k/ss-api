@@ -148,7 +148,12 @@ router.get('/sales', async ctx => {
   let mon = [ctx.params.mon];
   ctx.body = await dds_mon(mon);
 
-}).get('/dds_mon-salary/:mon', async ctx => {
+}).get('/dds_replication', async ctx => {
+
+  const ddsReplication = require('./ss-scripts-2017-2/dds_replication');
+  ctx.body = await ddsReplication();
+
+})get('/dds_mon-salary/:mon', async ctx => {
 
   const dds_monSalary = require('./ss-scripts-2017-2/dds_mon-salary');
   let mon = [ctx.params.mon];

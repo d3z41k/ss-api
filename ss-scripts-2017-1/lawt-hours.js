@@ -42,8 +42,6 @@ async function lawtHours() {
 
       for (let e = 0; e < stuff.length; e++) {
 
-        console.log(stuff[e]);
-
         try {
 
           range = list.listName(stuff[e]) + '!A' + START + ':AB';
@@ -52,6 +50,8 @@ async function lawtHours() {
           let dataHours = dataHoursRaw.map((row) => {
             return [row[2], row[27]];
           });
+
+
 
           //console.log(dataHours);
           let valueHours = [0, 0, 0, 0, 0, 0];
@@ -62,8 +62,6 @@ async function lawtHours() {
             }
           });
 
-          console.log(valueHours);
-Д
           valueHoursAll.push(valueHours);
 
         } catch (e) {

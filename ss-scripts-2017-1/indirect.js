@@ -23,12 +23,12 @@ async function indirect(months) {
     // Fetch months
     //--------------------------------------------------------------------------
 
-    let mode = false;
-
-    if (!arguments.length) {
-      mode = true;
-      months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-    }
+    // let mode = false;
+    //
+    // if (!arguments.length) {
+    //   mode = true;
+    //   months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    // }
 
     //--------------------------------------------------------------------------
     // Main function
@@ -50,6 +50,13 @@ async function indirect(months) {
         lera: '',
         olga: ''
       };
+
+      let mode = false;
+
+      if (!months) {
+        mode = true;
+        months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+      }
 
       // //-------------------------------------------------------------
       // // Read data from dds_lera to RAM

@@ -23,12 +23,12 @@ async function salary(months) {
     // Fetch months
     //--------------------------------------------------------------------------
 
-    let mode = false;
-
-    if (!arguments.length) {
-      mode = true;
-      months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-    }
+    // let mode = false;
+    //
+    // if (!arguments.length) {
+    //   mode = true;
+    //   months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    // }
 
     //--------------------------------------------------------------------------
     // Main function
@@ -49,6 +49,13 @@ async function salary(months) {
         'lera': '',
         'olga': ''
       };
+
+      let mode = false;
+
+      if (!months) {
+        mode = true;
+        months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+      }
 
       //------------------------------------------------------------------------
       // Read data from dds_lera to RAM
@@ -220,13 +227,15 @@ async function salary(months) {
 
         //= Update data for Common =
         await Promise.all(arrFuncions_C)
-        //  .then(async (results) => {console.log(results);})
+          .then(async (results) => {console.log(results);})
           .catch(console.log);
 
         //= Update data for Directions =
         await Promise.all(arrFuncions_D)
-        //  .then(async (results) => {console.log(results);})
+          .then(async (results) => {console.log(results);})
           .catch(console.log);
+
+
 
       } catch (e) {
         reject(e.stack);
@@ -236,6 +245,8 @@ async function salary(months) {
       // Update date-time in "Monitoring"
       //------------------------------------------------------------------------
 
+      resolve('complite!');
+
       if (mode) {
         range = 'main!B15';
       } else {
@@ -244,8 +255,6 @@ async function salary(months) {
       let now = new Date();
       now = [[formatDate(now)]];
       await crud.updateData(now, config.sid_2017.monit, range);
-
-      resolve('complite!');
 
     } // = End start function =
 

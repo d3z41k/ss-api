@@ -15,20 +15,20 @@ async function salary(months) {
     const formatDate = require('../libs/format-date');
     //const sleep = require('../libs/sleep');
     //const normLength = require('../libs/normalize-length');
-    const dbRefresh = require('../models-2017-1/db_refresh');
-    const pool = require('../models-2017-1/db_pool');
+    const dbRefresh = require('../models-2017-2/db_refresh');
+    const pool = require('../models-2017-2/db_pool');
     const salaryQuery = require('../models/db_salary-query');
 
     //--------------------------------------------------------------------------
     // Fetch months
     //--------------------------------------------------------------------------
 
-    let mode = false;
-
-    if (!arguments.length) {
-      mode = true;
-      months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-    }
+    // let mode = false;
+    //
+    // if (!arguments.length) {
+    //   mode = true;
+    //   months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    // }
 
     //--------------------------------------------------------------------------
     // Main function
@@ -50,6 +50,13 @@ async function salary(months) {
         'olga': ''
       };
 
+      let mode = false;
+
+      if (!months) {
+        mode = true;
+        months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      }
+
       //------------------------------------------------------------------------
       // Read data from dds_lera to RAM
       //------------------------------------------------------------------------
@@ -61,8 +68,8 @@ async function salary(months) {
       range2 = list + '!A6:AD';
 
       await Promise.all([
-        crud.readData(config.sid_2017.dds, range1),
-        crud.readData(config.sid_2017.dds, range2)
+        crud.readData(config.sid_2017_2.dds, range1),
+        crud.readData(config.sid_2017_2.dds, range2)
       ])
        .then(async ([dds_lera, dds_olga]) => {
           srcRows.lera = dds_lera;
@@ -87,7 +94,7 @@ async function salary(months) {
 
       list = encodeURIComponent('ФОТ (факт)');
       range = list + '!B1:E';
-      let dataSalary = await crud.readData(config.sid_2017.salary, range);
+      let dataSalary = await crud.readData(config.sid_2017_2.salary, range);
 
       //------------------------------------------------------------------------
       // Build paramsSlary and get & update Salary
@@ -206,7 +213,7 @@ async function salary(months) {
         });
 
         sumCommon.forEach((arrValues, i)=> {
-          arrFuncions_C.push(crud.updateData(arrValues, config.sid_2017.salary, arrRange_C[i]));
+          arrFuncions_C.push(crud.updateData(arrValues, config.sid_2017_2.salary, arrRange_C[i]));
         });
 
         //= Prepare array of Range & Functions for Direcions =
@@ -215,7 +222,7 @@ async function salary(months) {
         });
 
         zipValues.forEach((arrValues, i)=> {
-          arrFuncions_D.push(crud.updateData(arrValues, config.sid_2017.salary, arrRange_D[i]));
+          arrFuncions_D.push(crud.updateData(arrValues, config.sid_2017_2.salary, arrRange_D[i]));
         });
 
         //= Update data for Common =
@@ -243,7 +250,7 @@ async function salary(months) {
       }
       let now = new Date();
       now = [[formatDate(now)]];
-      await crud.updateData(now, config.sid_2017.monit, range);
+      await crud.updateData(now, config.sid_2017_2.monit, range);
 
       resolve('complite!');
 

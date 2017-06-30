@@ -13,7 +13,7 @@ async function profi2(months) {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
-    //const sleep = require('../libs/sleep');
+    const sleep = require('../libs/sleep');
     //const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models-2017-2/db_refresh');
     const pool = require('../models-2017-2/db_pool');
@@ -26,7 +26,7 @@ async function profi2(months) {
     // Fetch months
     //-------------------------------------------------------------
 
-    let colMonths = config.profi_MonCols_2017;
+    let colMonths = config.profi_MonCols_2017_2;
     let nowMonths  = {};
     let mode = 0;
 
@@ -68,7 +68,7 @@ async function profi2(months) {
 
       //---------------------------------------------------------------
 
-      //try {
+      try {
 
         //--------------------------------------------------------------
         // Build *static* Profi params
@@ -341,11 +341,13 @@ async function profi2(months) {
 
           resolve('complite!');
 
+          await sleep(15000);
+
         } //= End directions =
 
-      // } catch (e) {
-      //   reject(e.stack);
-      // }
+      } catch (e) {
+        reject(e.stack);
+      }
 
       //console.log('finish');
 

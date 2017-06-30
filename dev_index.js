@@ -118,6 +118,16 @@ router.get('/sales', async ctx => {
   let mon = [ctx.params.mon];
   ctx.body = await dds_monIndirect(mon);
 
+}).get('/dds_directory', async ctx => {
+
+  const ddsDirectory = require('./ss-scripts-2017-2/dds_directory');
+  ctx.body = await ddsDirectory();
+
+}).get('/dds_replication', async ctx => {
+
+  const ddsReplication = require('./ss-scripts-2017-1/dds_replication');
+  ctx.body = await ddsReplication();
+
 }).get('/profi_kz', async ctx => {
 
   const profi_kz = require('./ss-scripts-2017-1/profi_kz');

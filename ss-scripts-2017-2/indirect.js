@@ -15,20 +15,20 @@ async function indirect(months) {
     const formatDate = require('../libs/format-date');
     const sleep = require('../libs/sleep');
     //const normLength = require('../libs/normalize-length');
-    const dbRefresh = require('../models-2017-1/db_refresh');
-    const pool = require('../models-2017-1/db_pool');
+    const dbRefresh = require('../models-2017-2/db_refresh');
+    const pool = require('../models-2017-2/db_pool');
     const indirectQuery = require('../models/db_indirect-query');
 
     //--------------------------------------------------------------------------
     // Fetch months
     //--------------------------------------------------------------------------
 
-    let mode = false;
-
-    if (!arguments.length) {
-      mode = true;
-      months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-    }
+    // let mode = false;
+    //
+    // if (!arguments.length) {
+    //   mode = true;
+    //   months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    // }
 
     //--------------------------------------------------------------------------
     // Main function
@@ -47,13 +47,20 @@ async function indirect(months) {
       let range1 = '';
       let range2 = '';
 
+      let mode = false;
+
+      if (!months) {
+        mode = true;
+        months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      }
+
       //------------------------------------------------------------------------
       // Get data from 'Indirect'
       //------------------------------------------------------------------------
 
       list = encodeURIComponent('Косвенные (факт)');
       range = list + '!A1:E';
-      let dataIndirect = await crud.readData(config.sid_2017.indirect, range);
+      let dataIndirect = await crud.readData(config.sid_2017_2.indirect, range);
 
       //------------------------------------------------------------------------
       // Build paramsIndirect and get & update Indirect
@@ -250,28 +257,28 @@ async function indirect(months) {
               });
 
               zipValues1.forEach((arrValues, i)=> {
-                arrFuncions1.push(crud.updateData(arrValues, config.sid_2017.indirect, arrRange1[i]));
+                arrFuncions1.push(crud.updateData(arrValues, config.sid_2017_2.indirect, arrRange1[i]));
               });
 
               zipValues2.forEach((arrValues, i)=> {
-                arrFuncions2.push(crud.updateData(arrValues, config.sid_2017.indirect, arrRange2[i]));
+                arrFuncions2.push(crud.updateData(arrValues, config.sid_2017_2.indirect, arrRange2[i]));
               });
 
               zipValues3.forEach((arrValues, i)=> {
-                arrFuncions3.push(crud.updateData(arrValues, config.sid_2017.indirect, arrRange3[i]));
+                arrFuncions3.push(crud.updateData(arrValues, config.sid_2017_2.indirect, arrRange3[i]));
               });
 
               //= Async update data for Directions =
               Promise.all(arrFuncions1)
-                .then(async (results) => {console.log(results);})
+              //  .then(async (results) => {console.log(results);})
                 .catch(console.log);
 
               Promise.all(arrFuncions2)
-                .then(async (results) => {console.log(results);})
+              //  .then(async (results) => {console.log(results);})
                 .catch(console.log);
 
               Promise.all(arrFuncions3)
-                .then(async (results) => {console.log(results);})
+              //  .then(async (results) => {console.log(results);})
                 .catch(console.log);
 
             //------------------------------------------------------------------
@@ -294,7 +301,7 @@ async function indirect(months) {
                   });
 
                   zipValues.forEach((arrValues, i)=> {
-                    arrFuncions1.push(crud.updateData(arrValues, config.sid_2017.indirect, arrRange1[i]));
+                    arrFuncions1.push(crud.updateData(arrValues, config.sid_2017_2.indirect, arrRange1[i]));
                   });
 
                   await Promise.all(arrFuncions1)
@@ -335,7 +342,7 @@ async function indirect(months) {
                   });
 
                   zipValues.forEach((arrValues, i)=> {
-                    arrFuncions1.push(crud.updateData(arrValues, config.sid_2017.indirect, arrRange1[i]));
+                    arrFuncions1.push(crud.updateData(arrValues, config.sid_2017_2.indirect, arrRange1[i]));
                   });
 
                   await Promise.all(arrFuncions1)
@@ -364,7 +371,7 @@ async function indirect(months) {
 
       let now = new Date();
       now = [[formatDate(now)]];
-      await crud.updateData(now, config.sid_2017.monit, range);
+      await crud.updateData(now, config.sid_2017_2.monit, range);
 
       resolve('complite!');
 

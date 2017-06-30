@@ -1,15 +1,16 @@
 'use strict';
 
 const config = require('config');
+const formatNumber = require('../libs/format-number');
 
 // Need to expand!!!
 
 async function dbRefresh(pool, tableName, srcRows) {
-  return new Promise(async(resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
 
     await pool.query("TRUNCATE TABLE " + tableName)
       .then(() => {
-        console.log('table ' + tableName + ' truncate - OK!')
+        console.log('The table ' + tableName + ' has been truncated - OK!')
       })
       .catch(err => {
         reject(err)
@@ -23,11 +24,7 @@ async function dbRefresh(pool, tableName, srcRows) {
       srcRows[i].length = config.dds_width[2017][tableName];
 
       if (srcRows[i][5]) {
-        if (srcRows[i][5] && srcRows[i][5][0] == '(' && srcRows[i][5][srcRows[i][5].length - 1] == ')') {
-          srcRows[i][5] = srcRows[i][5].slice(1).slice(0, -1);
-          srcRows[i][5] = '-' + srcRows[i][5];
-        }
-        srcRows[i][5] = Number(srcRows[i][5].replace(/\s/g, ''));
+        srcRows[i][5] = formatNumber(srcRows[i][5]);
       }
 
       if (srcRows[i][21] && srcRows[i][21].includes('→')) {
@@ -47,7 +44,7 @@ async function dbRefresh(pool, tableName, srcRows) {
 
     }
 
-    resolve('table ' + tableName + ' refreshed!');
+    resolve('The table ' + tableName + ' has been replicated!');
 
   });
 }

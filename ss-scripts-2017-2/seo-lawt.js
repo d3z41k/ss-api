@@ -12,6 +12,8 @@ async function seoLawt() {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
+    const formatNumber = require('../libs/format-number');
+    const convertData = require('../libs/convert-data');
 
     //---------------------------------------------------------------
     // Main function
@@ -44,19 +46,8 @@ async function seoLawt() {
         }
       };
 
-      function convertData(date) {
-        const YEAR = 2017;
-        if (date[0].length == 1) {
-          date[0] = '0' + date[0];
-        }
-        if (date[1].length == 1) {
-          date[1] = '0' + date[1];
-        }
-        return date[0] + '.' + date[1] + '.' + YEAR;
-      }
-
       range = list.manual + '!D2:D';
-      let seoStuff = await crud.readData(config.sid_2017.seo_lawt, range);
+      let seoStuff = await crud.readData(config.sid_2017_2.seo_lawt, range);
 
       seoStuff = seoStuff.map(employee => {
         return employee[0];
@@ -65,7 +56,7 @@ async function seoLawt() {
       for (let e = 0; e < seoStuff.length; e++) {
 
         range = list.listName(seoStuff[e]) + '!A2:FF1700';
-        let dataSeo = await crud.readData(config.sid_2017.seo_lawt, range);
+        let dataSeo = await crud.readData(config.sid_2017_2.seo_lawt, range);
 
         let dataHours = [];
         let dataAdminHours = [];
@@ -77,9 +68,9 @@ async function seoLawt() {
               dataHours.push([
                 convertData([dataSeo[2][c], dataSeo[0][c]]),
                 ACTIVITIES.seo,
-                dataSeo[r][c]
+                formatNumber(dataSeo[r][c])
               ]);
-              let direction = dataSeo[r][1]
+              let direction = dataSeo[r][1];
               for (let s = 0; s < colLawtDirections[direction]; s++) {
                 dataHours[counter].push('');
               }
@@ -121,7 +112,7 @@ async function seoLawt() {
 
         range = list.listName(seoStuff[e]) + '!A10:Z';
 
-        await crud.updateData(dataHours, config.sid_2017.lawt, range)
+        await crud.updateData(dataHours, config.sid_2017_2.lawt, range)
         //  .then(async results => {console.log(results);})
           .catch(console.log);
 
@@ -138,7 +129,7 @@ async function seoLawt() {
       let now = new Date();
       now = [[formatDate(now)]];
 
-      await crud.updateData(now, config.sid_2017.monit, range);
+      await crud.updateData(now, config.sid_2017_2.monit, range);
 
     } // = End start function =
 

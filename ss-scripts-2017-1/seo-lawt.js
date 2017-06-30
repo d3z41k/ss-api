@@ -12,6 +12,8 @@ async function seoLawt() {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
+    const formatNumber = require('../libs/format-number');
+    const convertData = require('../libs/convert-data');
 
     //---------------------------------------------------------------
     // Main function
@@ -44,17 +46,6 @@ async function seoLawt() {
         }
       };
 
-      function convertData(date) {
-        const YEAR = 2017;
-        if (date[0].length == 1) {
-          date[0] = '0' + date[0];
-        }
-        if (date[1].length == 1) {
-          date[1] = '0' + date[1];
-        }
-        return date[0] + '.' + date[1] + '.' + YEAR;
-      }
-
       range = list.manual + '!D2:D';
       let seoStuff = await crud.readData(config.sid_2017.seo_lawt, range);
 
@@ -64,7 +55,7 @@ async function seoLawt() {
 
       for (let e = 0; e < seoStuff.length; e++) {
 
-        range = list.listName(seoStuff[e]) + '!A2:FF1700';
+        range = list.listName(seoStuff[e]) + '!A2:GI1700';
         let dataSeo = await crud.readData(config.sid_2017.seo_lawt, range);
 
         let dataHours = [];
@@ -73,16 +64,17 @@ async function seoLawt() {
 
         for (let r = START.row; r < dataSeo.length; r++) {
           for (let c = START.col; c < dataSeo[r].length; c++) {
-            if (dataSeo[r][c] && dataSeo[r][4] == 'факт') {
-              dataHours.push([
-                convertData([dataSeo[2][c], dataSeo[0][c]]),
-                ACTIVITIES.seo,
-                dataSeo[r][c]
-              ]);
-              let direction = dataSeo[r][1]
+            if (dataSeo[r][c] && dataSeo[r][4] == 'факт' && formatNumber(dataSeo[r][c])) {
+                dataHours.push([
+                  convertData([dataSeo[2][c], dataSeo[0][c]]),
+                  ACTIVITIES.seo,
+                  formatNumber(dataSeo[r][c])
+                ]);
+              let direction = dataSeo[r][1];
               for (let s = 0; s < colLawtDirections[direction]; s++) {
                 dataHours[counter].push('');
               }
+
               dataHours[counter].push(dataSeo[r][0]);
               counter++;
             }
