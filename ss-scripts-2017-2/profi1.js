@@ -13,9 +13,6 @@ async function profi1(months) {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
-    const sleep = require('../libs/sleep');
-    //const normLength = require('../libs/normalize-length');
-    const dbRefresh = require('../models-2017-2/db_refresh');
     const pool = require('../models-2017-2/db_pool');
     const profiQuery = require('../models/db_profi-query');
     const profiRentQuery = require('../models/db_profi_rent-ad-query');
@@ -27,15 +24,6 @@ async function profi1(months) {
     //-------------------------------------------------------------
 
     let colMonths = config.profi_MonCols_2017_2;
-    let nowMonths  = {};
-    let mode = 0;
-
-    if (arguments.length) {
-      nowMonths[months[0]] = colMonths[months[0]];
-      nowMonths[months[1]] = colMonths[months[1]];
-      colMonths = nowMonths;
-      mode = 1;
-    }
 
     //----------------------------------------------------------------
     // Main function Start
@@ -49,24 +37,6 @@ async function profi1(months) {
       const START = 8;
 
       let directions = config.directions.profi1;
-
-      // //--------------------------------------------------------------
-      // // Read data from DDS to RAM
-      // //--------------------------------------------------------------
-      //
-      // list = encodeURIComponent('ДДС_Лера');
-      // range = list + '!A6:V';
-      //
-      // let dataDDS = await crud.readData(config.sid_2017_2.dds, range);
-      //
-      // // = Normalizing of length "dataDDS" =
-      // //normLength(dataDDS);
-      //
-      // await dbRefresh(pool, 'dds_lera', dataDDS)
-      // //  .then(async (result) => {console.log(result);})
-      //   .catch(console.log);
-
-      //---------------------------------------------------------------
 
       try {
 
@@ -117,6 +87,12 @@ async function profi1(months) {
 
           if (directions[d] == 'КЗ') {
 
+            let zipValues = [];
+            let zipValues3 = [];
+            let zipValuesAll = [];
+            let arrRangeAll = [];
+            let arrFuncionsAll = [];
+
             //--------------------------------------------------------------
             // Build *dynamic* KZ params
             //--------------------------------------------------------------
@@ -149,10 +125,6 @@ async function profi1(months) {
             // To zip result in stack, prepair array of function and update
             //--------------------------------------------------------------
 
-            let zipValues = [];
-            let arrRange = [];
-            let arrFuncions = [];
-
             //= Zip valuses =
             values.forEach(val => {
               let arrArticles = [];
@@ -168,21 +140,6 @@ async function profi1(months) {
               ));
             });
 
-            //= Prepare array of Range =
-            for (let month in colMonths){
-              arrRange.push(list + '!' + colMonths[month][1][0] + START + ':' + colMonths[month][1][3]);
-            }
-
-            //= Prepare array of Functions =
-            zipValues.forEach((arrValues, i) => {
-              arrFuncions.push(crud.updateData(arrValues, config.sid_2017_2.profi1, arrRange[i]));
-            });
-
-            //= Update data =
-            await Promise.all(arrFuncions)
-              //.then(async (results) => {console.log(results);})
-              .catch(console.log);
-
             //--------------------------------------------------------------
             // To zip result, rend and ad in stack, prepair array of
             // function and update
@@ -195,10 +152,6 @@ async function profi1(months) {
               }
               values3[m][1] = values2[m][3];
             }
-
-            let zipValues3 = [];
-            let arrRange3 = [];
-            let arrFuncions3 = [];
 
             //= Zip valuses =
             values3.forEach(val => {
@@ -213,20 +166,35 @@ async function profi1(months) {
               ));
             });
 
+            //= Concat 2 values array for each month =
+
+            zipValues.forEach(async (monthValues, m) => {
+              zipValuesAll.push([]);
+              monthValues.forEach(async (line, l) => {
+                zipValuesAll[m].push(_.concat(line, zipValues3[m][l]));
+              });
+            });
+
             for (let month in colMonths){
-              arrRange3.push(list + '!' + colMonths[month][1][4] + START + ':' + colMonths[month][1][5]);
+              arrRangeAll.push(list + '!' + colMonths[month][1][0] + START + ':' + colMonths[month][1][5]);
             }
 
-            zipValues3.forEach((arrValues, i)=> {
-              arrFuncions3.push(crud.updateData(arrValues, config.sid_2017_2.profi1, arrRange3[i]));
+            zipValuesAll.forEach((arrValues, i)=> {
+              arrFuncionsAll.push(crud.updateData(arrValues, config.sid_2017.profi1, arrRangeAll[i]));
             });
 
             //= Update data =
-            await Promise.all(arrFuncions3)
-              .then(async (results) => {console.log(results);})
+            await Promise.all(zipValuesAll)
+            //  .then(async (results) => {console.log(results);})
               .catch(console.log);
 
           } else {
+
+            let zipValues = [];
+            let zipValues3 = [];
+            let zipValuesAll = [];
+            let arrRangeAll = [];
+            let arrFuncionsAll = [];
 
             //--------------------------------------------------------------
             // Build *dynamic* Profi params
@@ -260,10 +228,6 @@ async function profi1(months) {
             // To zip result in stack, prepair array of function and update
             //--------------------------------------------------------------
 
-            let zipValues = [];
-            let arrRange = [];
-            let arrFuncions = [];
-
             //= Zip valuses =
             values.forEach(val => {
               let arrArticles = [];
@@ -279,21 +243,6 @@ async function profi1(months) {
               ));
             });
 
-            //= Prepare array of Range =
-            for (let month in colMonths){
-              arrRange.push(list + '!' + colMonths[month][1][0] + START + ':' + colMonths[month][1][3]);
-            }
-
-            //= Prepare array of Functions =
-            zipValues.forEach((arrValues, i)=> {
-              arrFuncions.push(crud.updateData(arrValues, config.sid_2017_2.profi1, arrRange[i]));
-            });
-
-            //= Update data =
-            await Promise.all(arrFuncions)
-              .then(async (results) => {console.log(results);})
-              .catch(console.log);
-
             //--------------------------------------------------------------
             // To zip result, rend and ad in stack, prepair array of
             // function and update
@@ -306,10 +255,6 @@ async function profi1(months) {
               }
               values3[m][1] = values2[m][3];
             }
-
-            let zipValues3 = [];
-            let arrRange3 = [];
-            let arrFuncions3 = [];
 
             //= Zip valuses =
             values3.forEach(val => {
@@ -324,24 +269,29 @@ async function profi1(months) {
               ));
             });
 
+            zipValues.forEach(async (monthValues, m) => {
+              zipValuesAll.push([]);
+              monthValues.forEach(async (line, l) => {
+                zipValuesAll[m].push(_.concat(line, zipValues3[m][l]));
+              });
+            });
+
             for (let month in colMonths){
-              arrRange3.push(list + '!' + colMonths[month][1][4] + START + ':' + colMonths[month][1][5]);
+              arrRangeAll.push(list + '!' + colMonths[month][1][0] + START + ':' + colMonths[month][1][5]);
             }
 
-            zipValues3.forEach((arrValues, i) => {
-              arrFuncions3.push(crud.updateData(arrValues, config.sid_2017_2.profi1, arrRange3[i]));
+            zipValuesAll.forEach((arrValues, i) => {
+              arrFuncionsAll.push(crud.updateData(arrValues, config.sid_2017.profi1, arrRangeAll[i]));
             });
 
             //= Update data =
-            await Promise.all(arrFuncions3)
+            await Promise.all(arrFuncionsAll)
               //.then(async (results) => {console.log(results);})
-              .catch(console.log)
+              .catch(console.log);
 
           }
 
           resolve('complite!');
-
-          await sleep(15000);
 
         } //= End directions =
 
@@ -355,11 +305,8 @@ async function profi1(months) {
       // Update date-time in "Monitoring"
       //-------------------------------------------------------------
 
-      if (mode) {
-        range = 'main!C12';
-      } else {
-        range = 'main!B12';
-      }
+      range = 'main!B12';
+
       let now = new Date();
       now = [[formatDate(now)]];
 

@@ -28,7 +28,7 @@ async function domain() {
       let list = '';
       let range = '';
       const START = 7;
-      const MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+      const MONTHS = [7, 8, 9, 10, 11, 12];
       const colMonths = config.domain_colMonths_2017;
 
       //-------------------------------------------------------------

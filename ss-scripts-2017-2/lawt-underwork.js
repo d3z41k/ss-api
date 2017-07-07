@@ -12,6 +12,7 @@ async function lawtUnderwork() {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
+    const formatNumber = require('../libs/format-number');
 
     //---------------------------------------------------------------
     // Main function
@@ -24,6 +25,7 @@ async function lawtUnderwork() {
       let range = '';
       let valueUnderworkAll = [];
       const START = 10;
+      const MONTH_FACTOR = 7; // or 1 for first part of year
 
       let list = {
         'underwork': encodeURIComponent('Переработки'),
@@ -33,7 +35,7 @@ async function lawtUnderwork() {
       };
 
       range = list.underwork + '!A2:A';
-      let stuff = await crud.readData(config.sid_2017.lawt, range);
+      let stuff = await crud.readData(config.sid_2017_2.lawt, range);
 
       stuff = stuff.map(employee => {
         return employee[0];
@@ -43,7 +45,7 @@ async function lawtUnderwork() {
 
         try {
           range = list.listName(stuff[e]) + '!A' + START + ':AD';
-          let dataUnderworkRaw = await crud.readData(config.sid_2017.lawt, range);
+          let dataUnderworkRaw = await crud.readData(config.sid_2017_2.lawt, range);
 
           let dataUnderwork = dataUnderworkRaw.map((row) => {
             return [row[2], row[27], row[29]];
@@ -54,7 +56,7 @@ async function lawtUnderwork() {
 
           dataUnderwork.forEach(line => {
             if (line[2]) {
-              valueUnderwork[line[1] - 1] += Number(line[0].replace(/\,/g, '.'));
+              valueUnderwork[line[1] - MONTH_FACTOR] += formatNumber(line[0]);
             }
           });
 
@@ -66,7 +68,7 @@ async function lawtUnderwork() {
 
       range = list.underwork + '!B2:G';
 
-      await crud.updateData(valueUnderworkAll, config.sid_2017.lawt, range)
+      await crud.updateData(valueUnderworkAll, config.sid_2017_2.lawt, range)
         //.then(async result => {console.log(result);})
         .catch(console.err);
 
@@ -79,7 +81,7 @@ async function lawtUnderwork() {
       let now = new Date();
       now = [[formatDate(now)]];
 
-      await crud.updateData(now, config.sid_2017.monit, range);
+      await crud.updateData(now, config.sid_2017_2.monit, range);
 
     } // = End start function =
 

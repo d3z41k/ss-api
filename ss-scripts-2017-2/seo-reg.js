@@ -14,9 +14,8 @@ async function seoReg() {
     const formatDate = require('../libs/format-date');
     const formatNumber = require('../libs/format-number');
     //const normLength = require('../libs/normalize-length');
-    const dbRefresh = require('../models-2017-1/db_refresh');
-    const pool = require('../models-2017-1/db_pool');
-    const seoQuery = require('../models/db_seo-query');
+    const dbRefresh = require('../models-2017-2/db_refresh');
+    const pool = require('../models-2017-2/db_pool');
 
     //---------------------------------------------------------------
     // Main function
@@ -27,7 +26,7 @@ async function seoReg() {
       const crud = new Crud(auth);
 
       const START = 4;
-      const MONTHS = ['1', '2', '3', '4', '5' ,'6'];
+      const MONTHS = ['7', '8', '9', '10', '11' ,'12'];
       const ROLES = ['SEO оптимизатор', 'Копирайтер', 'Проект-менеджер', 'Верстальщик'];
 
       let valueLawtAll = [];
@@ -38,12 +37,12 @@ async function seoReg() {
         'margin': encodeURIComponent('Маржинальность'),
         'hoursWorked': encodeURIComponent('Отработанные часы'),
         'distrib': [
-          encodeURIComponent('Распределение 1'),
-          encodeURIComponent('Распределение 2'),
-          encodeURIComponent('Распределение 3'),
-          encodeURIComponent('Распределение 4'),
-          encodeURIComponent('Распределение 5'),
-          encodeURIComponent('Распределение 6')
+          encodeURIComponent('Распределение 7'),
+          encodeURIComponent('Распределение 8'),
+          encodeURIComponent('Распределение 9'),
+          encodeURIComponent('Распределение 10'),
+          encodeURIComponent('Распределение 11'),
+          encodeURIComponent('Распределение 12')
         ],
 
         'listName': function(name) {
@@ -57,7 +56,7 @@ async function seoReg() {
       //---------------------------------------------------------------------
 
       range = list.manual + '!O2:O';
-      let stuff = await crud.readData(config.sid_2017.lawt, range);
+      let stuff = await crud.readData(config.sid_2017_2.lawt, range);
 
       let crew = stuff;
 
@@ -70,12 +69,12 @@ async function seoReg() {
       });
 
       let salary = {
-        '1': [],
-        '2': [],
-        '3': [],
-        '4': [],
-        '5': [],
-        '6': []
+        '7': [],
+        '8': [],
+        '9': [],
+        '10': [],
+        '11': [],
+        '12': []
       };
 
       //---------------------------------------------------------------------
@@ -83,7 +82,7 @@ async function seoReg() {
       //---------------------------------------------------------------------
 
       range = list.margin + '!A4:A';
-      let seoProjects = await crud.readData(config.sid_2017.seo_margin, range);
+      let seoProjects = await crud.readData(config.sid_2017_2.seo_margin, range);
 
       seoProjects = seoProjects.map(project => {
         return project[0];
@@ -92,37 +91,37 @@ async function seoReg() {
       //console.log(seoProjects);
 
       let seoSalary = {
-        '1': {
+        '7': {
           'SEO оптимизатор': [],
           'Копирайтер': [],
           'Проект-менеджер': [],
           'Верстальщик': [],
         },
-        '2': {
+        '8': {
           'SEO оптимизатор': [],
           'Копирайтер': [],
           'Проект-менеджер': [],
           'Верстальщик': [],
         },
-        '3': {
+        '9': {
           'SEO оптимизатор': [],
           'Копирайтер': [],
           'Проект-менеджер': [],
           'Верстальщик': [],
         },
-        '4': {
+        '10': {
           'SEO оптимизатор': [],
           'Копирайтер': [],
           'Проект-менеджер': [],
           'Верстальщик': [],
         },
-        '5': {
+        '11': {
           'SEO оптимизатор': [],
           'Копирайтер': [],
           'Проект-менеджер': [],
           'Верстальщик': [],
         },
-        '6': {
+        '12': {
           'SEO оптимизатор': [],
           'Копирайтер': [],
           'Проект-менеджер': [],
@@ -140,7 +139,7 @@ async function seoReg() {
         let month = list.distrib[i].substr(-1);
 
         range = list.distrib[i] + '!B6:D';
-        let slaryData = await crud.readData(config.sid_2017.salary, range);
+        let slaryData = await crud.readData(config.sid_2017_2.salary, range);
 
         for (let c = 0; c < crew.length; c++) {
           for (let s = 0; s < slaryData.length; s++) {
@@ -160,7 +159,7 @@ async function seoReg() {
 
         try {
           range = list.listName(stuff[e]) + '!A3:AB';
-          let dataLawtRaw = await crud.readData(config.sid_2017.lawt, range);
+          let dataLawtRaw = await crud.readData(config.sid_2017_2.lawt, range);
 
           let dataLawt = dataLawtRaw.map((row) => {
             return [row[1], row[2], row[7], row[27]];
@@ -173,12 +172,12 @@ async function seoReg() {
             //Get Worked hours
 
             let workHours = {
-              '1': 0,
-              '2': 0,
-              '3': 0,
-              '4': 0,
-              '5': 0,
-              '6': 0
+              '7': 0,
+              '8': 0,
+              '9': 0,
+              '10': 0,
+              '11': 0,
+              '12': 0
             };
 
             dataLawt.forEach((line, l) => {
@@ -226,12 +225,12 @@ async function seoReg() {
       //console.log(seoSalary);
 
       let col_seoMargin = {
-        '1': ['E', 'H'],
-        '2': ['K', 'N'],
-        '3': ['Q', 'T'],
-        '4': ['W', 'Z'],
-        '5': ['AC', 'AF'],
-        '6': ['AI', 'AL'],
+        '7': ['E', 'H'],
+        '8': ['K', 'N'],
+        '9': ['Q', 'T'],
+        '10': ['W', 'Z'],
+        '11': ['AC', 'AF'],
+        '12': ['AI', 'AL'],
       };
 
       let dataArray = [];
@@ -253,7 +252,7 @@ async function seoReg() {
 
         range = list.margin + '!'+ col_seoMargin[MONTHS[m]][0] + START + ':' + col_seoMargin[MONTHS[m]][1];
 
-        await crud.updateData(dataArray[m], config.sid_2017.seo_margin, range)
+        await crud.updateData(dataArray[m], config.sid_2017_2.seo_margin, range)
           .then(async result => {console.log(result);})
           .catch(console.err);
 
@@ -270,7 +269,7 @@ async function seoReg() {
       // let now = new Date();
       // now = [[formatDate(now)]];
       //
-      // await crud.updateData(now, config.sid_2017.monit, range);
+      // await crud.updateData(now, config.sid_2017_2.monit, range);
 
       //resolve('complite!');
 

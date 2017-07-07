@@ -12,6 +12,7 @@ async function lawtHours() {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
+    const formatNumber = require('../libs/format-number');
 
     //---------------------------------------------------------------
     // Main function
@@ -24,7 +25,8 @@ async function lawtHours() {
       let range = '';
       let valueHoursAll = [];
       const START = 10;
-      const MONTHS = ['1', '2', '3', '4', '5' ,'6'];
+      const MONTHS = ['7', '8', '9', '10', '11', '12'];
+      const MONTH_FACTOR = 7; // or 1 for first part of year
 
       let list = {
         'hoursWorked': encodeURIComponent('Отработанные часы'),
@@ -34,7 +36,7 @@ async function lawtHours() {
       };
 
       range = list.hoursWorked + '!A3:A';
-      let stuff = await crud.readData(config.sid_2017.lawt, range);
+      let stuff = await crud.readData(config.sid_2017_2.lawt, range);
 
       stuff = stuff.map(employee => {
         return employee[0];
@@ -42,12 +44,12 @@ async function lawtHours() {
 
       for (let e = 0; e < stuff.length; e++) {
 
-        console.log(stuff[e]);
+        //console.log(stuff[e]);
 
         try {
 
           range = list.listName(stuff[e]) + '!A' + START + ':AB';
-          let dataHoursRaw = await crud.readData(config.sid_2017.lawt, range);
+          let dataHoursRaw = await crud.readData(config.sid_2017_2.lawt, range);
 
           let dataHours = dataHoursRaw.map((row) => {
             return [row[2], row[27]];
@@ -57,13 +59,13 @@ async function lawtHours() {
           let valueHours = [0, 0, 0, 0, 0, 0];
 
           dataHours.forEach(line => {
-            if (MONTHS.includes(line[1])) {
-              valueHours[line[1] - 1] += Number(line[0].replace(/\,/g, '.'));
+            if (MONTHS.includes(line[1]) && line[0]) {
+              valueHours[line[1] - MONTH_FACTOR] += formatNumber(line[0]);
             }
           });
 
-          console.log(valueHours);
-Д
+          //console.log(valueHours);
+
           valueHoursAll.push(valueHours);
 
         } catch (e) {
@@ -74,7 +76,7 @@ async function lawtHours() {
 
       range = list.hoursWorked + '!B3:G';
 
-      await crud.updateData(valueHoursAll, config.sid_2017.lawt, range)
+      await crud.updateData(valueHoursAll, config.sid_2017_2.lawt, range)
         //.then(async result => {console.log(result);})
         .catch(console.err);
 
@@ -87,7 +89,7 @@ async function lawtHours() {
       let now = new Date();
       now = [[formatDate(now)]];
 
-      await crud.updateData(now, config.sid_2017.monit, range);
+      await crud.updateData(now, config.sid_2017_2.monit, range);
 
     } // = End start function =
 

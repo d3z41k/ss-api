@@ -282,6 +282,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
                       //= Another employee
                       for (let t = 0; t < lawt.table[n].length; t++) {
                         if (lawt.table[n][t][0]
+                          && types.includes(lawt.table[n][t][1])
                           && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][mm]
                           && lawt.table[n][t][10] == params[2][p]
                           && lawt.table[n][t][2]) {
