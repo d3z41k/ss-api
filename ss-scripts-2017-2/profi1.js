@@ -1,4 +1,4 @@
- 'use strict';
+'use strict';
 
 const config = require('config');
 const _ = require('lodash/array');
@@ -281,7 +281,7 @@ async function profi1(months) {
             }
 
             zipValuesAll.forEach((arrValues, i) => {
-              arrFuncionsAll.push(crud.updateData(arrValues, config.sid_2017.profi1, arrRangeAll[i]));
+              arrFuncionsAll.push(crud.updateData(arrValues, config.sid_2017_2.profi1, arrRangeAll[i]));
             });
 
             //= Update data =
@@ -290,6 +290,8 @@ async function profi1(months) {
               .catch(console.log);
 
           }
+
+          //console.log(directions[d]);
 
           resolve('complite!');
 

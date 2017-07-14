@@ -30,12 +30,12 @@ async function salaryDistrib() {
         'calc': encodeURIComponent('Расчет ЗП'),
         'fot': encodeURIComponent('ФОТ (факт)'),
         'distrib': [
-          encodeURIComponent('Распределение 1'),
-          encodeURIComponent('Распределение 2'),
-          encodeURIComponent('Распределение 3'),
-          encodeURIComponent('Распределение 4'),
-          encodeURIComponent('Распределение 5'),
-          encodeURIComponent('Распределение 6')
+          encodeURIComponent('Распределение 7'),
+          encodeURIComponent('Распределение 8'),
+          encodeURIComponent('Распределение 9'),
+          encodeURIComponent('Распределение 10'),
+          encodeURIComponent('Распределение 11'),
+          encodeURIComponent('Распределение 12')
         ],
         'listName': function(name) {
           return encodeURIComponent(name);
@@ -70,10 +70,10 @@ async function salaryDistrib() {
           };
 
           range = list.calc + '!B11:K';
-          let dataCalcSalary = await crud.readData(config.sid_2017.salary, range);
+          let dataCalcSalary = await crud.readData(config.sid_2017_2.salary, range);
 
           range = list.distrib[d] + '!B' + START + ':C';
-          paramsDistrib = await crud.readData(config.sid_2017.salary, range);
+          paramsDistrib = await crud.readData(config.sid_2017_2.salary, range);
 
           for (let n = 0; n < paramsDistrib.length; n++) {
             for (let i = 0; i < dataCalcSalary.length; i++) {
@@ -122,8 +122,8 @@ async function salaryDistrib() {
           });
 
           await Promise.all([
-            crud.updateData(accruedSalaryNum, config.sid_2017.salary, range1),
-            crud.updateData(accruedSalaryNum, config.sid_2017.salary, range2)
+            crud.updateData(accruedSalaryNum, config.sid_2017_2.salary, range1),
+            crud.updateData(accruedSalaryNum, config.sid_2017_2.salary, range2)
           ])
           //  .then(async (results) => {console.log(results);})
             .catch(console.log);
@@ -149,7 +149,7 @@ async function salaryDistrib() {
           let dataLawt = '';
 
           range = list.distrib[d] + '!B1:I';
-          dataDistrib = await crud.readData(config.sid_2017.salary, range);
+          dataDistrib = await crud.readData(config.sid_2017_2.salary, range);
 
           paramsHours[0] = dataDistrib[0][6]; //current month
           paramsHours[1] = ['Административные задачи', 'Гарант. обслуж (сайт сдан)']; //admin type
@@ -178,7 +178,7 @@ async function salaryDistrib() {
 
             range = list.listName(employee[e]) + '!A10:E';
 
-            dataLawt = await crud.readData(config.sid_2017.lawt, range);
+            dataLawt = await crud.readData(config.sid_2017_2.lawt, range);
 
             if (dataLawt) {
 
@@ -276,7 +276,7 @@ async function salaryDistrib() {
 
           range = list.distrib[d] + '!Q' + START + ':AD';
 
-          await crud.updateData(valuesCommonTimeFinal, config.sid_2017.salary, range)
+          await crud.updateData(valuesCommonTimeFinal, config.sid_2017_2.salary, range)
           //  .then(async (results) => {console.log(results);})
             .catch(console.log);
 
@@ -285,10 +285,10 @@ async function salaryDistrib() {
           //--------------------------------------------------------------------
 
           range = list.distrib[d] + '!B' + START + ':I';
-          dataDistrib = await crud.readData(config.sid_2017.salary, range);
+          dataDistrib = await crud.readData(config.sid_2017_2.salary, range);
 
           range = list.distrib[d] + '!AF5:AQ';
-          let dataDistribDir = await crud.readData(config.sid_2017.salary, range);
+          let dataDistribDir = await crud.readData(config.sid_2017_2.salary, range);
 
           //= If existant data =
 
@@ -374,15 +374,15 @@ async function salaryDistrib() {
             // Clear old data in FOT and Distribution
 
             await Promise.all([
-              crud.updateData(zeroArray, config.sid_2017.salary, range1),
-              crud.updateData(zeroArray, config.sid_2017.salary, range2)
+              crud.updateData(zeroArray, config.sid_2017_2.salary, range1),
+              crud.updateData(zeroArray, config.sid_2017_2.salary, range2)
             ])
             //  .then(async (results) => {console.log(results);})
               .catch(console.log);
 
             await Promise.all([
-              crud.updateData(salaryDistrib, config.sid_2017.salary, range1),
-              crud.updateData(salaryDistrib, config.sid_2017.salary, range2)
+              crud.updateData(salaryDistrib, config.sid_2017_2.salary, range1),
+              crud.updateData(salaryDistrib, config.sid_2017_2.salary, range2)
             ])
             //  .then(async (results) => {console.log(results);})
               .catch(console.log);
@@ -406,7 +406,7 @@ async function salaryDistrib() {
 
       let now = new Date();
       now = [[formatDate(now)]];
-      await crud.updateData(now, config.sid_2017.monit, range);
+      await crud.updateData(now, config.sid_2017_2.monit, range);
 
       //resolve('complite!');
 

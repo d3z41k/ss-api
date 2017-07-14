@@ -86,6 +86,11 @@ router.get('/sales', async ctx => {
   const domain = require('./ss-scripts-2017-2/domain');
   ctx.body = await domain();
 
+}).get('/profi_online', async ctx => {
+
+  const profiOnline = require('./ss-scripts-2017-2/profi_online');
+  ctx.body = await profiOnline();
+
 }).get('/profi_kz', async ctx => {
 
   const profi_kz = require('./ss-scripts-2017-2/profi_kz');

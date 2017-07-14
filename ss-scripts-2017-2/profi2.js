@@ -283,7 +283,7 @@ async function profi2() {
             }
 
             zipValuesAll.forEach((arrValues, i) => {
-              arrFuncionsAll.push(crud.updateData(arrValues, config.sid_2017.profi2, arrRangeAll[i]));
+              arrFuncionsAll.push(crud.updateData(arrValues, config.sid_2017_2.profi2, arrRangeAll[i]));
             });
 
             //= Update data =
@@ -309,7 +309,7 @@ async function profi2() {
       //------------------------------------------------------------------------
 
       range = 'main!B13';
-      
+
       let now = new Date();
       now = [[formatDate(now)]];
 

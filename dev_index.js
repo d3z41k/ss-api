@@ -133,6 +133,11 @@ router.get('/sales', async ctx => {
   const profi_kz = require('./ss-scripts-2017-1/profi_kz');
   ctx.body = await profi_kz();
 
+}).get('/profi_online', async ctx => {
+
+  const profiOnline = require('./ss-scripts-2017-2/profi_online');
+  ctx.body = await profiOnline();
+
 }).get('/profi1', async ctx => {
 
   const profi1 = require('./ss-scripts-2017-1/profi1');
@@ -183,7 +188,7 @@ router.get('/sales', async ctx => {
   ctx.body = await salary();
 
 }).get('/salary-distrib', async ctx => {
-  const salaryDistrib = require('./ss-scripts-2017-1/salary-distrib');
+  const salaryDistrib = require('./ss-scripts-2017-2/salary-distrib');
   ctx.body = await salaryDistrib();
 
 }).get('/indirect/:month', async ctx => {
