@@ -35,14 +35,14 @@ async function finModelBalance() {
       //------------------------------------------------------------------------
 
       range = list.indirectFact + '!B' + START + ':EK';
-      let indirectFactData = await crud.readData(config.ssId.indirect, range);
+      let indirectFactData = await crud.readData(config.sid_2017.indirect, range);
 
       //------------------------------------------------------------------------
       // Get data from 'Fin-model 2017'
       //------------------------------------------------------------------------
 
       range = list.indirectPlan + '!B' + START + ':D';
-      let indirectPlanData = await crud.readData(config.sid_2017.fin_model, range);
+      let indirectPlanData = await crud.readData(config.sid_2017_2.fin_model, range);
 
       //------------------------------------------------------------------------
       // Main module
@@ -94,7 +94,7 @@ async function finModelBalance() {
 
       range = list.indirectPlan + '!M' + START + ':R';
 
-      await crud.updateData(balancePlanInfo, config.sid_2017.fin_model, range)
+      await crud.updateData(balancePlanInfo, config.sid_2017_2.fin_model, range)
         .then(async results => {console.log(results);})
         .catch(console.log);
 
@@ -103,10 +103,10 @@ async function finModelBalance() {
       //------------------------------------------------------------------------
 
       range = list.indirectFact + '!EF1';
-      let chekFact = await crud.readData(config.ssId.indirect, range);
+      let chekFact = await crud.readData(config.sid_2017.indirect, range);
 
       range = list.indirectPlan + '!M2';
-      let chekPlan = await crud.readData(config.sid_2017.fin_model, range);
+      let chekPlan = await crud.readData(config.sid_2017_2.fin_model, range);
 
       chekFact = chekFact[0][0] && Number(chekFact[0][0].replace(/\s/g, '').replace(/\(/g,'-').replace(/\)/g,''))
         ? Number(chekFact[0][0].replace(/\s/g, '').replace(/\(/g,'-').replace(/\)/g,'')) : 0;
@@ -117,7 +117,7 @@ async function finModelBalance() {
 
       range = list.indirectPlan + '!M1';
 
-      await crud.updateData([[chekFact - chekPlan]], config.sid_2017.fin_model, range)
+      await crud.updateData([[chekFact - chekPlan]], config.sid_2017_2.fin_model, range)
         .then(async results => {console.log(results);})
         .catch(console.log);
 

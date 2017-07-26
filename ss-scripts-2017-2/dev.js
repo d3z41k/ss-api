@@ -84,6 +84,8 @@ async function dev() {
         let prePayRange = list + '!P' + START + ':Q' + (values[0].length + START);
         let finalPayRange = list + '!T' + START + ':U' + (values[0].length + START);
 
+        console.log(values);
+
         await Promise.all([
           crud.updateData(values[0], config.sid_2017_2.dev, sellPayRange),
           crud.updateData(values[1], config.sid_2017_2.dev, prePayRange),

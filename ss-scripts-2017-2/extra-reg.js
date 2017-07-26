@@ -19,12 +19,13 @@ async function extraReg() {
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
     const normLength = require('../libs/normalize-length');
+    const normType = require('../libs/normalize-type');
     const dbRefresh = require('../models/db_refresh');
     const pool = require('../models-2017-2/db_pool');
     const extraRegQuery = require('../models-2017-2/db_extra-reg-query');
     const extraRegAddQuery = require('../models-2017-2/db_extra-reg-add-query');
-    const getRatioHours = require('../libs/extra-reg/getRatioHours');
-    const getMargin = require('../libs/extra-reg/getMargin');
+    const getRatioHours = require('./libs/extra-reg/getRatioHours');
+    const getMargin = require('./libs/extra-reg/getMargin');
     let abc = require('../libs/abc')();
 
     async function start(auth) {
@@ -123,51 +124,52 @@ async function extraReg() {
 
                //= Push start month =
                if (clientData[i][6]
-                 && clientData[i][6].slice(3, 5) < 7
                  && clientData[i][6].slice(6) == '2016') {
-                 actionMonth[x].push(1);
+                 actionMonth[x].push(7);
                } else {
-                 actionMonth[x].push(clientData[i][6] && clientData[i][6].slice(3,5) < 7
-                   ? Number(clientData[i][6].slice(3, 5)) : 1);
+                 actionMonth[x].push(clientData[i][6] && clientData[i][6].slice(3, 5) >= 7
+                   ? Number(clientData[i][6].slice(3, 5)) : 7);
                }
                //= Push end month =
                if (clientData[i][10]
-                 && clientData[i][10].slice(6) == '2016') {
+                 && (clientData[i][10].slice(6) == '2016' || clientData[i][10].slice(3, 5) < 7)) {
                  actionMonth[x].push(0);
                } else {
-                 actionMonth[x].push(clientData[i][10] && clientData[i][10].slice(3,5) < 7
-                    ? Number(clientData[i][10].slice(3, 5)) : 6);
+                 actionMonth[x].push(clientData[i][10] && clientData[i][10].slice(3, 5) >= 7
+                    ? Number(clientData[i][10].slice(3, 5)) : 12);
                }
              }
            }
             actionMonth[x].length = 2;
           }
 
-        //= Get Actual months for a projects =
-        actionMonth.forEach((months) => {
-            if (!months[1]) {
-              contractMonths.push([0]);
-            } else {
-              contractMonths.push(YEAR.slice(months[0], months[1] + 1));
-            }
-            actionMonths.push(YEAR.slice(months[0]));
-        });
-
-        //= Сut Action months for a projects =
-        actionMonths.forEach((months) => {
-          let line = months.filter((month) => {
-            return month < 7;
+          //= Get Actual months for a projects =
+          actionMonth.forEach(months => {
+              if (!months[1]) {
+                contractMonths.push([0]);
+              } else {
+                contractMonths.push(YEAR.slice(months[0], months[1] + 1));
+              }
+              actionMonths.push(YEAR.slice(months[0]));
           });
-          cutActionMonths.push(line);
-        });
 
-        //= Get Contract months for a projects =
-        contractMonths.forEach((months) => {
-          let line = months.filter((month) => {
-            return month < 7;
+          //console.log(contractMonths);
+
+          //= Сut Action months for a projects =
+          actionMonths.forEach(months => {
+            let line = months.filter(month => {
+              return month >= 7;
+            });
+            cutActionMonths.push(line);
           });
-          cutContractMonths.push(line);
-        });
+
+          //= Get Contract months for a projects =
+          contractMonths.forEach(months => {
+            let line = months.filter(month => {
+              return month >= 7;
+            });
+            cutContractMonths.push(line);
+          });
 
       } catch (e) {
         reject(e.stack);
@@ -195,7 +197,7 @@ async function extraReg() {
         for (let i = 0; i < monthAct.length; i++) {
           if (registryData[xArray[x] - START][0]  == monthAct[i][0]) {
             if (monthAct[i][1]
-              && monthAct[i][1].slice(6) == '2016') {
+              && monthAct[i][1].slice(6) == '2016' || monthAct[i][1].slice(3, 5) < 7)) {
               month = 0;
             } else {
               month = monthAct[i][1] ? Number(monthAct[i][1].substr(3, 2)) : '';
@@ -253,7 +255,7 @@ async function extraReg() {
         }
       });
 
-      let costsDataLastraw = clientDataLast.map((row) => {
+      let costsDataLastraw = clientDataLast.map(row => {
         if (row[100] && Number(row[100].replace(/\s/g, ''))) {
           return [
             row[2], Number(row[100].replace(/\s/g, ''))
@@ -516,7 +518,7 @@ async function extraReg() {
 
       let salaryData = await crud.readData(config.sid_2017_2.salary, range);
 
-      let accruedMonth = config.accruedMonth_1;
+      let accruedMonth = config.accruedMonth_2;
       let accruedIndex = {
         '7': '',
         '8': '',
@@ -656,10 +658,14 @@ async function extraReg() {
            margins.push([]);
            for (let c = 0; c < contractSum.length; c++) {
              if(contractSum[c][0] == paramsMargin[0][p]) {
-               margins[p].push(margin[p][0] ? margin[p][0] / contractSum[c][1] : 0);
+               if (contractSum[c][1]) {
+                 margins[p].push(margin[p][0] ? margin[p][0] / contractSum[c][1] : 0);
+               } else {
+                 margins[p].push(0);
+               }
 
                //= Cut to 2 number after poin =
-               margins[p][0] = margins[p][0].toFixed(2);
+               margins[p][0] = Math.round(margins[p][0] * 100) / 100;
              }
            }
          }

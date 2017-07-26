@@ -13,10 +13,10 @@ async function finState(nowMonths) {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
-    const dbRefresh = require('../models-2017-1/db_refresh');
-    const pool = require('../models-2017-1/db_pool');
+    const dbRefresh = require('../models-2017-2/db_refresh');
+    const pool = require('../models-2017-2/db_pool');
     //const sleep = require('../libs/sleep');
-    const factQuery = require('../models-2017-1/db_fact-query');
+    const factQuery = require('../models-2017-2/db_fact-query');
 
 
 
@@ -67,8 +67,8 @@ async function finState(nowMonths) {
       range2 = list.dds_olga + '!A6:AD';
 
       await Promise.all([
-        crud.readData(config.sid_2017.dds, range1),
-        crud.readData(config.sid_2017.dds, range2)
+        crud.readData(config.sid_2017_2.dds, range1),
+        crud.readData(config.sid_2017_2.dds, range2)
       ])
        .then(async ([dds_lera, dds_olga]) => {
           srcRows.lera = dds_lera;
@@ -91,7 +91,7 @@ async function finState(nowMonths) {
         range = list.mts + '!B' + START + ':B' + END;
 
         params[0] = months; //months
-        params[1] = await crud.readData(config.sid_2017.fin_state, range); //articles
+        params[1] = await crud.readData(config.sid_2017_2.fin_state, range); //articles
 
         params[1].forEach(article => {
           if (!article) {
@@ -134,7 +134,7 @@ async function finState(nowMonths) {
           //------------------------------------------------------------------------
 
             range = encodeURIComponent(division + '(план)') + '!B1:98';
-            dataModel[division] = await crud.readData(config.sid_2017.fin_model, range);
+            dataModel[division] = await crud.readData(config.sid_2017_2.fin_model, range);
 
             //console.log(params);
 
@@ -219,7 +219,7 @@ async function finState(nowMonths) {
 
 
             zipValuesDir.forEach((arrValues, m) => {
-              arrFuncions.push(crud.updateData(arrValues, config.sid_2017.fin_state, arrRange[m]));
+              arrFuncions.push(crud.updateData(arrValues, config.sid_2017_2.fin_state, arrRange[m]));
             });
 
             await Promise.all(arrFuncions)
@@ -243,7 +243,7 @@ async function finState(nowMonths) {
         [formatDate(now)]
       ];
 
-      await crud.updateData(now, config.sid_2017.monit, range)
+      await crud.updateData(now, config.sid_2017_2.monit, range)
       //.then(async (result) => {console.log(result);})
         .catch(console.log);
 

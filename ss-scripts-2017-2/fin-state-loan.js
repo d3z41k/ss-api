@@ -12,8 +12,8 @@ async function finStateLoan() {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     //const formatDate = require('../libs/format-date');
-    const dbRefresh = require('../models-2017-1/db_refresh');
-    const pool = require('../models-2017-1/db_pool');
+    const dbRefresh = require('../models-2017-2/db_refresh');
+    const pool = require('../models-2017-2/db_pool');
     const loanQuery = require('../models/db_loan-query');
     const abc = require('../libs/abc')();
 
@@ -83,7 +83,7 @@ async function finStateLoan() {
 
         range = list.loan + '!A1:AZ14';
 
-        let dataLoan = await crud.readData(config.sid_2017.fin_state, range);
+        let dataLoan = await crud.readData(config.sid_2017_2.fin_state, range);
 
         //= Build params =
 
@@ -167,8 +167,8 @@ async function finStateLoan() {
         range2 = list.loan + '!' + COL_MONTH[month][0] + '10:' + COL_MONTH[month][COL_MONTH[month].length - 1] + '14';
 
         await Promise.all([
-          crud.updateData(sumLoan, config.sid_2017.fin_state, range1),
-          crud.updateData(sumRefund, config.sid_2017.fin_state, range2)
+          crud.updateData(sumLoan, config.sid_2017_2.fin_state, range1),
+          crud.updateData(sumRefund, config.sid_2017_2.fin_state, range2)
         ])
           .then((result) => {console.log(result);})
           .catch(console.log);

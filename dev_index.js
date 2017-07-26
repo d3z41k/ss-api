@@ -36,7 +36,7 @@ router.get('/sales', async ctx => {
   const seo = require('./ss-scripts-2017-1/seo');
   ctx.body = await seo();
 
-}).get('/seo-reg', async ctx => {
+}).get('/seo-', async ctx => {
 
   const seoReg = require('./ss-scripts-2017-1/seo-reg');
   ctx.body = await seoReg();
@@ -51,14 +51,19 @@ router.get('/sales', async ctx => {
   const dev = require('./ss-scripts-2017-1/dev');
   ctx.body = await dev();
 
+}).get('/dev2', async ctx => {
+
+  const dev = require('./ss-scripts-2017-2/dev');
+  ctx.body = await dev();
+
 }).get('/dev-reg', async ctx => {
 
   const devReg = require('./ss-scripts-2017-1/dev-reg');
   ctx.body = await devReg();
 
-}).get('/_dev-reg', async ctx => {
+}).get('/dev-reg2', async ctx => {
 
-  const devReg = require('./ss-scripts-2017-1/_dev-reg');
+  const devReg = require('./ss-scripts-2017-2/dev-reg');
   ctx.body = await devReg();
 
 }).get('/dev-reg-2016', async ctx => {

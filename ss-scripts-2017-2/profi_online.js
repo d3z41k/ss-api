@@ -33,34 +33,37 @@ async function profiOnline() {
       let range1 = '';
       let range2 = '';
       let ddsDataReport = [];
+      let startRow = '';
 
       list = {
         'dds_lera': encodeURIComponent('ДДС_Лера'),
         'online': encodeURIComponent('Онлайн оплаты')
       };
 
-      range = list.online + '!K1';
+      range = list.online + '!L1';
       let lastElement = await crud.readData(config.sid_2017_2.dds, range);
       lastElement = Number(lastElement[0][0]);
 
-      range = list.online + '!K2';
-      let startRow = await crud.readData(config.sid_2017_2.dds, range);
-      startRow = Number(startRow[0][0]);
+      range = list.online + '!D1:D';
+      let onlineRow = await crud.readData(config.sid_2017_2.dds, range);
+      startRow = onlineRow.length + 1;
+
+
 
       range = list.dds_lera + '!A1:O';
       let ddsData = await crud.readData(config.sid_2017_2.dds, range);
 
 
       ddsData = ddsData.map((row) => {
-        return [row[0], row[6], row[9], row[5], row[11], row[12], row[13], row[14]];
+        return [row[0], row[6], row[9], row[5], row[10], row[11], row[12], row[13], row[14]];
       });
 
       try {
 
         for (let i = lastElement; i < ddsData.length; i++) {
           if (ARTICLES.includes(ddsData[i][2])
-            && (ddsData[i][4] || ddsData[i][7])
-            && ddsData[i][7] !== '39цветов.рф'
+            && (ddsData[i][5] || ddsData[i][8])
+            && ddsData[i][8] !== '39цветов.рф'
           ) {
             ddsDataReport.push(ddsData[i]);
           }
@@ -87,13 +90,11 @@ async function profiOnline() {
         reject(e.stack);
       }
 
-      range = list.online + '!K1';
-      range1 = list.online + '!K2';
-      range2 = list.online + '!A' + startRow + ':H';
+      range1 = list.online + '!L1';
+      range2 = list.online + '!A' + startRow + ':I';
 
       await Promise.all([
-        crud.updateData([[lastElement]], config.sid_2017_2.dds, range),
-        crud.updateData([[ddsDataReport.length + startRow]], config.sid_2017_2.dds, range1),
+        crud.updateData([[lastElement]], config.sid_2017_2.dds, range1),
         crud.updateData(ddsDataReport, config.sid_2017_2.dds, range2)
       ])
        .then(async results => {console.log(results);})

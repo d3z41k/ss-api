@@ -22,7 +22,7 @@ async function devQuery(pool, tableName, params) {
             ])
           .then(([col, feilds]) => {
             for (let key in col[0]) {
-              values[t][i].push(col[0][key] ? col[0][key] : '');
+              values[t][i].push(col[0][key] ? col[0][key] : null);
             }
 
           })
