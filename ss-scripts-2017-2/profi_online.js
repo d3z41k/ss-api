@@ -1,6 +1,7 @@
 'use strict';
 
 const config = require('config');
+const _ = require('lodash/array');
 
 async function profiOnline() {
   return new Promise(async(resolve, reject) => {
@@ -20,7 +21,10 @@ async function profiOnline() {
     async function start(auth) {
 
       const crud = new Crud(auth);
-      const START = 5;
+      const START = {
+        'dds': 6,
+        'online': 2
+      };
       const ARTICLES = [
         'Поступление от новых клиентов (продажа)',
         'Поступление денег от сущ.клиентов (предоплата)',
@@ -30,37 +34,33 @@ async function profiOnline() {
 
       let list = '';
       let range = '';
-      let range1 = '';
-      let range2 = '';
       let ddsDataReport = [];
-      let startRow = '';
 
       list = {
         'dds_lera': encodeURIComponent('ДДС_Лера'),
         'online': encodeURIComponent('Онлайн оплаты')
       };
 
-      range = list.online + '!L1';
-      let lastElement = await crud.readData(config.sid_2017_2.dds, range);
-      lastElement = Number(lastElement[0][0]);
-
-      range = list.online + '!D1:D';
-      let onlineRow = await crud.readData(config.sid_2017_2.dds, range);
-      startRow = onlineRow.length + 1;
-
-
-
-      range = list.dds_lera + '!A1:O';
+      range = list.dds_lera + '!A' + START.dds + ':O';
       let ddsData = await crud.readData(config.sid_2017_2.dds, range);
 
-
-      ddsData = ddsData.map((row) => {
-        return [row[0], row[6], row[9], row[5], row[10], row[11], row[12], row[13], row[14]];
+      ddsData = ddsData.map(row => {
+        return [
+          row[0],
+          row[6],
+          row[9],
+          row[5],
+          row[10],
+          row[11],
+          row[12],
+          row[13],
+          row[14] ? row[14] : ''
+        ];
       });
 
       try {
 
-        for (let i = lastElement; i < ddsData.length; i++) {
+        for (let i = 0; i < ddsData.length; i++) {
           if (ARTICLES.includes(ddsData[i][2])
             && (ddsData[i][5] || ddsData[i][8])
             && ddsData[i][8] !== '39цветов.рф'
@@ -69,35 +69,42 @@ async function profiOnline() {
           }
         }
 
-        for (let i = START; i < ddsData.length; i++) {
-          if (!ddsData[i][3]) {
-            if (ddsData[i + 1] && !ddsData[i + 1][3]) {
-              if (ddsData[i + 2] && !ddsData[i + 2][3]) {
-                if (ddsData[i + 3] && !ddsData[i + 3][3]) {
-                  if (ddsData[i + 4] && !ddsData[i + 4][3]) {
-                    lastElement = i;
-                    break;
-                  }
-                }
-              }
-            }
-          }
-        }
-
-      //  console.log(lastElement);
-
       } catch (e) {
         reject(e.stack);
       }
 
-      range1 = list.online + '!L1';
-      range2 = list.online + '!A' + startRow + ':I';
+      range = list.online + '!A' + START.online + ':J';
+      let onlineData = await crud.readData(config.sid_2017_2.dds, range);
 
-      await Promise.all([
-        crud.updateData([[lastElement]], config.sid_2017_2.dds, range1),
-        crud.updateData(ddsDataReport, config.sid_2017_2.dds, range2)
-      ])
-       .then(async results => {console.log(results);})
+      let onlineDataNote = onlineData.filter(line => {
+        return line[9] ? line : false;
+      });
+
+      onlineDataNote.forEach(lineOnline => {
+        let note = lineOnline.splice(-1, 1);
+        ddsDataReport.forEach((lineDds, i) => {
+          if (!_.difference(lineDds, lineOnline).length) {
+            ddsDataReport[i].push(note[0]);
+          }
+        });
+      });
+
+      let clear = [];
+
+      for (let i = 0; i < 1500; i++) {
+        clear.push([]);
+        for (let j = 0; j < 10; j++) {
+          clear[i].push('');
+        }
+      }
+
+      range = list.online + '!A' + START.online + ':J';
+      await crud.updateData(clear, config.sid_2017_2.dds, range)
+      // .then(async results => {console.log(results);})
+       .catch(console.log);
+
+      await crud.updateData(ddsDataReport, config.sid_2017_2.dds, range)
+      // .then(async results => {console.log(results);})
        .catch(console.log);
 
     } // = End start function =

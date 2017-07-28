@@ -13,7 +13,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
     let ratioAll = [];
     let factHours = [];
     let factHoursAll = [];
-    let months = [1, 2, 3, 4, 5, 6];
+    let months = [7, 8, 9, 10, 11, 12];
 
     //= Build the salaryData sum for each month =
 
@@ -116,7 +116,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
       //= Build quantinty of a projects =
       let quantityProjects = {
         'manager': {
-          '1': {
+          '7': {
             'Интеграция (AMO)': [],
             'Обслуживание (AMO)': [],
             'Виджеты разработка (AMO)': [],
@@ -124,7 +124,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
             'Доп. работы (АМО)': []
           },
 
-          '2': {
+          '8': {
             'Интеграция (AMO)': [],
             'Обслуживание (AMO)': [],
             'Виджеты разработка (AMO)': [],
@@ -132,7 +132,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
             'Доп. работы (АМО)': []
           },
 
-          '3': {
+          '9': {
             'Интеграция (AMO)': [],
             'Обслуживание (AMO)': [],
             'Виджеты разработка (AMO)': [],
@@ -140,7 +140,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
             'Доп. работы (АМО)': []
           },
 
-          '4': {
+          '10': {
             'Интеграция (AMO)': [],
             'Обслуживание (AMO)': [],
             'Виджеты разработка (AMO)': [],
@@ -148,7 +148,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
             'Доп. работы (АМО)': []
           },
 
-          '5': {
+          '11': {
             'Интеграция (AMO)': [],
             'Обслуживание (AMO)': [],
             'Виджеты разработка (AMO)': [],
@@ -156,7 +156,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
             'Доп. работы (АМО)': []
           },
 
-          '6': {
+          '12': {
             'Интеграция (AMO)': [],
             'Обслуживание (AMO)': [],
             'Виджеты разработка (AMO)': [],
@@ -166,12 +166,12 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
           }
         },
         'cto': {
-          '1': [],
-          '2': [],
-          '3': [],
-          '4': [],
-          '5': [],
-          '6': []
+          '7': [],
+          '8': [],
+          '9': [],
+          '10': [],
+          '11': [],
+          '12': []
         }
       };
 

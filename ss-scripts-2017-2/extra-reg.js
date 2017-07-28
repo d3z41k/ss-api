@@ -18,9 +18,9 @@ async function extraReg() {
 
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
+    const formatNumber = require('../libs/format-number');
     const normLength = require('../libs/normalize-length');
     const normType = require('../libs/normalize-type');
-    const dbRefresh = require('../models/db_refresh');
     const pool = require('../models-2017-2/db_pool');
     const extraRegQuery = require('../models-2017-2/db_extra-reg-query');
     const extraRegAddQuery = require('../models-2017-2/db_extra-reg-add-query');
@@ -197,7 +197,7 @@ async function extraReg() {
         for (let i = 0; i < monthAct.length; i++) {
           if (registryData[xArray[x] - START][0]  == monthAct[i][0]) {
             if (monthAct[i][1]
-              && monthAct[i][1].slice(6) == '2016' || monthAct[i][1].slice(3, 5) < 7)) {
+              && (monthAct[i][1].slice(6) == '2016' || monthAct[i][1].slice(3, 5) < 7)) {
               month = 0;
             } else {
               month = monthAct[i][1] ? Number(monthAct[i][1].substr(3, 2)) : '';
@@ -240,9 +240,9 @@ async function extraReg() {
       let clientDataLast = await crud.readData(config.sid_2017.extra, range);
 
       let debtDataLastraw = clientDataLast.map((row) => {
-        if (row[92] && Number(row[92].replace(/\s/g, ''))) {
+        if (row[92]) {
           return [
-            row[2], Number(row[92].replace(/\s/g, ''))
+            row[2], formatNumber(row[92])
           ];
         } else {
           return [];
@@ -256,9 +256,9 @@ async function extraReg() {
       });
 
       let costsDataLastraw = clientDataLast.map(row => {
-        if (row[100] && Number(row[100].replace(/\s/g, ''))) {
+        if (row[100]) {
           return [
-            row[2], Number(row[100].replace(/\s/g, ''))
+            row[2], formatNumber(row[100])
           ];
         } else {
           return [];

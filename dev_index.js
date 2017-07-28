@@ -85,9 +85,9 @@ router.get('/sales', async ctx => {
 
   const extraReg = require('./ss-scripts-2017-1/extra-reg');
   ctx.body = await extraReg();
-}).get('/extra-reg-2016', async ctx => {
+}).get('/extra-reg2', async ctx => {
 
-  const extraReg = require('./ss-scripts/extra-reg');
+  const extraReg = require('./ss-scripts-2017-2/extra-reg');
   ctx.body = await extraReg();
 
 }).get('/amo', async ctx => {
@@ -98,6 +98,11 @@ router.get('/sales', async ctx => {
 }).get('/amo-reg', async ctx => {
 
   const amoReg = require('./ss-scripts-2017-1/amo-reg');
+  ctx.body = await amoReg();
+
+}).get('/amo-reg2', async ctx => {
+
+  const amoReg = require('./ss-scripts-2017-2/amo-reg');
   ctx.body = await amoReg();
 
 }).get('/domain', async ctx => {

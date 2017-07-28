@@ -19,13 +19,12 @@ async function amoReg() {
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
     const normLength = require('../libs/normalize-length');
-    //const sleep = require('../libs/sleep');
-    //const dbRefresh = require('../models-2017-1/db_refresh');
+    const formatNumber = require('../libs/format-number');
     const pool = require('../models-2017-2/db_pool');
     const amoRegQuery = require('../models-2017-2/db_amo-reg-query');
     const amoRegAddQuery = require('../models-2017-2/db_amo-reg-add-query');
-    const getRatioHours = require('../libs/amo-reg/getRatioHours');
-    const getMargin = require('../libs/amo-reg/getMargin');
+    const getRatioHours = require('./libs/amo-reg/getRatioHours');
+    const getMargin = require('./libs/amo-reg/getMargin');
     let abc = require('../libs/abc')();
 
     async function start(auth) {
@@ -116,23 +115,23 @@ async function amoReg() {
         for (let x = 0; x < xArray.length; x++) {
           actionMonth.push([]);
           for (let i = 0; i < clientData.length; i++) {
-            if (registryData[xArray[x] - START][0] == clientData[i][0]) {
+            if (registryData[xArray[x] - START][0]  == clientData[i][0]) {
 
               //= Push start month =
-              if (clientData[i][7]
-                && clientData[i][7].slice(6) == '2016') {
-                actionMonth[x].push(1);
+              if (clientData[i][6]
+                && clientData[i][6].slice(6) == '2016') {
+                actionMonth[x].push(7);
               } else {
-                actionMonth[x].push(clientData[i][7] && clientData[i][6].slice(3, 5) < 7
-                  ? Number(clientData[i][7].slice(3, 5)) : 1);
+                actionMonth[x].push(clientData[i][6] && clientData[i][6].slice(3, 5) >= 7
+                  ? Number(clientData[i][6].slice(3, 5)) : 7);
               }
               //= Push end month =
-              if (clientData[i][11]
-                && clientData[i][11].slice(6) == '2016') {
+              if (clientData[i][10]
+                && (clientData[i][10].slice(6) == '2016' || clientData[i][10].slice(3, 5) < 7)) {
                 actionMonth[x].push(0);
               } else {
-                actionMonth[x].push(clientData[i][11] && clientData[i][11].slice(3, 5) < 7
-                   ? Number(clientData[i][11].slice(3, 5)) : 6);
+                actionMonth[x].push(clientData[i][10] && clientData[i][10].slice(3, 5) >= 7
+                   ? Number(clientData[i][10].slice(3, 5)) : 12);
               }
             }
           }
@@ -140,7 +139,7 @@ async function amoReg() {
          }
 
          //= Get Actual months for a projects =
-         actionMonth.forEach((months) => {
+         actionMonth.forEach(months => {
              if (!months[1]) {
                contractMonths.push([0]);
              } else {
@@ -149,18 +148,20 @@ async function amoReg() {
              actionMonths.push(YEAR.slice(months[0]));
          });
 
+         //console.log(contractMonths);
+
          //= Сut Action months for a projects =
-         actionMonths.forEach((months) => {
-           let line = months.filter((month) => {
-             return month < 7;
+         actionMonths.forEach(months => {
+           let line = months.filter(month => {
+             return month >= 7;
            });
            cutActionMonths.push(line);
          });
 
          //= Get Contract months for a projects =
-         contractMonths.forEach((months) => {
-           let line = months.filter((month) => {
-             return month < 7;
+         contractMonths.forEach(months => {
+           let line = months.filter(month => {
+             return month >= 7;
            });
            cutContractMonths.push(line);
          });
@@ -192,7 +193,7 @@ async function amoReg() {
         for (let i = 0; i < monthAct.length; i++) {
           if (registryData[xArray[x] - START][0]  == monthAct[i][0]) {
             if (monthAct[i][1]
-              && monthAct[i][1].slice(6) == '2016') {
+              && (monthAct[i][1].slice(6) == '2016' || monthAct[i][1].slice(3, 5) < 7)) {
               month = 0;
             } else {
               month = monthAct[i][1] ? Number(monthAct[i][1].substr(3, 2)) : '';
@@ -235,10 +236,10 @@ async function amoReg() {
 
       let clientDataLast = await crud.readData(config.sid_2017.amo, range);
 
-      let debtDataLastraw = clientDataLast.map((row) => {
-        if (row[92] && Number(row[92].replace(/\s/g, ''))) {
+      let debtDataLastraw = clientDataLast.map(row => {
+        if (row[92]) {
           return [
-            row[2], Number(row[92].replace(/\s/g, ''))
+            row[2], formatNumber(row[92])
           ];
         } else {
           return [];
@@ -251,10 +252,10 @@ async function amoReg() {
         }
       });
 
-      let costsDataLastraw = clientDataLast.map((row) => {
-        if (row[100] && Number(row[100].replace(/\s/g, ''))) {
+      let costsDataLastraw = clientDataLast.map(row => {
+        if (row[100]) {
           return [
-            row[2], Number(row[100].replace(/\s/g, ''))
+            row[2], formatNumber(row[100])
           ];
         } else {
           return [];
@@ -522,7 +523,7 @@ async function amoReg() {
 
       let salaryData = await crud.readData(config.sid_2017_2.salary, range);
 
-      let accruedMonth = config.accruedMonth_1;
+      let accruedMonth = config.accruedMonth_2;
       let accruedIndex = {
         '7': '',
         '8': '',
