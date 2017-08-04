@@ -36,9 +36,9 @@ router.get('/sales', async ctx => {
   const seo = require('./ss-scripts-2017-1/seo');
   ctx.body = await seo();
 
-}).get('/seo-', async ctx => {
+}).get('/seo-reg', async ctx => {
 
-  const seoReg = require('./ss-scripts-2017-1/seo-reg');
+  const seoReg = require('./ss-scripts-2017-2/seo-reg');
   ctx.body = await seoReg();
 
 }).get('/seo-lawt', async ctx => {
@@ -174,7 +174,7 @@ router.get('/sales', async ctx => {
 
 }).get('/profi2', async ctx => {
 
-  const profi2 = require('./ss-scripts-2017-1/profi2');
+  const profi2 = require('./ss-scripts-2017-2/profi2');
   ctx.body = await profi2();
 
 }).get('/profi2/:pre_month/:curr_month', async ctx => {
@@ -213,18 +213,18 @@ router.get('/sales', async ctx => {
 
 }).get('/fin-state/', async ctx => {
 
-  const finState = require('./ss-scripts-2017-1/fin-state');
+  const finState = require('./ss-scripts-2017-2/fin-state');
   ctx.body = await finState();
 
 }).get('/fin-state/:curr_month', async ctx => {
 
   let months = ctx.params.curr_month;
 
-  const finState = require('./ss-scripts-2017-1/fin-state');
+  const finState = require('./ss-scripts-2017-2/fin-state');
   ctx.body = await finState(months);
 }).get('/fin-state-loan', async ctx => {
 
-  const finStateLoan = require('./ss-scripts-2017-1/fin-state-loan');
+  const finStateLoan = require('./ss-scripts-2017-2/fin-state-loan');
   ctx.body = await finStateLoan();
 
 }).get('/fin-model-balance', async ctx => {

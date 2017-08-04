@@ -3,7 +3,7 @@
 const config = require('config');
 const _ = require('lodash/array');
 
-async function profi1(months) {
+async function profi1() {
   return new Promise(async (resolve, reject) => {
 
     //-------------------------------------------------------------------------
@@ -82,6 +82,8 @@ async function profi1(months) {
         //--------------------------------------------------------------
         // Start directions loop
         //--------------------------------------------------------------
+
+        resolve('complite!');
 
         for (let d = 0; d < directions.length; d++){
 
@@ -180,7 +182,7 @@ async function profi1(months) {
             }
 
             zipValuesAll.forEach((arrValues, i)=> {
-              arrFuncionsAll.push(crud.updateData(arrValues, config.sid_2017.profi1, arrRangeAll[i]));
+              arrFuncionsAll.push(crud.updateData(arrValues, config.sid_2017_2.profi1, arrRangeAll[i]));
             });
 
             //= Update data =
@@ -292,8 +294,6 @@ async function profi1(months) {
           }
 
           //console.log(directions[d]);
-
-          resolve('complite!');
 
         } //= End directions =
 

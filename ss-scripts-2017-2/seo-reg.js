@@ -88,8 +88,6 @@ async function seoReg() {
         return project[0];
       });
 
-      //console.log(seoProjects);
-
       let seoSalary = {
         '7': {
           'SEO оптимизатор': [],
@@ -136,7 +134,7 @@ async function seoReg() {
 
       for (let i = 0; i < list.distrib.length; i++) {
 
-        let month = list.distrib[i].substr(-1);
+        let month = decodeURIComponent(list.distrib[i]).match(/\d+/)[0];
 
         range = list.distrib[i] + '!B6:D';
         let slaryData = await crud.readData(config.sid_2017_2.salary, range);
@@ -256,7 +254,7 @@ async function seoReg() {
           .then(async result => {console.log(result);})
           .catch(console.err);
 
-      }
+     } //end months
 
       //console.log(dataArray);
 

@@ -12,7 +12,6 @@ async function finStateLoan() {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     //const formatDate = require('../libs/format-date');
-    const dbRefresh = require('../models-2017-2/db_refresh');
     const pool = require('../models-2017-2/db_pool');
     const loanQuery = require('../models/db_loan-query');
     const abc = require('../libs/abc')();
@@ -48,19 +47,6 @@ async function finStateLoan() {
       };
 
       let divisions = config.divisions;
-
-
-      //-------------------------------------------------------------
-      // Refresh DDS Lera
-      //-------------------------------------------------------------
-
-      range = list.dds_lera + '!A6:AC';
-
-      let dataDDS = await crud.readData(config.ssId.dds, range);
-
-      await dbRefresh(pool, 'dds_lera', dataDDS)
-        .then(async (results) => {console.log(results);})
-        .catch(console.log);
 
       //-------------------------------------------------------------
       // Main functional per each month

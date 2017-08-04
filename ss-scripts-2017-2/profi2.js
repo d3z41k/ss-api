@@ -83,6 +83,8 @@ async function profi2() {
         // Start directions loop
         //--------------------------------------------------------------
 
+        resolve('complite!');
+
         for (let d = 0; d < directions.length; d++){
 
           if (directions[d] == 'КЗ') {
@@ -180,12 +182,12 @@ async function profi2() {
             }
 
             zipValuesAll.forEach((arrValues, i)=> {
-              arrFuncionsAll.push(crud.updateData(arrValues, config.sid_2017.profi2, arrRangeAll[i]));
+              arrFuncionsAll.push(crud.updateData(arrValues, config.sid_2017_2.profi2, arrRangeAll[i]));
             });
 
             //= Update data =
             await Promise.all(zipValuesAll)
-              //.then(async (results) => {console.log(results);})
+            //  .then(async (results) => {console.log(results);})
               .catch(console.log);
 
           } else {
@@ -291,10 +293,9 @@ async function profi2() {
               //.then(async (results) => {console.log(results);})
               .catch(console.log);
 
-
           }
 
-          resolve('complite!');
+          //console.log(directions[d]);
 
         } //= End directions =
 
@@ -302,7 +303,7 @@ async function profi2() {
         reject(e.stack);
       }
 
-      //console.log('finish');
+      //console.log('finish!');
 
       //------------------------------------------------------------------------
       // Update date-time in "Monitoring"
@@ -315,12 +316,7 @@ async function profi2() {
 
       await crud.updateData(now, config.sid_2017_2.monit, range);
 
-      //resolve('complite!');
-
     } //= End start function =
-
-    //crutch for avoid timeout
-    //resolve('complite!');
 
   });
 }

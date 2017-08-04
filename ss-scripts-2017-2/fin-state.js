@@ -3,7 +3,7 @@
 const config = require('config');
 const _ = require('lodash/array');
 
-async function finState(nowMonths) {
+async function finState() {
   return new Promise(async(resolve, reject) => {
 
     //-------------------------------------------------------------------------
@@ -13,25 +13,11 @@ async function finState(nowMonths) {
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
-    const dbRefresh = require('../models-2017-2/db_refresh');
     const pool = require('../models-2017-2/db_pool');
     //const sleep = require('../libs/sleep');
     const factQuery = require('../models-2017-2/db_fact-query');
 
-
-
-    if (arguments.length) {
-      let indexMonths = config.months;
-      var months = [indexMonths[nowMonths]];
-    } else {
-      months = [1, 2, 3, 4, 5, 6];
-    }
-
-    if (months.length == 1) {
-      var mode = true;
-    } else {
-      mode = false;
-    }
+    let months = [7, 8, 9, 10, 11, 12];
 
     //---------------------------------------------------------------
     // Main function
@@ -59,30 +45,6 @@ async function finState(nowMonths) {
       let divisions = config.divisions_2017;
       let rangeDirections = config.rangeDirections;
 
-      //-------------------------------------------------------------
-      // Refresh DDS table
-      //-------------------------------------------------------------
-
-      range1 = list.dds_lera + '!A6:V';
-      range2 = list.dds_olga + '!A6:AD';
-
-      await Promise.all([
-        crud.readData(config.sid_2017_2.dds, range1),
-        crud.readData(config.sid_2017_2.dds, range2)
-      ])
-       .then(async ([dds_lera, dds_olga]) => {
-          srcRows.lera = dds_lera;
-          srcRows.olga = dds_olga;
-        })
-        .catch(console.log);
-
-      await Promise.all([
-        dbRefresh(pool, 'dds_lera', srcRows.lera),
-        dbRefresh(pool, 'dds_olga', srcRows.olga)
-      ])
-        .then(async (results) => {console.log(results);})
-        .catch(console.log);
-
       //------------------------------------------------------------------------
       // Build params
       //------------------------------------------------------------------------
@@ -98,7 +60,6 @@ async function finState(nowMonths) {
             article = '';
           }
         });
-
 
           for (let division in divisions) {
 
@@ -226,17 +187,17 @@ async function finState(nowMonths) {
             //  .then(async (results) => {console.log(results);})
               .catch(console.log);
 
+            console.log(division);
+
           } //end divisions
+
+          console.log('finish');
 
       //-------------------------------------------------------------
       // Update date-time in "Monitoring"
       //-------------------------------------------------------------
 
-      if (mode) {
-        range = 'main!C22';
-      } else {
-        range = 'main!B22';
-      }
+      range = 'main!B22';
 
       let now = new Date();
       now = [
