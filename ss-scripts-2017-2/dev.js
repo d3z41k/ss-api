@@ -11,6 +11,7 @@ async function dev() {
 
     require('../libs/auth')(start);
     const Crud = require('../controllers/crud');
+    const formatNumber = require('../libs/format-number');
     const formatDate = require('../libs/format-date');
     //const normLength = require('../libs/normalize-length');
     const dbRefresh = require('../models-2017-2/db_refresh');
@@ -79,12 +80,24 @@ async function dev() {
         //= Get values =
         let values = await devQuery(pool, 'dds_olga', paramsDevCients);
 
+        paramsDevCients[0].forEach((project, i) => {
+          if (project == 'конкрит' && values[2][i]) {
+            values[2][i][0] = formatNumber(values[2][i][0]) + 74760; // hardcode
+          }
+          if (project == 'http://www.mir-motorov.ru/' && values[2][i]) {
+            values[2][i][0] = formatNumber(values[2][i][0]) + 68400; // hardcode
+          }
+          if (project == 'пустышки39' && values[0][i]) {
+            values[0][i][0] = 69560; // hardcode
+            values[0][i][1] = '24.04.2017'; // hardcode
+          }
+
+        });
+
         //= Update data =
         let sellPayRange = list + '!L' + START + ':M' + (values[0].length + START);
         let prePayRange = list + '!P' + START + ':Q' + (values[0].length + START);
         let finalPayRange = list + '!T' + START + ':U' + (values[0].length + START);
-
-        console.log(values);
 
         await Promise.all([
           crud.updateData(values[0], config.sid_2017_2.dev, sellPayRange),

@@ -14,12 +14,12 @@ async function devRegQuery(pool, tableName, params, CREW) {
               '`Направление деятельноcти` = ? ' +
               'AND `Статья движения денег` = ? ' +
               'AND `Месяц` = ? ' +
-              'AND `Проекты разработка` LIKE ? ' +
+              'AND `Проекты разработка` = ? ' +
               'AND `Контрагент Разработка` = ?', [
                 params[0],
                 params[1][a],
                 params[2][m],
-                '%' + params[3][i] + '%',
+                params[3][i],
                 params[4][i]
               ])
             .then(([col, feilds]) => {

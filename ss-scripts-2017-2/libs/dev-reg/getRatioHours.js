@@ -20,7 +20,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
 
     //= Build the salaryData sum for each month =
 
-    console.log(cutContractMonths);
+    //console.log(cutContractMonths);
 
     try {
 
@@ -88,7 +88,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
       for (let m = 0; m < months.length; m++) {
         ratio.push([]);
           for (let d = 0; d < dividers.length; d++) {
-            div = dividers[d][1][months[m] - 1];
+            div = dividers[d][1][m];
             sal = sum[m][d];
             ratio[m].push(div ? Math.round(sal / div * 10000) / 10000 : 0);
         }
@@ -99,8 +99,6 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
           line.push(0);
         }
       });
-
-      //console.log(ratio);
 
       //= Build quantinty of a projects =
       let quantityProjects = {

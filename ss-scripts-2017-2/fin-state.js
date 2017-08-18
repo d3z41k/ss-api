@@ -30,16 +30,11 @@ async function finState() {
       const END = 100;
 
       let range = '';
-      let range1 = '';
-      let range2 = '';
+
       let list = {
         'dds_lera': encodeURIComponent('ДДС_Лера'),
         'dds_olga': encodeURIComponent('ДДС_Ольга'),
         'mts': encodeURIComponent('МТС')
-      };
-      let srcRows = {
-        lera: '',
-        olga: ''
       };
 
       let divisions = config.divisions_2017;
@@ -187,11 +182,11 @@ async function finState() {
             //  .then(async (results) => {console.log(results);})
               .catch(console.log);
 
-            console.log(division);
+            //console.log(division);
 
           } //end divisions
 
-          console.log('finish');
+          //console.log('finish');
 
       //-------------------------------------------------------------
       // Update date-time in "Monitoring"
