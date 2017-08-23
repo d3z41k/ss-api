@@ -118,20 +118,20 @@ async function amoReg() {
             if (registryData[xArray[x] - START][0]  == clientData[i][0]) {
 
               //= Push start month =
-              if (clientData[i][6]
-                && clientData[i][6].slice(6) == '2016') {
+              if (clientData[i][7]
+                && clientData[i][7].slice(6) == '2016') {
                 actionMonth[x].push(7);
               } else {
-                actionMonth[x].push(clientData[i][6] && clientData[i][6].slice(3, 5) >= 7
+                actionMonth[x].push(clientData[i][7] && clientData[i][7].slice(3, 5) >= 7
                   ? Number(clientData[i][6].slice(3, 5)) : 7);
               }
               //= Push end month =
-              if (clientData[i][10]
-                && (clientData[i][10].slice(6) == '2016' || clientData[i][10].slice(3, 5) < 7)) {
+              if (clientData[i][11]
+                && (clientData[i][11].slice(6) == '2016' || clientData[i][11].slice(3, 5) < 7)) {
                 actionMonth[x].push(0);
               } else {
-                actionMonth[x].push(clientData[i][10] && clientData[i][10].slice(3, 5) >= 7
-                   ? Number(clientData[i][10].slice(3, 5)) : 12);
+                actionMonth[x].push(clientData[i][11] && clientData[i][11].slice(3, 5) >= 7
+                   ? Number(clientData[i][11].slice(3, 5)) : 12);
               }
             }
           }
@@ -147,8 +147,6 @@ async function amoReg() {
              }
              actionMonths.push(YEAR.slice(months[0]));
          });
-
-         //console.log(contractMonths);
 
          //= Сut Action months for a projects =
          actionMonths.forEach(months => {
@@ -166,6 +164,9 @@ async function amoReg() {
            cutContractMonths.push(line);
          });
 
+         //console.log(cutContractMonths);
+
+
       } catch (e) {
         reject(e.stack);
       }
@@ -174,7 +175,7 @@ async function amoReg() {
       // Get & Insert mounth and amount of the act
       //------------------------------------------------------------------------
 
-      let monthAct = clientData.map((row) => {
+      let monthAct = clientData.map(row => {
         return [
           row[0],
           row[11] ? row[11] : 0,

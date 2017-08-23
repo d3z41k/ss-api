@@ -101,7 +101,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
       for (let m = 0; m < months.length; m++) {
         ratio.push([]);
           for (let d = 0; d < dividers.length; d++) {
-            div = dividers[d][1][months[m] - 1];
+            div = dividers[d][1][m];
             sal = sum[m][d];
             ratio[m].push(div ? Math.round(sal / div * 10000) / 10000 : 0);
           }
