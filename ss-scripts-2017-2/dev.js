@@ -43,7 +43,7 @@ async function dev() {
       //normLength(dataDDS);
 
        await dbRefresh(pool, 'dds_olga', dataDDS)
-        .then(async (result) => {console.log(result);})
+      //  .then(async (result) => {console.log(result);})
         .catch(console.log);
 
       //------------------------------------------------------------------------

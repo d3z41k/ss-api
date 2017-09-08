@@ -20,7 +20,9 @@ class Crud {
           console.log('The API returned an error: ' + err);
           reject(err);
         }
-        resolve(response.values);
+          if (response) {
+            resolve(response.values);
+          }
       });
 
     });

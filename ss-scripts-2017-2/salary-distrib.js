@@ -178,7 +178,10 @@ async function salaryDistrib() {
 
             range = list.listName(employee[e]) + '!A10:E';
 
-            dataLawt = await crud.readData(config.sid_2017_2.lawt, range);
+            dataLawt = await crud.readData(config.sid_2017_2.lawt, range)
+                        .catch(() => {
+                          console.log('Страница сотрудника не найдена в ЛУВРе!');
+                        });
 
             if (dataLawt) {
 
@@ -349,8 +352,7 @@ async function salaryDistrib() {
                 }
               }
               else {
-
-                  for (var key in salaryDirection) {
+                  for (let key in salaryDirection) {
                     if (salaryDirection[key][i]) {
                       salaryDistrib[i].push(salaryDirection[key][i][0]);
                     }

@@ -112,30 +112,30 @@ async function devReg() {
        *** Part 1 - All Plan Hourse
        ************************************************************************/
 
-      // //------------------------------------------------------------------------
-      // // Get data (hours and type) from 'normative'
-      // //------------------------------------------------------------------------
-      //
-      // range = list.normative + '!B72:C75';
-      // let normaHour = await crud.readData(config.sid_2017_2.dev, range);
-      //
-      // range = list.normative + '!B24:E48';
-      // let srcNormaType = await crud.readData(config.sid_2017_2.dev, range);
-      //
-      // let normaType = normType(srcNormaType); //normalize srcNormaType
-      //
-      // //------------------------------------------------------------------------
-      // // Get and Update allHours
-      // //------------------------------------------------------------------------
-      //
-      // let planHours = await getPlanHours(normaHour, normaType, paramsHours);
-      //
-      // range = list.development + '!K'+ xArray[0] +':K';
-      // await crud.updateData(planHours, config.sid_2017_2.dev, range)
-      //   //.then(async result => {console.log(result);})
-      //   .catch(console.err);
-      //
-      // console.log('* Get and Update allHours *');
+      //------------------------------------------------------------------------
+      // Get data (hours and type) from 'normative'
+      //------------------------------------------------------------------------
+
+      range = list.normative + '!B72:C75';
+      let normaHour = await crud.readData(config.sid_2017_2.dev, range);
+
+      range = list.normative + '!B24:E48';
+      let srcNormaType = await crud.readData(config.sid_2017_2.dev, range);
+
+      let normaType = normType(srcNormaType); //normalize srcNormaType
+
+      //------------------------------------------------------------------------
+      // Get and Update allHours
+      //------------------------------------------------------------------------
+
+      let planHours = await getPlanHours(normaHour, normaType, paramsHours);
+
+      range = list.development + '!K'+ xArray[0] +':K';
+      await crud.updateData(planHours, config.sid_2017_2.dev, range)
+        //.then(async result => {console.log(result);})
+        .catch(console.err);
+
+      console.log('* Get and Update allHours *');
 
       /*************************************************************************
        *** Part 2 - Contract sum and Action months
