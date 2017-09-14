@@ -13,9 +13,6 @@ async function seoReg() {
     const Crud = require('../controllers/crud');
     const formatDate = require('../libs/format-date');
     const formatNumber = require('../libs/format-number');
-    //const normLength = require('../libs/normalize-length');
-    const dbRefresh = require('../models-2017-2/db_refresh');
-    const pool = require('../models-2017-2/db_pool');
 
     //---------------------------------------------------------------
     // Main function
@@ -26,13 +23,12 @@ async function seoReg() {
       const crud = new Crud(auth);
 
       const START = 4;
-      const MONTHS = ['7', '8', '9', '10', '11' ,'12'];
-      const ROLES = ['SEO оптимизатор', 'Копирайтер', 'Проект-менеджер', 'Верстальщик'];
+      const COPYWRITE_RATIO = 500;
+      const MONTHS = ['7', '8', '9', '10', '11', '12'];
+      const ROLES = ['SEO оптимизатор', 'Проект-менеджер', 'Верстальщик'];
 
-      let valueLawtAll = [];
       let range = '';
       let list = {
-
         'manual': encodeURIComponent('Спр'),
         'margin': encodeURIComponent('Маржинальность'),
         'hoursWorked': encodeURIComponent('Отработанные часы'),
@@ -43,6 +39,11 @@ async function seoReg() {
           encodeURIComponent('Распределение 10'),
           encodeURIComponent('Распределение 11'),
           encodeURIComponent('Распределение 12')
+        ],
+        'copywrite': [
+          encodeURIComponent('Галина работа июль'),
+          encodeURIComponent('Галина работа август'),
+          encodeURIComponent('Галина работа сентябрь')
         ],
 
         'listName': function(name) {
@@ -141,7 +142,7 @@ async function seoReg() {
 
         for (let c = 0; c < crew.length; c++) {
           for (let s = 0; s < slaryData.length; s++) {
-            if(crew[c][0] == slaryData[s][0] && slaryData[s][2]) {
+            if (crew[c][0] == slaryData[s][0] && slaryData[s][2]) {
               salary[month][crew[c][0]] = formatNumber(slaryData[s][2]);
             }
           }
@@ -165,7 +166,7 @@ async function seoReg() {
 
           let role = dataLawt[0][0];
 
-          if(ROLES.includes(role)) {
+          if (ROLES.includes(role)) {
 
             //Get Worked hours
 
@@ -186,24 +187,24 @@ async function seoReg() {
 
             //= Get ratio =
             for (let m = 0; m < MONTHS.length; m++) {
-              if(salary[MONTHS[m]][stuff[e]] && workHours[MONTHS[m]]) {
+              if (salary[MONTHS[m]][stuff[e]] && workHours[MONTHS[m]]) {
                 salary[MONTHS[m]][stuff[e]] = salary[MONTHS[m]][stuff[e]] / workHours[MONTHS[m]];
               }
             }
 
             for (let l = 0; l < dataLawt.length; l++) {
-                for (let p = 0; p < seoProjects.length; p++) {
-                  if (dataLawt[l][1]
-                    && dataLawt[l][2]
-                    && dataLawt[l][0] === 'SEO '
-                    && MONTHS.includes(dataLawt[l][3])
-                    && dataLawt[l][2] == seoProjects[p]) {
+              for (let p = 0; p < seoProjects.length; p++) {
+                if (dataLawt[l][1]
+                  && dataLawt[l][2]
+                  && dataLawt[l][0] === 'SEO '
+                  && MONTHS.includes(dataLawt[l][3])
+                  && dataLawt[l][2] == seoProjects[p]) {
 
-                    if(seoSalary[dataLawt[l][3]][role].hasOwnProperty(seoProjects[p])) {
-                      seoSalary[dataLawt[l][3]][role][seoProjects[p]] += (formatNumber(dataLawt[l][1]) * salary[dataLawt[l][3]][stuff[e]]);
-                    } else {
-                      seoSalary[dataLawt[l][3]][role][seoProjects[p]] = (formatNumber(dataLawt[l][1]) * salary[dataLawt[l][3]][stuff[e]]);
-                    }
+                  if (seoSalary[dataLawt[l][3]][role].hasOwnProperty(seoProjects[p])) {
+                    seoSalary[dataLawt[l][3]][role][seoProjects[p]] += (formatNumber(dataLawt[l][1]) * salary[dataLawt[l][3]][stuff[e]]);
+                  } else {
+                    seoSalary[dataLawt[l][3]][role][seoProjects[p]] = (formatNumber(dataLawt[l][1]) * salary[dataLawt[l][3]][stuff[e]]);
+                  }
                 }
               }
             }
@@ -216,11 +217,35 @@ async function seoReg() {
 
       } //end staff
 
+      range = list.copywrite[0] + '!A3:S';
+      let dataCopywriteRaw = await crud.readData(config.sid_2017_2.copywrite, range);
+
+      let dataCopywrite = dataCopywriteRaw.map((row) => {
+        return [row[0], row[7], row[15], row[18]];
+      });
+
+      dataCopywrite.forEach(row => {
+        if (row[1] && row[1] !== 'нет') {
+          let month = row[1].split('.')[1];
+          month[0] === '0' ? month = month[1] : month;
+          for (let p = 0; p < seoProjects.length; p++) {
+            if (MONTHS.includes(month)
+              && row[2]
+              && row[0] == seoProjects[p]) {
+                if (seoSalary[month]['Копирайтер'].hasOwnProperty(seoProjects[p])) {
+                  seoSalary[month]['Копирайтер'][seoProjects[p]] += row[3] ? formatNumber(row[2]) * formatNumber(row[3]) : formatNumber(row[2]) * COPYWRITE_RATIO;
+                } else {
+                  seoSalary[month]['Копирайтер'][seoProjects[p]] = row[3] ? formatNumber(row[2]) * formatNumber(row[3]) : formatNumber(row[2]) * COPYWRITE_RATIO;
+                }
+              }
+            }
+          }
+      });
+
+
       //---------------------------------------------------------------------
       // Prepair data
       //---------------------------------------------------------------------
-
-      //console.log(seoSalary);
 
       let col_seoMargin = {
         '7': ['E', 'H'],
