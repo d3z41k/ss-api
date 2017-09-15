@@ -22,7 +22,7 @@ async function seoReg() {
 
       const crud = new Crud(auth);
 
-      const START = 4;
+      const START = 5;
       const COPYWRITE_RATIO = 500;
       const MONTHS = ['7', '8', '9', '10', '11', '12'];
       const ROLES = ['SEO оптимизатор', 'Проект-менеджер', 'Верстальщик'];
@@ -92,38 +92,38 @@ async function seoReg() {
       let seoSalary = {
         '7': {
           'SEO оптимизатор': [],
-          'Копирайтер': [],
           'Проект-менеджер': [],
+          'Копирайтер': [],
           'Верстальщик': [],
         },
         '8': {
           'SEO оптимизатор': [],
-          'Копирайтер': [],
           'Проект-менеджер': [],
+          'Копирайтер': [],
           'Верстальщик': [],
         },
         '9': {
           'SEO оптимизатор': [],
-          'Копирайтер': [],
           'Проект-менеджер': [],
+          'Копирайтер': [],
           'Верстальщик': [],
         },
         '10': {
           'SEO оптимизатор': [],
-          'Копирайтер': [],
           'Проект-менеджер': [],
+          'Копирайтер': [],
           'Верстальщик': [],
         },
         '11': {
           'SEO оптимизатор': [],
-          'Копирайтер': [],
           'Проект-менеджер': [],
+          'Копирайтер': [],
           'Верстальщик': [],
         },
         '12': {
           'SEO оптимизатор': [],
-          'Копирайтер': [],
           'Проект-менеджер': [],
+          'Копирайтер': [],
           'Верстальщик': [],
         },
 
@@ -217,15 +217,23 @@ async function seoReg() {
 
       } //end staff
 
-      range = list.copywrite[0] + '!A3:S';
-      let dataCopywriteRaw = await crud.readData(config.sid_2017_2.copywrite, range);
 
-      let dataCopywrite = dataCopywriteRaw.map((row) => {
-        return [row[0], row[7], row[15], row[18]];
-      });
+      let dataCopywrite = [];
+
+      for (var c = 0; c < list.copywrite.length; c++) {
+        range = list.copywrite[c] + '!A3:S';
+        let dataCopywriteRaw = await crud.readData(config.sid_2017_2.copywrite, range);
+
+        dataCopywriteRaw.forEach((row) => {
+          dataCopywrite.push([row[0], row[7], row[15], row[18]]);
+        });
+      }
 
       dataCopywrite.forEach(row => {
-        if (row[1] && row[1] !== 'нет') {
+        if (row[1]
+          && row[1] !== 'нет'
+          && row[1].length <= 10
+        ) {
           let month = row[1].split('.')[1];
           month[0] === '0' ? month = month[1] : month;
           for (let p = 0; p < seoProjects.length; p++) {
@@ -242,10 +250,11 @@ async function seoReg() {
           }
       });
 
-
       //---------------------------------------------------------------------
       // Prepair data
       //---------------------------------------------------------------------
+
+      //console.log(seoSalary);
 
       let col_seoMargin = {
         '7': ['E', 'H'],
@@ -258,12 +267,20 @@ async function seoReg() {
 
       let dataArray = [];
 
+    console.log(seoSalary);
+
       for (let m = 0; m < MONTHS.length; m++) {
         dataArray.push([]);
 
         for (let p = 0; p < seoProjects.length; p++) {
           let line = [];
+
           for (let role in seoSalary[MONTHS[m]]) {
+
+            // if (role == 'Проект-менеджер') {
+            //   console.log(seoSalary[MONTHS[m]][role]);
+            // }
+
             if (seoSalary[MONTHS[m]][role].hasOwnProperty(seoProjects[p])) {
               line.push(seoSalary[MONTHS[m]][role][seoProjects[p]])
             } else {
@@ -280,8 +297,6 @@ async function seoReg() {
           .catch(console.err);
 
      } //end months
-
-      //console.log(dataArray);
 
       //------------------------------------------------------------------------
       // Update date-time in "Monitoring"
