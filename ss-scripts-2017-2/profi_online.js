@@ -76,18 +76,22 @@ async function profiOnline() {
       range = list.online + '!A' + START.online + ':J';
       let onlineData = await crud.readData(config.sid_2017_2.dds, range);
 
-      let onlineDataNote = onlineData.filter(line => {
-        return line[9] ? line : false;
-      });
+      if (onlineData) {
 
-      onlineDataNote.forEach(lineOnline => {
-        let note = lineOnline.splice(-1, 1);
-        ddsDataReport.forEach((lineDds, i) => {
-          if (!_.difference(lineDds, lineOnline).length) {
-            ddsDataReport[i].push(note[0]);
-          }
+        let onlineDataNote = onlineData.filter(line => {
+          return line[9] ? line : false;
         });
-      });
+
+        onlineDataNote.forEach(lineOnline => {
+          let note = lineOnline.splice(-1, 1);
+          ddsDataReport.forEach((lineDds, i) => {
+            if (!_.difference(lineDds, lineOnline).length) {
+              ddsDataReport[i].push(note[0]);
+            }
+          });
+        });
+
+      }
 
       let clear = [];
 
