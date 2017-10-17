@@ -20,7 +20,7 @@ async function contextQuery(pool, tableName, params) {
                 params[0][i],
                 params[1][i],
                 params[2],
-                params[3],
+                params[3][a],
                 params[4][a]
               ])
             .then(([col, feilds]) => {

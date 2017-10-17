@@ -52,7 +52,7 @@ async function context() {
         //---------------------------------------------------------------------
 
         list = encodeURIComponent('Контекст (реестр)');
-        range = list + '!A1:AB';
+        range = list + '!A1:AC';
         let contextClients = await crud.readData(config.sid_2017_2.context, range);
 
         //---------------------------------------------------------------------
@@ -78,8 +78,8 @@ async function context() {
             }
 
             paramsContextCients[2] = m; //month
-            paramsContextCients[3].push(contextClients[2][24]); //direction
-            paramsContextCients[4].push(contextClients[3][24], contextClients[3][25], contextClients[3][26], contextClients[3][27]); // articles
+            paramsContextCients[3].push(contextClients[2][25], contextClients[2][26], contextClients[2][27], contextClients[2][28]); //direction
+            paramsContextCients[4].push(contextClients[3][25], contextClients[3][26], contextClients[3][27], contextClients[3][28]); // articles
 
           } catch (e) {
             reject(e.stack);

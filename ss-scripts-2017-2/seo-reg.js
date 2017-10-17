@@ -314,9 +314,14 @@ async function seoReg() {
             if (row[1]
               && row[1] !== 'нет'
               && row[1].length <= 10
+              && row[1].indexOf('/') === -1
             ) {
+
               let month = row[1].split('.')[1];
+
               month[0] === '0' ? month = month[1] : month;
+
+
               for (let p = 0; p < seoProjects.length; p++) {
                 if (MONTHS.includes(month)
                   && row[2]
@@ -337,6 +342,7 @@ async function seoReg() {
             if (row[1]
               && row[1] !== 'нет'
               && row[1].length <= 10
+              && row[1].indexOf('/') === -1
             ) {
               let month = row[1].split('.')[1];
               month[0] === '0' ? month = month[1] : month;
@@ -408,7 +414,7 @@ async function seoReg() {
               for (let role in seoSalary[MONTHS[m]]) {
 
                 if (seoSalary[MONTHS[m]][role].hasOwnProperty(seoProjects[p])) {
-                  line.push(seoSalary[MONTHS[m]][role][seoProjects[p]])
+                  line.push(seoSalary[MONTHS[m]][role][seoProjects[p]]);
                 } else {
                   line.push(0);
                 }
@@ -423,8 +429,6 @@ async function seoReg() {
               .catch(console.err);
           } //end months
         } //endif
-
-        console.log(DIVISION[d] + 'Finish!');
 
       } // end division
 
