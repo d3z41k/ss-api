@@ -187,7 +187,7 @@ async function extraReg() {
         ];
       });
 
-      let colsAct = config.reg_colsAct_1;
+      let colsAct = config.reg_colsAct_2;
       let endMonths = [];
 
       for (let x = 0; x < xArray.length; x++) {
