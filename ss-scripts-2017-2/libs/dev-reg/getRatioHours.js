@@ -4,7 +4,7 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
     const DIRECTION = 'Разработка сайта';
     const CTO = 'Заводов Павел';
     const MANAGER = 'Сребняк Кирилл';
-    const MANAGER1 = 'Корнюшина Светлана';
+    const MANAGER1 = 'Моисеева Надежда';
 
 
     let sal = 0;
@@ -81,8 +81,6 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
           }
         }
       }
-
-      //console.log(worksHours);
 
       //= Build ratio =
       for (let m = 0; m < months.length; m++) {
