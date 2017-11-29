@@ -44,13 +44,16 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
 
         for (let m = 0; m < months.length; m++) {
           divider = 0;
-          for (let t = 0; t < lawt.table[n].length; t++) {
-            if (lawt.table[n][t][0]
-              && Number(lawt.table[n][t][0].substr(3, 2)) == months[m]
-              && lawt.table[n][t][2]) {
-               divider += Number(lawt.table[n][t][2].replace(/,/g, '.'));
+          if (lawt.table[n]) {
+            for (let t = 0; t < lawt.table[n].length; t++) {
+              if (lawt.table[n][t][0]
+                && Number(lawt.table[n][t][0].substr(3, 2)) == months[m]
+                && lawt.table[n][t][2]) {
+                 divider += Number(lawt.table[n][t][2].replace(/,/g, '.'));
+              }
             }
           }
+
           dividers[n][1].push(Math.round(divider * 10000) / 10000);
         }
       }
@@ -66,18 +69,20 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
       };
 
       for (let n = 0; n < lawt.name.length; n++) {
-        for (let t = 0; t < lawt.table[n].length; t++) {
+        if (lawt.table[n]) {
+          for (let t = 0; t < lawt.table[n].length; t++) {
 
-          if (lawt.name[n].trim() == MANAGER
-            && lawt.table[n][t][2]) {
-             worksHours.manager.push(Number(lawt.table[n][t][2].replace(/,/g, '.')));
-          } else if (lawt.name[n].trim() == MANAGER1
-            && lawt.table[n][t][2]) {
-             worksHours.manager1.push(Number(lawt.table[n][t][2].replace(/,/g, '.')));
-          } else if(lawt.name[n].trim() == CTO
-            && lawt.table[n][t][1].trim() == DIRECTION
-            && lawt.table[n][t][2]) {
-             worksHours.cto.push(Number(lawt.table[n][t][2].replace(/,/g, '.')));
+            if (lawt.name[n].trim() == MANAGER
+              && lawt.table[n][t][2]) {
+               worksHours.manager.push(Number(lawt.table[n][t][2].replace(/,/g, '.')));
+            } else if (lawt.name[n].trim() == MANAGER1
+              && lawt.table[n][t][2]) {
+               worksHours.manager1.push(Number(lawt.table[n][t][2].replace(/,/g, '.')));
+            } else if(lawt.name[n].trim() == CTO
+              && lawt.table[n][t][1].trim() == DIRECTION
+              && lawt.table[n][t][2]) {
+               worksHours.cto.push(Number(lawt.table[n][t][2].replace(/,/g, '.')));
+            }
           }
         }
       }
@@ -153,13 +158,15 @@ async function getRatioHours(salaryData, lawt, params, cutContractMonths, accrue
                     } else {
 
                       //= Another employee
-                      for (let t = 0; t < lawt.table[n].length; t++) {
-                        if (lawt.table[n][t][0]
-                          && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][mm]
-                          && lawt.table[n][t][5] == params[2][p] //site (project name)
-                          && lawt.table[n][t][1].trim() == DIRECTION
-                          && lawt.table[n][t][2]) {
-                            factHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
+                      if (lawt.table[n]) {
+                        for (let t = 0; t < lawt.table[n].length; t++) {
+                          if (lawt.table[n][t][0]
+                            && Number(lawt.table[n][t][0].substr(3, 2)) == params[1][p][mm]
+                            && lawt.table[n][t][5] == params[2][p] //site (project name)
+                            && lawt.table[n][t][1].trim() == DIRECTION
+                            && lawt.table[n][t][2]) {
+                              factHour += Number(lawt.table[n][t][2].replace(/,/g, '.'));
+                          }
                         }
                       }
                     }

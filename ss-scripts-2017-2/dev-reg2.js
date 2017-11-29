@@ -424,24 +424,24 @@ async function devReg() {
 
       console.log('* ratioParams for Ratio and factHours *');
 
-      // /*************************************************************************
-      //  *** Part 8 - Monitioring
-      //  ************************************************************************/
-      //
-      // //-------------------------------------------------------------
-      // // Update date-time in "Monitoring"
-      // //-------------------------------------------------------------
-      //
-      // range = 'main!D4';
-      //
-      // let now = new Date();
-      // now = [
-      //   [formatDate(now)]
-      // ];
-      //
-      // await crud.updateData(now, config.sid_2017_2.monit, range)
-      // //  .then(async (result) => {console.log(result);})
-      //   .catch(console.err);
+      /*************************************************************************
+       *** Part 8 - Monitioring
+       ************************************************************************/
+
+      //-------------------------------------------------------------
+      // Update date-time in "Monitoring"
+      //-------------------------------------------------------------
+
+      range = 'main!D4';
+
+      let now = new Date();
+      now = [
+        [formatDate(now)]
+      ];
+
+      await crud.updateData(now, config.sid_2017_2.monit, range)
+      //  .then(async (result) => {console.log(result);})
+        .catch(console.err);
 
     } //= End start function =
 

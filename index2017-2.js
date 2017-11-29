@@ -53,7 +53,7 @@ router.get('/sales', async ctx => {
 
 }).get('/dev-reg', async ctx => {
 
-  const devReg = require('./ss-scripts-2017-2/dev-reg');
+  const devReg = require('./ss-scripts-2017-2/dev-reg2');
   ctx.body = await devReg();
 
 }).get('/dev-result', async ctx => {
